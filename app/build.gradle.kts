@@ -9,8 +9,6 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
 }
-group = "com.bat"
-version = "1.0-SNAPSHOT"
 
 repositories {
     // Use Maven Central for resolving dependencies.
@@ -25,6 +23,8 @@ dependencies {
 
     // This dependency is used by the application.
     implementation(libs.guava)
+    // Source: https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
+    implementation("com.mysql:mysql-connector-j:9.5.0")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
