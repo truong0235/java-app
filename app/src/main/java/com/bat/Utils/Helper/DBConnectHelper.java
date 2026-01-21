@@ -1,29 +1,24 @@
-package Utils.Helper;
+package com.bat.Utils.Helper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import Utils.Statics.Const;
+import com.bat.Utils.Statics.Const;
 
 public class DBConnectHelper {
+
     private Connection conn;
 
-    public DBConnectHelper() {
+    public DBConnectHelper() throws Exception {
         try {
-            Class.forName(Const.DBDRIVER); // often optional with modern drivers
+            Class.forName(Const.DBDRIVER); 
             connect();
-            if (conn != null) {
-                System.out.println("Connection established successfully.");
-                closeConnection();
-            } else {
-                System.out.println("Failed to establish connection.");
-            }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new Exception("Cannot established connectiont to database: " + e.getMessage(), e);
         }
     }
 
-    public void connect() {
+    public void connect() throws Exception {
         if (conn == null) {
             try {
                 String url = Const.DBURL + Const.DBNAME;
@@ -31,10 +26,12 @@ public class DBConnectHelper {
             } catch (SQLException e) {
                 throw new RuntimeException("SQL error: " + e.getMessage(), e);
             }
+        } else {
+            System.out.println("Database connection already exist.");
         }
     }
 
-    public void closeConnection() {
+    public void closeConnection() throws Exception {
         if (conn != null) {
             try {
                 conn.close();
@@ -42,6 +39,17 @@ public class DBConnectHelper {
             } catch (SQLException e) {
                 throw new RuntimeException("Error closing connection: " + e.getMessage(), e);
             }
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            DBConnectHelper dbHelper = new DBConnectHelper();
+            System.out.println("Database connection established successfully.");
+            dbHelper.closeConnection();
+            System.out.println("Database connection closed successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
