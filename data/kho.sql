@@ -92,7 +92,7 @@ CREATE TABLE product (
 CREATE TABLE import_receipt (
     import_id INT AUTO_INCREMENT PRIMARY KEY,
     import_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    status INT,
+    status TINYINT DEFAULT 1,
     total_price DECIMAL(18, 2),
     provider_id INT,
     user_id INT,

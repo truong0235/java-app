@@ -12,7 +12,7 @@
 
 ## phân công
 ### cup
- - kiểm kê, nhập, lịch sử thay đổi, thống kê,
+ - kiểm kê, nhập, lịch sử thay đổi, thống kê
 ### school
  - phân quyền, phiéu đặt hàng, xuất
 ### others
