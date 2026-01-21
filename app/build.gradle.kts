@@ -35,8 +35,12 @@ java {
 }
 
 application {
-    // Define the main class for the application.
     mainClass = "com.bat.App"
+
+    if (hasProperty("launch")) {
+        mainClass.set("${property("launch")}")
+    }
+    // Define the main class for the application.
 }
 
 tasks.named<Test>("test") {
