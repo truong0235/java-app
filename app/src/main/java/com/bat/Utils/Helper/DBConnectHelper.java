@@ -3,51 +3,45 @@ package Utils.Helper;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
-
 import Utils.Statics.Const;
 
-
 public class DBConnectHelper {
-    private static Connection conn;
-    
-    public static Connection getConnection() {
-        if (conn == null) {
-            try {
-                Class.forName(Const.DBDRIVER);
-                conn = DriverManager.getConnection(
-                        "jdbc:" + Const.DBURL + Const.DBNAME,
-                        Const.DBUSERNAME,
-                        Const.DBPASSWORD);
-            } catch (ClassNotFoundException e) {
-                System.out.println("Driver class not found: " + e.getMessage());
-            } catch (SQLException e) {
-                System.out.println("SQL error: " + e.getMessage());
+    private Connection conn;
+
+    public DBConnectHelper() {
+        try {
+            Class.forName(Const.DBDRIVER); // often optional with modern drivers
+            connect();
+            if (conn != null) {
+                System.out.println("Connection established successfully.");
+                closeConnection();
+            } else {
+                System.out.println("Failed to establish connection.");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return conn;
     }
 
-    public static void closeConnection() {
+    public void connect() {
+        if (conn == null) {
+            try {
+                String url = Const.DBURL + Const.DBNAME;
+                conn = DriverManager.getConnection(url, Const.DBUSERNAME, Const.DBPASSWORD);
+            } catch (SQLException e) {
+                throw new RuntimeException("SQL error: " + e.getMessage(), e);
+            }
+        }
+    }
+
+    public void closeConnection() {
         if (conn != null) {
             try {
                 conn.close();
                 conn = null;
             } catch (SQLException e) {
-                System.out.println("Error closing connection: " + e.getMessage());
+                throw new RuntimeException("Error closing connection: " + e.getMessage(), e);
             }
         }
     }
-
-    public static void main(String[] args) {
-        Class.forName("com.mysql.cj.jdbc.Driver"); 
-        Connection connection = DBConnectHelper.getConnection();
-        if (connection != null) {
-            System.out.println("Connection established successfully.");
-            DBConnectHelper.closeConnection();
-        } else {
-            System.out.println("Failed to establish connection.");
-        }
-    }
 }
-
