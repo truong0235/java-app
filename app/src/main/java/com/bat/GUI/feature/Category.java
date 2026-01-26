@@ -1,12 +1,10 @@
-package com.bat.GUI.Feature;
+package com.bat.GUI.feature;
 
-import java.awt.Color;
-
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Category extends JPanel{
     public Category() {
-        this.setBackground(new Color(240, 240, 10));
-        
+        this.add(new JLabel("Category Page"));
     }
 }
