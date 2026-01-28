@@ -7,10 +7,11 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import com.bat.DTO.ImportDTO;
+import com.bat.DTO.LotDTO;
 import com.bat.Utils.Helper.DBConnectHelper;
 
 public class ImportDAL {
-    public ArrayList<ImportDTO> getAllImports() {
+    public ArrayList<ImportDTO> getImports() {
         ArrayList<ImportDTO> importList = new ArrayList<>();
         try {
             DBConnectHelper db = new DBConnectHelper();
@@ -80,7 +81,23 @@ public class ImportDAL {
         return false;
     }
     
-    public boolean delete(int importId){
+    public boolean delete(int importId){ //  kiểm tra trước khi xoá -> update SL sp -> xoá  lịch sử nhập kho, các lot liên quan, import 
+        LotTransactionDAL transDAL = new LotTransactionDAL();
+        LotDAL lotDAL = new LotDAL();
+
+        ArrayList<LotDTO> lotList = lotDAL.getLotsByImpId(importId);
+        for (LotDTO lot : lotList) {
+            int lotId = lot.getLotId();
+            int prQty = lot.getInitialQuantity();
+
+            ProductDAL productDAL = new ProductDAL();
+            productDAL.updateQuantityByLotId(lotId, - prQty);
+        }
+
+        lotDAL.deleteByImpId(importId);
+        transDAL.delete(importId);
+
+
         String query = "UPDATE import_receipt SET status = 0 WHERE import_id = ?";
         try {
             DBConnectHelper db = new DBConnectHelper();

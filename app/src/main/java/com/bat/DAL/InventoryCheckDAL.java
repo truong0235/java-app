@@ -5,11 +5,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
+import com.bat.DTO.CheckDetailDTO;
 import com.bat.DTO.InventoryCheckDTO;
 import com.bat.Utils.Helper.DBConnectHelper;
 
 public class InventoryCheckDAL {
-    public ArrayList<InventoryCheckDTO> getAllInventoryChecks() {
+    public ArrayList<InventoryCheckDTO> getInventoryChecks() {
         ArrayList<InventoryCheckDTO> inventoryChecks = new ArrayList<>();
         String query = "SELECT check_id, user_id, check_date, status FROM InventoryChecks ORDER BY check_date DESC";
         try {
@@ -57,7 +58,24 @@ public class InventoryCheckDAL {
         return -1;
     }
 
-    public boolean delete(int checkId) {
+    public boolean delete(int checkId) { // update SL sp, lô -> xóa ct kiểm kê, lsu thay đổi, 
+        CheckDetailDAL checkDetailDAL = new CheckDetailDAL();
+        LotTransactionDAL lotTransactionDAL = new LotTransactionDAL();
+
+        ArrayList<CheckDetailDTO> details = checkDetailDAL.getCheckDetails(checkId);
+        for (CheckDetailDTO detail : details) {
+            int id = detail.getLotId();
+            LotDAL lotDAL = new LotDAL();
+            ProductDAL productDAL = new ProductDAL();
+
+            lotDAL.updateQuantity(id, - detail.getDifference());
+
+            productDAL.updateQuantityByLotId(id, - detail.getDifference());
+        }
+
+        checkDetailDAL.delete(checkId);
+        lotTransactionDAL.delete(checkId);
+        
         String query = "UPDATE inventory_check SET status = 0 WHERE check_id = ?";
         try{
             DBConnectHelper db = new DBConnectHelper();

@@ -7,7 +7,6 @@ import com.bat.DAL.LotDAL;
 import com.bat.DAL.LotTransactionDAL;
 import com.bat.DTO.ImportDTO;
 import com.bat.DTO.LotDTO;
-import com.bat.DTO.LotTransactionDTO;
 
 public class ImportBLL {
     private final ImportDAL importDAL = new ImportDAL();
@@ -24,33 +23,21 @@ public class ImportBLL {
     }
 
     public void LoadData() {
-        importList = importDAL.getAllImports();
+        importList = importDAL.getImports();
     }
 
-    public int add(ImportDTO imp, ArrayList<LotDTO> lotList) {
+    public boolean addImport(ImportDTO imp, ArrayList<LotDTO> lotList) {
         int result = importDAL.add(imp);
         if (result != -1) {
             for (LotDTO lot : lotList) {
-                int lotResult = lotDAL.add(lot);
-                LotTransactionDTO trans = new LotTransactionDTO(
-                    0,
-                    lotResult,
-                    result,
-                    lot.getInitialQuantity(),
-                    lot.getInitialQuantity(),
-                    lot.getImportDate(),
-                    "import"
-                );
-                int trResult = transDAL.add(trans); 
-                if (lotResult == -1 || trResult == -1) {
-                    return -1;
-                }
+                lot.setImportId(result);
+                lotDAL.add(lot);
             }
         }
-        return -1;
+        return result != -1;
     }
 
-    public boolean delete(int importId) { // xoá import, các lot liên quan, lịch sử nhập kho và kiểm tra trước khi xoá
+    public boolean cancelImport(int importId) { // xoá import, các lot liên quan, lịch sử nhập kho và kiểm tra trước khi xoá
         boolean isChecked = importDAL.checkUsedLot(importId)   ;
         if (!isChecked) {
             importDAL.delete(importId);
