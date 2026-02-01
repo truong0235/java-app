@@ -1,4 +1,4 @@
-package com.bat.GUI.Component;
+package com.bat.GUI.component;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -16,10 +16,10 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 import com.bat.GUI.Main;
-import com.bat.GUI.Panel.Home;
-import com.bat.GUI.Panel.Import;
-import com.bat.GUI.Panel.InventoryCheck;
-import com.bat.GUI.Panel.Product;
+import com.bat.GUI.panel.Home;
+import com.bat.GUI.panel.Import;
+import com.bat.GUI.panel.InventoryCheck;
+import com.bat.GUI.panel.Product;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 

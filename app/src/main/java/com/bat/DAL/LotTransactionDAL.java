@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import com.bat.DTO.LotTransactionDTO;
-import com.bat.Utils.Helper.DBConnectHelper;
+import com.bat.utils.helper.DBConnectHelper;
 
 public class LotTransactionDAL {
     public ArrayList<LotTransactionDTO> getLotTransactionsByLotId(int lotId) {

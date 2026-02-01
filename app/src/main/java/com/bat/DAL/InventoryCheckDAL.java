@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import com.bat.DTO.CheckDetailDTO;
 import com.bat.DTO.InventoryCheckDTO;
-import com.bat.Utils.Helper.DBConnectHelper;
+import com.bat.utils.helper.DBConnectHelper;
 
 public class InventoryCheckDAL {
     public ArrayList<InventoryCheckDTO> getInventoryChecks() {

@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 
 import com.bat.DTO.ProductDTO;
-import com.bat.Utils.Helper.DBConnectHelper;
+import com.bat.utils.helper.DBConnectHelper;
 
 public class ProductDAL {
     public ArrayList<ProductDTO> getProducts() {

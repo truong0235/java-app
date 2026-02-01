@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import com.bat.DTO.CheckDetailDTO;
 import com.bat.DTO.LotTransactionDTO;
-import com.bat.Utils.Helper.DBConnectHelper;
+import com.bat.utils.helper.DBConnectHelper;
 
 public class CheckDetailDAL {
     public ArrayList<CheckDetailDTO> getCheckDetails (int checkId){

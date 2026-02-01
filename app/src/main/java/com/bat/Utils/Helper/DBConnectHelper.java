@@ -1,10 +1,10 @@
-package com.bat.Utils.Helper;
+package com.bat.utils.helper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import com.bat.Utils.Statics.Const;
+import com.bat.utils.statics.Const;
 
 public class DBConnectHelper {
 
@@ -48,9 +48,9 @@ public class DBConnectHelper {
 
     public static void main(String[] args) {
         try {
-            DBConnectHelper dbHelper = new DBConnectHelper();
+            DBConnectHelper dbhelper = new DBConnectHelper();
             System.out.println("Database connection established successfully.");
-            dbHelper.closeConnection();
+            dbhelper.closeConnection();
             System.out.println("Database connection closed successfully.");
         } catch (Exception e) {
             e.printStackTrace();

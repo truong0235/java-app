@@ -1,4 +1,4 @@
-package com.bat.GUI.Component;
+package com.bat.GUI.component;
 
 public class MenuBarConfig {
     public String title;
