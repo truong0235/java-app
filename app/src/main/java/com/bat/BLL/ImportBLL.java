@@ -15,7 +15,7 @@ public class ImportBLL {
 
     ArrayList<ImportDTO> importList;
     public ImportBLL() {
-        importList = new ArrayList<>();
+        importList = importDAL.getImports();
     }
 
     public ArrayList<ImportDTO> getImportList() {

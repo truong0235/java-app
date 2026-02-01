@@ -29,7 +29,7 @@ public class IntegratedSearch extends JPanel {
         this.setLayout(bx);
 
         JPanel jpSearch = new JPanel(new BorderLayout(8,10));
-        jpSearch.setBorder(new EmptyBorder(10,10,10,10));
+        jpSearch.setBorder(new EmptyBorder(5,5,5,5));
         jpSearch.setBackground(Color.white);
         cbxChoose = new JComboBox<>(new DefaultComboBoxModel<>(str));        
         // cbxChoose.setModel(new DefaultComboBoxModel<>(str));
@@ -57,7 +57,7 @@ public class IntegratedSearch extends JPanel {
             System.err.println("Icon not found: /icon/reload.svg");
         }
         // btnReset.setPreferredSize(new Dimension(125, 0));
-        btnReset.addActionListener(this::btnResetActionPerformed);
+        // btnReset.addActionListener(this::btnResetActionPerformed);
         jpSearch.add(btnReset,BorderLayout.EAST);
         this.add(jpSearch);
     }
@@ -66,8 +66,8 @@ public class IntegratedSearch extends JPanel {
         initComponent(str);
     }
 
-    private void btnResetActionPerformed(java.awt.event.ActionEvent e) {
-        txtSearchForm.setText("");
-        cbxChoose.setSelectedIndex(0);
-    }
+    // private void btnResetActionPerformed(java.awt.event.ActionEvent e) {
+    //     txtSearchForm.setText("");
+    //     cbxChoose.setSelectedIndex(0);
+    // }
 }

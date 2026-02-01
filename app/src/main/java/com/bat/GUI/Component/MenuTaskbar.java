@@ -18,6 +18,7 @@ import javax.swing.border.EmptyBorder;
 import com.bat.GUI.Main;
 import com.bat.GUI.Panel.Home;
 import com.bat.GUI.Panel.Import;
+import com.bat.GUI.Panel.ImportManagement;
 import com.bat.GUI.Panel.InventoryCheck;
 import com.bat.GUI.Panel.Product;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
@@ -41,6 +42,7 @@ public class MenuTaskbar extends JPanel{
         {"Trang chủ", "home.svg", "trangchu"},
         {"Sản phẩm", "product.svg", "sanpham"},
         {"Phiếu nhập", "import.svg", "nhaphang"},
+        {"Mẫu", "import.svg", "nhaphang"},
         {"Phiếu kiểm kê", "check.svg", "kiemke"},
         {"Đăng xuất", "log_out.svg", "dangxuat"},
     };
@@ -208,6 +210,7 @@ public class MenuTaskbar extends JPanel{
             case "Sản phẩm" -> mainFrame.setPanel(new Product(mainFrame));
             case "Phiếu kiểm kê" -> mainFrame.setPanel(new InventoryCheck(mainFrame));
             case "Phiếu nhập" -> mainFrame.setPanel(new Import(mainFrame));
+            case "Mẫu" -> mainFrame.setPanel(new ImportManagement(mainFrame));
             default -> JOptionPane.showMessageDialog(mainFrame, "Chức năng đang phát triển!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         }
     }

@@ -5,6 +5,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -14,32 +18,84 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
-import com.bat.GUI.Component.MenuBarConfig;
+import com.bat.GUI.Component.IntegratedSearch;
 import com.bat.GUI.Component.MenuFunction;
 import com.bat.GUI.Main;
+import com.toedter.calendar.JDateChooser;
 
 public class ImportManagement extends JPanel {
-    
+    IntegratedSearch searchPanel;
+    MenuFunction menuFunction;
+    JComboBox<String> providerCbx, userCbx;
+    JDateChooser fromDateChooser, toDateChooser;
     public ImportManagement(Main main) {
+        initComponent();
+    }
+
+    public void initComponent() {
         this.setLayout(new BorderLayout());
         this.setBackground(new Color(228, 238, 255));
+        this.setBorder(new EmptyBorder(10, 10, 10, 10));
         
         // Config cho trang quản lý phiếu nhập
         String[] importButtons = {"detail", "create", "update", "delete", "export"};
         
-        String[] importSearchOptions = {"Tất cả", "Mã phiếu nhập", "Nhà cung cấp", "Ngày nhập", "Trạng thái"};
+        String[] importSearchOptions = {"Tất cả", "Mã phiếu nhập", "Nhà cung cấp", "Nhân viên nhập"};
+
+        JPanel menuBar = new JPanel(new BorderLayout());
+        menuBar.setBackground(new Color(228, 238, 255));
+        menuBar.setBorder(new EmptyBorder(0, 0, 10, 0));
         
-        MenuBarConfig importConfig = new MenuBarConfig(
-            "Quản lý phiếu nhập",
-            "Danh sách phiếu nhập hàng hóa", 
-            importButtons,
-            importSearchOptions,
-            "Nhập mã phiếu, nhà cung cấp..."
-        );
+        // Header panel với title và buttons
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
         
-        JPanel menuBar = MenuFunction.createCompleteMenuBar(importConfig);
+        // Title panel bên trái
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+        titlePanel.setOpaque(false);
+        
+        JLabel titleLabel = new JLabel("Quản lý phiếu nhập");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setForeground(new Color(33, 37, 41));
+        titleLabel.setAlignmentX(LEFT_ALIGNMENT);
+        
+        JLabel subtitleLabel = new JLabel("Danh sách phiếu nhập hàng hóa");
+        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        subtitleLabel.setForeground(new Color(108, 117, 125));
+        subtitleLabel.setAlignmentX(LEFT_ALIGNMENT);
+        subtitleLabel.setBorder(new EmptyBorder(3, 0, 0, 0));
+        
+        titlePanel.add(titleLabel);
+        titlePanel.add(subtitleLabel);
+        headerPanel.add(titlePanel, BorderLayout.WEST);
+
+        headerPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
+        
+        // Tạo MenuFunction instance để truy cập buttons HashMap
+        menuFunction = new MenuFunction(importButtons);
+        for (String btnKey : importButtons) {
+            JButton btn = menuFunction.buttons.get(btnKey);
+            btn.setActionCommand(btnKey);
+            // btn.addActionListener(this);
+        }
+        
+        headerPanel.add(menuFunction, BorderLayout.EAST);
+        menuBar.add(headerPanel, BorderLayout.NORTH);
+        
+        // Search panel ở dưới nếu có config
+        if (importSearchOptions != null) {
+            searchPanel = new IntegratedSearch(importSearchOptions);
+            searchPanel.txtSearchForm.putClientProperty("JTextField.placeholderText", "Nhập mã phiếu, nhà cung cấp..."); 
+            searchPanel.btnReset.setActionCommand("reset");
+            // searchPanel.btnReset.addActionListener(this);
+            // searchPanel.putClientProperty("FlatLaf.style", "arc: 15;");
+
+            menuBar.add(searchPanel, BorderLayout.SOUTH);
+        }
+
         this.add(menuBar, BorderLayout.NORTH);
-        
+
         // Tạo table content cho phiếu nhập
         JPanel tablePanel = createImportTablePanel();
         this.add(tablePanel, BorderLayout.CENTER);
