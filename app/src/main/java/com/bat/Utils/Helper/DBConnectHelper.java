@@ -3,6 +3,7 @@ package com.bat.Utils.Helper;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
 import com.bat.Utils.Statics.Const;
 
 public class DBConnectHelper {
@@ -18,6 +19,9 @@ public class DBConnectHelper {
         }
     }
 
+    public Connection getConnection() {
+        return conn;
+    }
     public void connect() throws Exception {
         if (conn == null) {
             try {

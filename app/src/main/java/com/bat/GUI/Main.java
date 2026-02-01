@@ -3,151 +3,102 @@ package com.bat.GUI;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Rectangle;
-import java.awt.event.FocusListener;
-import java.awt.event.FocusEvent;
+import java.awt.Insets;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.EmptyBorder;
 
-import com.bat.GUI.feature.Category;
-import com.bat.GUI.feature.Home;
-import com.bat.GUI.feature.Product;
+import com.bat.GUI.Component.MenuTaskbar;
+import com.bat.GUI.Panel.Home;
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
 
-public class Main {
-    private JFrame frame;
+public class Main extends JFrame {
+    Color MainColor = new Color(250, 250, 250);
+    private JPanel MainContent;
 
-    private JPanel rightPanel;
-    private JPanel contentPanel;
+    private MenuTaskbar menuTaskbar;
+    private Home home;
 
     public static void main(String[] args) {
-        new Main().init();
-    }
-
-    private void rightPanel() {
-        this.rightPanel = new JPanel();
-        this.rightPanel.setBackground(new Color(30, 30, 30));
-        this.rightPanel.setLayout(new BorderLayout());
-
-        this.rightPanel.add(userPanel(), BorderLayout.NORTH);
-        this.rightPanel.add(navigationPanel(), BorderLayout.CENTER);
-
-    }
-
-    private JButton navigationButton(String buttonString, JPanel panel) {
-        JButton button = new JButton();
-
-        button.setBackground(null);
-        button.setForeground(new Color(200, 200, 200));
-        button.setFocusPainted(false);
-        button.setBorder(null);
-        button.setBorderPainted(false);
-        ;
-
-        button.setPreferredSize(new Dimension(200, 40));
-        button.setMinimumSize(new Dimension(200, 40));
-        button.setMaximumSize(new Dimension(200, 40));
-
-        button.setText(buttonString);
-        button.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                button.setBackground(new Color(255, 255, 255));
-                button.setForeground(new Color(0, 0, 0));
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                button.setForeground(new Color(255, 255, 255));
-                button.setBackground(null);
-            }
+        // Cài đặt font Roboto trước
+        FlatRobotoFont.install();
+        FlatLaf.setPreferredFontFamily(FlatRobotoFont.FAMILY);
+        FlatLaf.setPreferredLightFontFamily(FlatRobotoFont.FAMILY_LIGHT);
+        FlatLaf.setPreferredSemiboldFontFamily(FlatRobotoFont.FAMILY_SEMIBOLD);
+        
+        // Thiết lập Look and Feel
+        try {
+            UIManager.setLookAndFeel(new FlatIntelliJLaf());
+        } catch (UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
+        
+        FlatIntelliJLaf.registerCustomDefaultsSource("style");
+        FlatIntelliJLaf.setup();
+        UIManager.put("Table.showVerticalLines", false);
+        UIManager.put("Table.showHorizontalLines", true);
+        UIManager.put("TextComponent.arc", 5);
+        UIManager.put("ScrollBar.thumbArc", 999);
+        UIManager.put("ScrollBar.thumbInsets", new Insets(2, 2, 2, 2));
+        UIManager.put("Button.iconTextGap", 10);
+        UIManager.put("PasswordField.showRevealButton", true);
+        UIManager.put("Table.selectionBackground", new Color(240, 247, 250));
+        UIManager.put("Table.selectionForeground", new Color(0, 0, 0));
+        UIManager.put("Table.scrollPaneBorder", new EmptyBorder(0, 0, 0, 0));
+        UIManager.put("Table.rowHeight", 40);
+        UIManager.put("TabbedPane.selectedBackground", Color.white);
+        UIManager.put("TableHeader.height", 40);
+        UIManager.put("TableHeader.font", UIManager.getFont("h4.font"));
+        UIManager.put("TableHeader.background", new Color(242, 242, 242));
+        UIManager.put("TableHeader.separatorColor", new Color(242, 242, 242));
+        UIManager.put("TableHeader.bottomSeparatorColor", new Color(242, 242, 242));
+        
+        // Khởi tạo application trên EDT
+        SwingUtilities.invokeLater(() -> {
+            new Main().init();
         });
-        button.addActionListener(e -> {
-            contentPanel.removeAll();
-            contentPanel.add(panel);
-            contentPanel.revalidate();
-            contentPanel.repaint();
-        });
-
-        return button;
     }
 
- private JPanel userPanel() {
-        JPanel userPanel = new JPanel();
-        userPanel.setBackground(new Color(30, 30, 30)); // Background color to make it visible
-        userPanel.setLayout(null); // Use null layout for absolute positioning
-
-        // Create user name label
-        JLabel userName = new JLabel("User: John Doe");
-        userName.setBounds(10, 10, 200, 20); // Set bounds (x, y, width, height)
-        userName.setForeground(new Color(200, 200, 200));
-        userPanel.add(userName);
-
-        // Create user role label
-        JLabel userRole = new JLabel("Role: Admin");
-        userRole.setBounds(10, 30, 200, 20); // Set bounds (x, y, width, height)
-        userRole.setForeground(new Color(200, 200, 200));
-        userPanel.add(userRole);
-
-        // Create logout button
-        JButton logoutButton = new JButton("Logout");
-        logoutButton.setBackground(null);
-        logoutButton.setForeground(new Color(200, 200, 200));
-        logoutButton.setBounds(10, 50, 100, 30); // Set bounds (x, y, width, height)
-
-        logoutButton.addActionListener(e -> System.out.println("Logout clicked"));
-        userPanel.add(logoutButton); // Add logout button to user panel
-
-        userPanel.setPreferredSize(new Dimension(200, 100)); // Set preferred size for the panel
-
-        return userPanel;
-    }
-
-    private JPanel navigationPanel() {
-        JPanel navPanel = new JPanel();
-        navPanel.setBackground(new Color(30, 30, 30));
-        navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
-
-        JButton productButton = navigationButton("Product", new Product());
-
-        JButton categoryButton = navigationButton("Category", new Category());
-
-        JButton navButton1 = navigationButton("Home", new Home());
-
-        navPanel.add(navButton1);
-        navPanel.add(productButton);
-        navPanel.add(categoryButton);
-        return navPanel;
-    }
-
-    private void contentPanel() {
-        this.contentPanel = new JPanel();
-        this.contentPanel.setLayout(new BorderLayout());
-    }
 
     public void init() {
-        SwingUtilities.invokeLater(() -> {
-            this.frame = new JFrame();
-            this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            this.frame.setLayout(new BorderLayout());
+        this.setTitle("Hệ thống quản lý kho sách");  
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLayout(new BorderLayout());
+        this.setSize(new Dimension(1400, 800));
+        this.setLocationRelativeTo(null);
 
-            rightPanel();
-            contentPanel();
+        // Khởi tạo các component trước khi hiển thị
+        menuTaskbar = new MenuTaskbar(this);
+        menuTaskbar.setPreferredSize(new Dimension(250, 1400));
+        this.add(menuTaskbar, BorderLayout.WEST);
 
-            frame.add(this.rightPanel, BorderLayout.WEST);
-
-            frame.add(this.contentPanel, BorderLayout.CENTER);
-
-            frame.setSize(1200, 720);
-
-            frame.setLocationRelativeTo(null);
-
-            frame.setVisible(true);
-        });
+        MainContent = new JPanel();
+        MainContent.setBackground(MainColor);
+        MainContent.setLayout(new BorderLayout(0, 0));
+        this.add(MainContent, BorderLayout.CENTER);
+        
+        home = new Home();
+        MainContent.add(home, BorderLayout.CENTER);
+        
+        // Refresh UI
+        this.revalidate();
+        this.repaint();
+        
+        // Hiển thị cuối cùng
+        this.setVisible(true);
     }
+
+    public void setPanel(JPanel pn) {
+        MainContent.removeAll();
+        MainContent.add(pn, BorderLayout.CENTER);
+        MainContent.revalidate();
+        MainContent.repaint();
+    }
+     
 }

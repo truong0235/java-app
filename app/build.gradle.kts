@@ -25,6 +25,9 @@ dependencies {
     implementation(libs.guava)
     // Source: https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
     implementation("com.mysql:mysql-connector-j:9.5.0")
+    implementation ("com.formdev:flatlaf:3.7")
+    implementation("com.formdev:flatlaf-extras:3.7")
+    implementation("com.formdev:flatlaf-fonts-roboto:2.137")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -35,7 +38,7 @@ java {
 }
 
 application {
-    mainClass = "com.bat.App"
+    mainClass = "com.bat.GUI.Main"
 
     if (hasProperty("launch")) {
         mainClass.set("${property("launch")}")
