@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import com.bat.DTO.ImportDTO;
 import com.bat.DTO.LotDTO;
-import com.bat.Utils.Helper.DBConnectHelper;
+import com.bat.utils.helper.DBConnectHelper;
 
 public class ImportDAL {
     public ArrayList<ImportDTO> getImports() {

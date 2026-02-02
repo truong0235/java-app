@@ -1,4 +1,4 @@
-package com.bat.GUI.Panel;
+package com.bat.GUI.panel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,9 +18,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
-import com.bat.GUI.Component.IntegratedSearch;
-import com.bat.GUI.Component.MenuFunction;
 import com.bat.GUI.Main;
+import com.bat.GUI.component.IntegratedSearch;
+import com.bat.GUI.component.MenuFunction;
 import com.toedter.calendar.JDateChooser;
 
 public class ImportManagement extends JPanel {

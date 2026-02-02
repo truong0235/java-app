@@ -1,5 +1,5 @@
 
-package com.bat.GUI.Component;
+package com.bat.GUI.component;
 
 import java.awt.Color;
 import java.awt.Graphics;

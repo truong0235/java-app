@@ -12,8 +12,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
-import com.bat.GUI.Component.MenuTaskbar;
-import com.bat.GUI.Panel.Home;
+import com.bat.GUI.component.MenuTaskbar;
+import com.bat.GUI.panel.Home;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;

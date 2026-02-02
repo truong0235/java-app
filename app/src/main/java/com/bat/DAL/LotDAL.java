@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import com.bat.DTO.LotDTO;
 import com.bat.DTO.LotTransactionDTO;
-import com.bat.Utils.Helper.DBConnectHelper;
+import com.bat.utils.helper.DBConnectHelper;
 
 public class LotDAL {
     public ArrayList<LotDTO> getLotsByImpId(int impId) {

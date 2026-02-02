@@ -1,4 +1,4 @@
-package com.bat.GUI.Panel;
+package com.bat.GUI.panel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -29,9 +29,9 @@ import com.bat.BLL.UserBLL;
 import com.bat.DTO.ImportDTO;
 import com.bat.DTO.ProviderDTO;
 import com.bat.DTO.UserDTO;
-import com.bat.GUI.Component.IntegratedSearch;
-import com.bat.GUI.Component.MenuFunction;
 import com.bat.GUI.Main;
+import com.bat.GUI.component.IntegratedSearch;
+import com.bat.GUI.component.MenuFunction;
 import com.toedter.calendar.JDateChooser;
 
 public class Import extends JPanel implements ActionListener {

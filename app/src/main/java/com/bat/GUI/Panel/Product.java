@@ -1,4 +1,4 @@
-package com.bat.GUI.Panel;
+package com.bat.GUI.panel;
 
 
 import javax.swing.JLabel;

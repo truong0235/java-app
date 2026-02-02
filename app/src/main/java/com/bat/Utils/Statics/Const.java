@@ -1,4 +1,4 @@
-package com.bat.Utils.Statics;
+package com.bat.utils.statics;
 
 public final class Const {
     public static final String DBURL = "jdbc:mysql://localhost:3306/";
