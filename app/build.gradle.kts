@@ -28,6 +28,7 @@ dependencies {
     implementation ("com.formdev:flatlaf:3.7")
     implementation("com.formdev:flatlaf-extras:3.7")
     implementation("com.formdev:flatlaf-fonts-roboto:2.137")
+    implementation ("com.toedter:jcalendar:1.4")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
