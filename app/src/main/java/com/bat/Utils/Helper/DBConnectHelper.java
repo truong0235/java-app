@@ -1,4 +1,4 @@
-package com.bat.utils.helper;
+package com.bat.utils.Helper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

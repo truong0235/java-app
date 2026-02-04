@@ -1,3 +1,4 @@
+package com.bat.GUI.panel;
 // package com.bat.GUI.Panel;
 
 // import java.awt.BorderLayout;
