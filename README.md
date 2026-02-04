@@ -16,4 +16,4 @@
 ### school
  - phân quyền, phiéu đặt hàng, xuất
 ### others
- - pha trà bổ cam
+ - qly san pham, danh muc; ql nguoi dung; login; khach hang; nha cung cap
