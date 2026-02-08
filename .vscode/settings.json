@@ -1,5 +1,10 @@
 {
     "java.project.sourcePaths": [
         "app/src/main/java"
-    ]
+    ],
+<<<<<<< HEAD
+    "java.compile.nullAnalysis.mode": "automatic"
+=======
+    "java.compile.nullAnalysis.mode": "disabled"
+>>>>>>> main
 }

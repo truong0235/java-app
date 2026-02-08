@@ -152,7 +152,6 @@ public class ImportManagement extends JPanel {
         // Cell renderer for status column
         table.getColumnModel().getColumn(4).setCellRenderer(new ImportStatusCellRenderer());
         
-        // Center align for some columns
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);

@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import com.bat.utils.statics.Const;
+import com.bat.utils.statics.Config;
 
 public class DBConnectHelper {
 
@@ -12,7 +12,7 @@ public class DBConnectHelper {
 
     public DBConnectHelper() throws Exception {
         try {
-            Class.forName(Const.DBDRIVER); 
+            Class.forName(Config.DBDRIVER); 
             connect();
         } catch (Exception e) {
             throw new Exception("Cannot established connectiont to database: " + e.getMessage(), e);
@@ -25,8 +25,8 @@ public class DBConnectHelper {
     public void connect() throws Exception {
         if (conn == null) {
             try {
-                String url = Const.DBURL + Const.DBNAME;
-                conn = DriverManager.getConnection(url, Const.DBUSERNAME, Const.DBPASSWORD);
+                String url = Config.DBURL + Config.DBNAME;
+                conn = DriverManager.getConnection(url, Config.DBUSERNAME, Config.DBPASSWORD);
             } catch (SQLException e) {
                 throw new RuntimeException("SQL error: " + e.getMessage(), e);
             }
