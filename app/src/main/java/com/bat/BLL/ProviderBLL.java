@@ -26,5 +26,11 @@ public class ProviderBLL {
         }
         return null;
     }
-
+    
+    public int getPrdIdByIdx(int index) {
+        if (index >= 0 && index < providers.size()) {
+            return providers.get(index).getProviderId();
+        }
+        return -1; // or throw an exception
+    }
 }

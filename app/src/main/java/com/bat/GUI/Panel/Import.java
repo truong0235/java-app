@@ -7,13 +7,21 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -29,27 +37,34 @@ import com.bat.BLL.UserBLL;
 import com.bat.DTO.ImportDTO;
 import com.bat.DTO.ProviderDTO;
 import com.bat.DTO.UserDTO;
+import com.bat.GUI.Dialog.AddImportDialog;
+import com.bat.GUI.Dialog.ReceiptDetailDialog;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
 import com.toedter.calendar.JDateChooser;
 
-public class Import extends JPanel implements ActionListener {
+public class Import extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {
     UserBLL userBLL = new UserBLL();
     ProviderBLL providerBLL = new ProviderBLL();
     ImportBLL importBLL = new ImportBLL();
 
     DefaultTableModel tableModel;
+    JTable table;
     ArrayList<ImportDTO> importList;
+    
 
     IntegratedSearch searchPanel;
     MenuFunction menuFunction;
     JComboBox<String> providerCbx, userCbx;
     JDateChooser fromDateChooser, toDateChooser;
+    Main main;
 
     public Import(Main main) {
+        this.main = main;
         initComponent();
-        loadDataTable();
+        importList = importBLL.getImportList();
+        loadDataTable(importList);
     }
 
     public void initComponent() {
@@ -109,14 +124,11 @@ public class Import extends JPanel implements ActionListener {
             searchPanel.txtSearchForm.putClientProperty("JTextField.placeholderText", "Nhập mã phiếu, nhà cung cấp..."); 
             searchPanel.btnReset.setActionCommand("reset");
             searchPanel.btnReset.addActionListener(this);
-            // searchPanel.putClientProperty("FlatLaf.style", "arc: 15;");
-
             menuBar.add(searchPanel, BorderLayout.SOUTH);
+            searchPanel.txtSearchForm.addKeyListener(this);
         }
 
         this.add(menuBar, BorderLayout.NORTH);
-
-
         
         // Tạo table content cho phiếu nhập
         JPanel tablePanel = createImportTablePanel();
@@ -159,22 +171,30 @@ public class Import extends JPanel implements ActionListener {
         }
         userPn.add(userLbl);
         userPn.add(userCbx);
+        userCbx.addItemListener(this); 
+        providerCbx.addItemListener(this);
 
         JPanel fromDatePn = new JPanel();
         fromDatePn.setLayout(new GridLayout(2,1));
         fromDatePn.setBackground(Color.WHITE);
         JLabel fromDateLbl = new JLabel("Từ ngày:");
         fromDateChooser = new JDateChooser();
+        fromDateChooser.getDateEditor().getUiComponent().setFocusable(false);
         fromDatePn.add(fromDateLbl);
         fromDatePn.add(fromDateChooser);
-
+        
         JPanel toDatePn = new JPanel();
         toDatePn.setLayout(new GridLayout(2,1));
         toDatePn.setBackground(Color.WHITE);
         JLabel toDateLbl = new JLabel("Đến ngày:");
         toDateChooser = new JDateChooser();
+        toDateChooser.getDateEditor().getUiComponent().setFocusable(false);
         toDatePn.add(toDateLbl);
         toDatePn.add(toDateChooser);
+        
+        fromDateChooser.addPropertyChangeListener(this);
+        toDateChooser.addPropertyChangeListener(this);
+
 
         panel.add(prdPn);
         panel.add(userPn);
@@ -191,7 +211,6 @@ public class Import extends JPanel implements ActionListener {
         
         // Tạo table với dữ liệu mẫu phiếu nhập
         String[] columns = {"Mã phiếu", "Nhà cung cấp", "Ngày nhập", "Nhân viên nhập" ,"Tổng tiền", "Trạng thái"};
-        
         tableModel = new DefaultTableModel(null, columns) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -199,8 +218,7 @@ public class Import extends JPanel implements ActionListener {
             }
         };
         
-        JTable table = new JTable(tableModel);
-        
+        table = new JTable(tableModel);
         // Styling table
         table.setRowHeight(45);
         table.setShowVerticalLines(false);
@@ -274,10 +292,10 @@ public class Import extends JPanel implements ActionListener {
     //     }
     // }
 
-    public void loadDataTable() {
-        importList = importBLL.getImportList();
+    public void loadDataTable(ArrayList<ImportDTO> importData) {
+        // importList = importBLL.getImportList();
         tableModel.setRowCount(0);
-        for (ImportDTO imp : importList) {
+        for (ImportDTO imp : importData) {
             Object[] rowData = {
                 imp.getReceiptId(),
                 providerBLL.getProviderNameById(imp.getProviderId()),
@@ -290,21 +308,47 @@ public class Import extends JPanel implements ActionListener {
         }
     }
 
+    public int getRowSelected() {
+        int index = table.getSelectedRow();
+        if (index == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn phiếu nhập");
+        }
+        return index;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
         switch (command) {
             case "create":
-                System.out.println("Create button clicked");
+                AddImportDialog dialog = new AddImportDialog(main);
+                dialog.setVisible(true);
+                importList = importBLL.getImportList();
+                loadDataTable(importList);
                 break;
             case "update":
                 System.out.println("Update button clicked");
                 break;
             case "delete":
-                System.out.println("Delete button clicked");
+                // System.out.println("Delete button clicked");
+                int selectedRow = getRowSelected();
+                int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu nhập đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                if (confirm == 0) {
+                    ImportDTO selectedImport = importList.get(selectedRow);
+                    if (importBLL.cancelImport(selectedImport.getReceiptId())) {
+                        importList = importBLL.getImportList();
+                        JOptionPane.showMessageDialog(null, "Xóa phiếu nhập thành công.");
+                        loadDataTable(importList);
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, "Sản phẩm trong phiếu này đã được xuất kho, không thể xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
                 break;
             case "detail":
-                System.out.println("Detail button clicked");
+                int idx = getRowSelected();
+                ReceiptDetailDialog detailDialog = new ReceiptDetailDialog(main, "Chi tiết phiếu nhập", importList.get(idx));
+                // detailDialog.setVisible(true);
                 break;
             case "export":
                 System.out.println("Export button clicked");
@@ -325,5 +369,81 @@ public class Import extends JPanel implements ActionListener {
         userCbx.setSelectedIndex(0);
         fromDateChooser.setDate(null);
         toDateChooser.setDate(null);
+    }
+
+    public boolean validateFilterInputs(){
+        // System.out.println();
+        Date fromDate = fromDateChooser.getDate();
+        Date toDate = toDateChooser.getDate();
+        Date currentDate = new Date();
+
+        if (fromDate != null && fromDate.after(currentDate)) {
+            JOptionPane.showMessageDialog(this, "Ngày bắt đầu không được lớn hơn ngày hiện tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            fromDateChooser.setDate(null);
+            return false;
+        }
+        if (toDate != null && toDate.after(currentDate)) {
+            JOptionPane.showMessageDialog(this, "Ngày kết thúc không được lớn hơn ngày hiện tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            toDateChooser.setDate(null);
+            return false;
+        }
+        if (fromDate != null && toDate != null && fromDate.after(toDate))
+        {
+            JOptionPane.showMessageDialog(this, "Ngày bắt đầu không được lớn hơn ngày kết thúc.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            fromDateChooser.setDate(null);
+            toDateChooser.setDate(null);
+            return false;
+        }
+        if (fromDate == null && toDate != null)
+        {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày bắt đầu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
+    public void filter() {
+        if (validateFilterInputs()) {
+            String searchTxt = searchPanel.txtSearchForm.getText().trim();            
+            int prdId = providerCbx.getSelectedIndex() == 0 ? 0 : providerBLL.getPrdIdByIdx(providerCbx.getSelectedIndex() - 1);
+            int userId = userCbx.getSelectedIndex() == 0 ? 0 : userBLL.getUserIdByIdx(userCbx.getSelectedIndex() - 1);
+            int searchOpt = searchPanel.cbxChoose.getSelectedIndex();
+            Date fromDate = fromDateChooser.getDate() == null ? null : fromDateChooser.getDate();
+            Date toDate = toDateChooser.getDate() == null ? null : toDateChooser.getDate();
+            ArrayList<ImportDTO> filteredImports = importBLL.searchImports(searchTxt, prdId, userId, searchOpt, fromDate, toDate);
+            loadDataTable(filteredImports);
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent ie) {
+        if (ie.getSource() == providerCbx || ie.getSource() == userCbx) {
+            filter();
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent ke) {
+        // throw new UnsupportedOperationException("Not supported yet.");
+        // System.out.println("Key typed");
+    }
+
+    @Override
+    public void keyPressed(KeyEvent ke) {
+        // throw new UnsupportedOperationException("Not supported yet.");
+        // System.out.println("Key pressed");
+    }
+
+    @Override
+    public void keyReleased(KeyEvent ke) {
+        // throw new UnsupportedOperationException("Not supported yet.");
+        filter();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent pce) {
+        if (pce.getSource() == fromDateChooser || pce.getSource() == toDateChooser) {
+            filter();
+        }
     }
 }

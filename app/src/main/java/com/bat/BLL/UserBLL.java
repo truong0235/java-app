@@ -26,4 +26,11 @@ public class UserBLL {
         }
         return null;
     }
+
+    public int getUserIdByIdx(int index) {
+        if (index >= 0 && index < users.size()) {
+            return users.get(index).getUserId();
+        }
+        return -1; // or throw an exception
+    }
 }
