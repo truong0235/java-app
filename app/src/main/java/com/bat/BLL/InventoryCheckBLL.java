@@ -1,6 +1,10 @@
 package com.bat.BLL;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.bat.DAL.CheckDetailDAL;
 import com.bat.DAL.InventoryCheckDAL;
@@ -11,13 +15,15 @@ public class InventoryCheckBLL {
     private CheckDetailDAL checkDetailDAL;
     private InventoryCheckDAL inventoryCheckDAL;
 
+    private UserBLL userBLL = new UserBLL();
+
     private ArrayList<InventoryCheckDTO> checkList;
 
     public InventoryCheckBLL() {
         inventoryCheckDAL = new InventoryCheckDAL();
         checkDetailDAL = new CheckDetailDAL();
         checkList = new ArrayList<>();
-        LoadData();
+        checkList = inventoryCheckDAL.getInventoryChecks();
     }
 
     public ArrayList<InventoryCheckDTO> getCheckList() {
@@ -30,10 +36,6 @@ public class InventoryCheckBLL {
 
     public ArrayList<CheckDetailDTO> getCheckDetails(int checkId) {
         return checkDetailDAL.getCheckDetails(checkId);
-    }
-
-    public void LoadData() {
-        checkList = inventoryCheckDAL.getInventoryChecks();
     }
 
     public boolean addCheck(InventoryCheckDTO check, ArrayList<CheckDetailDTO> dList) {
@@ -53,4 +55,51 @@ public class InventoryCheckBLL {
         return inventoryCheckDAL.delete(checkId);
     }
   
+    public ArrayList<InventoryCheckDTO> searchImports(String searchTxt, int userId, int searchOpt, Date fromDate, Date toDate) {
+        ArrayList<InventoryCheckDTO> filteredChecks = new ArrayList<>();
+        ZoneId zone = ZoneId.systemDefault();
+        
+        for (InventoryCheckDTO check : checkList) {
+            boolean matches = true;
+
+            if(!searchTxt.isEmpty()) {
+                String userName = userBLL.getUserNameById(check.getUserId()).toLowerCase();
+                String searchLower = searchTxt.toLowerCase();
+                String checkIdStr = String.valueOf(check.getCheckId());
+
+                switch (searchOpt) {
+                    case 0:
+                        matches &=  checkIdStr.contains(searchTxt)|| userName.contains(searchLower);
+                        break;
+                    case 1:
+                        matches &= checkIdStr.contains(searchTxt);
+                        break;
+                    case 2:
+                        matches &= userName.contains(searchLower);
+                        break;
+                    default:
+                        throw new AssertionError();
+                }
+            }
+
+            if (userId != 0) {
+                matches &= (check.getUserId() == userId);
+            }
+
+            if (fromDate != null) {
+                LocalDateTime fromDT = LocalDateTime.ofInstant(fromDate.toInstant(), zone).with(LocalTime.MIN);
+                matches &= !check.getCheckDate().isBefore(fromDT);
+            }
+
+            if (toDate != null) {
+                LocalDateTime toDT = LocalDateTime.ofInstant(toDate.toInstant(), zone).with(LocalTime.MAX);
+                matches &= !check.getCheckDate().isAfter(toDT);
+            }
+
+            if (matches) {
+                filteredChecks.add(check);
+            }
+        }
+        return filteredChecks;
+    }
 }

@@ -12,7 +12,7 @@ import com.bat.utils.helper.DBConnectHelper;
 public class InventoryCheckDAL {
     public ArrayList<InventoryCheckDTO> getInventoryChecks() {
         ArrayList<InventoryCheckDTO> inventoryChecks = new ArrayList<>();
-        String query = "SELECT check_id, user_id, check_date, status FROM InventoryChecks ORDER BY check_date DESC";
+        String query = "SELECT check_id, user_id, check_date, status FROM inventory_check ORDER BY check_date DESC";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -36,7 +36,7 @@ public class InventoryCheckDAL {
     }
 
     public int add(InventoryCheckDTO check){
-        String query = "INSERT INTO InventoryChecks (user_id, status) VALUES (?, ?)";
+        String query = "INSERT INTO inventory_check (user_id, status) VALUES (?, ?)";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
