@@ -35,6 +35,8 @@ import com.bat.BLL.InventoryCheckBLL;
 import com.bat.BLL.UserBLL;
 import com.bat.DTO.InventoryCheckDTO;
 import com.bat.DTO.UserDTO;
+import com.bat.GUI.Dialog.AddCheckDialog;
+import com.bat.GUI.Dialog.CheckDetailDialog;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
@@ -253,36 +255,33 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
         switch (command) {
-        //     case "create":
-        //         AddImportDialog dialog = new AddImportDialog(main);
-        //         dialog.setVisible(true);
-        //         checkList = checkBLL.getImportList();
-        //         loadDataTable(checkList);
-        //         break;
-        //     case "update":
-        //         System.out.println("Update button clicked");
-        //         break;
-        //     case "delete":
-        //         // System.out.println("Delete button clicked");
-        //         int selectedRow = getRowSelected();
-        //         int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu nhập đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-        //         if (confirm == 0) {
-        //             ImportDTO selectedImport = checkList.get(selectedRow);
-        //             if (checkBLL.cancelImport(selectedImport.getReceiptId())) {
-        //                 checkList = checkBLL.getImportList();
-        //                 JOptionPane.showMessageDialog(null, "Xóa phiếu nhập thành công.");
-        //                 loadDataTable(checkList);
-        //             }
-        //             else {
-        //                 JOptionPane.showMessageDialog(null, "Sản phẩm trong phiếu này đã được xuất kho, không thể xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-        //             }
-        //         }
-        //         break;
-        //     case "detail":
-        //         int idx = getRowSelected();
-        //         ReceiptDetailDialog detailDialog = new ReceiptDetailDialog(main, "Chi tiết phiếu nhập", checkList.get(idx));
-        //         // detailDialog.setVisible(true);
-        //         break;
+            case "create":
+                AddCheckDialog dialog = new AddCheckDialog(main);
+                dialog.setVisible(true);
+                checkList = checkBLL.getCheckList();
+                loadDataTable(checkList);
+                break;
+            case "delete":
+                // System.out.println("Delete button clicked");
+                int selectedRow = getRowSelected();
+                int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu kiểm kê đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                if (confirm == 0) {
+                    InventoryCheckDTO selectedCheck = checkList.get(selectedRow);
+                    if (checkBLL.cancelCheck(selectedCheck.getCheckId())) {
+                        checkList = checkBLL.getCheckList();
+                        JOptionPane.showMessageDialog(null, "Xóa phiếu kiểm kê thành công.");
+                        loadDataTable(checkList);
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, "Sản phẩm trong phiếu này đã được xuất kho, không thể xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+                break;
+            case "detail":
+                int idx = getRowSelected();
+                CheckDetailDialog detailDialog = new CheckDetailDialog(main, checkList.get(idx));
+                // detailDialog.setVisible(true);
+                break;
         //     case "export":
         //         System.out.println("Export button clicked");
         //         break;

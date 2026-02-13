@@ -13,7 +13,7 @@ public class CheckDetailDAL {
         ArrayList<CheckDetailDTO> list = new ArrayList<>();
         try {
             DBConnectHelper db = new DBConnectHelper();
-            String query = "SELECT * FROM check_detail WHERE check_id = ?";
+            String query = "SELECT * FROM inventory_check_detail WHERE check_id = ?";
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, checkId);
@@ -35,7 +35,7 @@ public class CheckDetailDAL {
     }
 
     public boolean add (CheckDetailDTO detail){
-        String query = "INSERT INTO check_detail (check_id, lot_id, difference, actual_quantity, system_quantity) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO inventory_check_detail (check_id, lot_id, difference, actual_quantity, system_quantity) VALUES (?, ?, ?, ?, ?)";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -78,7 +78,7 @@ public class CheckDetailDAL {
 
     public boolean delete(int checkId){
         // cân nhắc xóa mềm 
-        String query = "DELETE FROM check_detail WHERE check_id = ?";
+        String query = "DELETE FROM inventory_check_detail WHERE check_id = ?";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();

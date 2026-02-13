@@ -13,6 +13,36 @@ import com.bat.DTO.ProductDTO;
 import com.bat.utils.helper.DBConnectHelper;
 
 public class LotDAL {
+    public ArrayList<LotDTO> getLots() {
+        ArrayList<LotDTO> lotList = new ArrayList<>();
+        String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id " + 
+                        "FROM Lot";
+        try {
+            DBConnectHelper db = new DBConnectHelper();
+            Connection conn = db.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query);
+            ResultSet rs = (ResultSet) ps.executeQuery();
+            while(rs.next()) {
+                LotDTO lot = new LotDTO(
+                    rs.getInt("lot_id"),
+                    rs.getString("lot_code"),
+                    rs.getInt("product_id"),
+                    rs.getInt("import_id"),
+                    rs.getInt("initial_quantity"),
+                    rs.getInt("quantity"),
+                    rs.getBigDecimal("import_price"),
+                    rs.getInt("print_year"),
+                    rs.getString("status"),
+                    rs.getTimestamp("import_date").toLocalDateTime()
+                );
+                lotList.add(lot);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lotList;
+    }
+
     public ArrayList<LotDTO> getLotsByImpId(int impId) {
         ArrayList<LotDTO> lotList = new ArrayList<>();
         String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id " + 
@@ -46,7 +76,7 @@ public class LotDAL {
 
     public ArrayList<LotDTO> getLotsByProductId(int productId) {
         ArrayList<LotDTO> lotList = new ArrayList<>();
-        String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id" + 
+        String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id " + 
                         "FROM Lot WHERE product_id = ?";
         try {
             DBConnectHelper db = new DBConnectHelper();
@@ -76,7 +106,7 @@ public class LotDAL {
     }
 
     public LotDTO getLotById(int lotId) {
-        String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id" + 
+        String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id " + 
                         "FROM Lot WHERE lot_id = ?";
         try {
             DBConnectHelper db = new DBConnectHelper();

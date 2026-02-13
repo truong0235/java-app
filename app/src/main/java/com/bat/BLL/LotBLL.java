@@ -11,8 +11,20 @@ public class LotBLL {
     public LotBLL() {
     }
 
+    public ArrayList<LotDTO> getLots() {
+        return lotDAL.getLots();
+    }
+
     public boolean isLotCodeExist(String lotCode) {
         return lotDAL.isLotCodeExists(lotCode);
+    }
+
+    public LotDTO getLotById(int lotId) {
+        return lotDAL.getLotById(lotId);
+    }
+
+    public ArrayList<LotDTO> getLotsByProductId(int productId) {
+        return lotDAL.getLotsByProductId(productId);
     }
 
     public ArrayList<LotDTO> getLotsByImportId(int importId) {

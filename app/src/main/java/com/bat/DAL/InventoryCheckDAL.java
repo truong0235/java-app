@@ -12,7 +12,7 @@ import com.bat.utils.helper.DBConnectHelper;
 public class InventoryCheckDAL {
     public ArrayList<InventoryCheckDTO> getInventoryChecks() {
         ArrayList<InventoryCheckDTO> inventoryChecks = new ArrayList<>();
-        String query = "SELECT check_id, user_id, check_date, status FROM inventory_check ORDER BY check_date DESC";
+        String query = "SELECT check_id, user_id, check_date, status FROM inventory_check WHERE status = 1 ORDER BY check_date DESC";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();

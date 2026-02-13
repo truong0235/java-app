@@ -22,12 +22,11 @@ public class InventoryCheckBLL {
     public InventoryCheckBLL() {
         inventoryCheckDAL = new InventoryCheckDAL();
         checkDetailDAL = new CheckDetailDAL();
-        checkList = new ArrayList<>();
         checkList = inventoryCheckDAL.getInventoryChecks();
     }
 
     public ArrayList<InventoryCheckDTO> getCheckList() {
-        return checkList;
+        return inventoryCheckDAL.getInventoryChecks();
     }
 
     public void setCheckList(ArrayList<InventoryCheckDTO> checkList) {

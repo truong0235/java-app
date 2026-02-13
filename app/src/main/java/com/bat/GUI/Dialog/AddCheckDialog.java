@@ -4,19 +4,16 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,46 +26,56 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import com.bat.BLL.ImportBLL;
+import com.bat.BLL.InventoryCheckBLL;
 import com.bat.BLL.LotBLL;
 import com.bat.BLL.ProductBLL;
 import com.bat.BLL.ProviderBLL;
-import com.bat.DTO.ImportDTO;
+import com.bat.DTO.CheckDetailDTO;
+import com.bat.DTO.InventoryCheckDTO;
 import com.bat.DTO.LotDTO;
 import com.bat.DTO.ProductDTO;
-import com.bat.DTO.ProviderDTO;
 
-public class AddImportDialog extends JDialog implements ActionListener { // vde: lưu provider id trong db
+public class AddCheckDialog extends JDialog implements ActionListener { // thêm một ô só lượng ban đầu 
     private ProductBLL productBLL = new ProductBLL();
     private ProviderBLL providerBLL = new ProviderBLL();
     private ImportBLL importBLL = new ImportBLL();
+    private InventoryCheckBLL checkBLL = new InventoryCheckBLL();
     private LotBLL lotBLL = new LotBLL();
 
     private ArrayList<ProductDTO> productList;
     private ArrayList<ProductDTO> filteredProducts;
-    private ArrayList<LotDTO> selectedLots = new ArrayList<>();
+    private ArrayList<CheckDetailDTO> selectedDetails = new ArrayList<>();
+    private ArrayList<LotDTO> lotList;
+    private ArrayList<LotDTO> filteredLots = new ArrayList<>();
 
     // Left panel - Product search
-    private JTextField txtSearch;
+    private JTextField txtPrSearch;
     private JTable tblProducts;
     private DefaultTableModel productTableModel;
 
+    private JTextField txtLotSearch;
+    private JTable tblLots;
+    private DefaultTableModel lotTableModel;
+
     // Right panel - Lot details
-    private JTextField txtProductName, txtProductId, txtLot, txtPublisher, txtQuantity, txtPrice;
-    private JComboBox<String> cbxProvider;
+    private JTextField txtProductName, txtProductId, txtLot, txtQuantity, txtSysQty;
     private JButton btnAdd, btnEdit, btnDelete;
 
     // Bottom panel - Selected lots
-    private JTable tblSelectedLots;
-    private DefaultTableModel selectedLotsTableModel;
-    private JLabel lblTotalPrice;
+    private JTable tblSelectedDetails;
+    private DefaultTableModel selectedDetailsTableModel;
+    // private JLabel lblTotalPrice;
     private JButton btnImport, btnCancel;
 
     private int USERID = 1;
 
-    public AddImportDialog(JFrame parent) {
+    public AddCheckDialog(JFrame parent) {
         super(parent, "Thêm phiếu nhập", true);
         // this.currentUserId = userId;
         productList = productBLL.getProductsList();
+        // lotList = lotBLL.getLots();
+        // filteredLots = new ArrayList<>(lotList);
+        filteredLots = new ArrayList<>();
         filteredProducts = new ArrayList<>(productList);
         
         initComponents();
@@ -86,13 +93,14 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         mainPanel.setBorder(new EmptyBorder(5,5,5,5));
         
         // Left-Right split
-        JPanel topPanel = new JPanel(new GridLayout(1, 2, 10, 0));
+        JPanel topPanel = new JPanel(new GridLayout(1, 3, 10, 0));
         topPanel.setBackground(Color.WHITE);
         topPanel.add(createProductSearchPanel());
-        topPanel.add(createLotDetailsPanel());
+        topPanel.add(createLotSearchPanel());
+        topPanel.add(createCheckDetailsPanel());
         
         mainPanel.add(topPanel, BorderLayout.CENTER);
-        mainPanel.add(createSelectedLotsPanel(), BorderLayout.SOUTH);
+        mainPanel.add(createSelectedDetailsPanel(), BorderLayout.SOUTH);
         
         add(mainPanel, BorderLayout.CENTER);
     }
@@ -105,19 +113,19 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         // Search box
         JPanel searchPanel = new JPanel(new BorderLayout(5, 5));
         searchPanel.setBackground(Color.WHITE);
-        txtSearch = new JTextField();
-        txtSearch.putClientProperty("JTextField.placeholderText", "Tìm sản phẩm, mã sản phẩm...");
-        txtSearch.setPreferredSize(new Dimension(0,30));
-        txtSearch.addKeyListener(new KeyAdapter() {
+        txtPrSearch = new JTextField();
+        txtPrSearch.putClientProperty("JTextField.placeholderText", "Tìm sản phẩm, mã sản phẩm...");
+        txtPrSearch.setPreferredSize(new Dimension(0,30));
+        txtPrSearch.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
                 filterProducts();
             }
         });
-        searchPanel.add(txtSearch, BorderLayout.CENTER);
+        searchPanel.add(txtPrSearch, BorderLayout.CENTER);
 
         // Product table
-        String[] columns = {"Mã SP", "Tên sản phẩm", "SL"};
+        String[] columns = {"Mã SP", "Tên sản phẩm"};
         productTableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -126,12 +134,15 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         };
         tblProducts = new JTable(productTableModel);
         tblProducts.getColumnModel().getColumn(0).setPreferredWidth(100);
-        tblProducts.getColumnModel().getColumn(1).setPreferredWidth(300);
-        tblProducts.getColumnModel().getColumn(2).setPreferredWidth(100);
+        tblProducts.getColumnModel().getColumn(1).setPreferredWidth(200);
         tblProducts.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblProducts.getSelectedRow() != -1) {
-                tblSelectedLots.clearSelection();
-                loadProductDetails();
+                tblSelectedDetails.clearSelection();
+                tblLots.clearSelection();
+                txtLotSearch.setText("");
+                lotList = lotBLL.getLotsByProductId(filteredProducts.get(tblProducts.getSelectedRow()).getProductId());
+                filteredLots = new ArrayList<>(lotList);
+                loadLotTable();
                 btnAdd.setEnabled(true);
                 btnEdit.setEnabled(false);
                 btnDelete.setEnabled(false);
@@ -146,22 +157,55 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         return panel;
     }
 
-    private JPanel createLotDetailsPanel() {
+    private JPanel createLotSearchPanel() {
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setBorder(new EmptyBorder(5,5,5,5));
+        panel.setBackground(Color.WHITE);
+
+        JPanel searchPanel = new JPanel(new BorderLayout(5, 5));
+        searchPanel.setBackground(Color.WHITE);
+        txtLotSearch = new JTextField();
+        txtLotSearch.putClientProperty("JTextField.placeholderText", "Nhập mã lô thực tế...");
+        txtLotSearch.setPreferredSize(new Dimension(0,30));
+        txtLotSearch.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                filterLots();
+            }
+        });
+        searchPanel.add(txtLotSearch, BorderLayout.CENTER);
+
+        String[] columns = {"Mã lô", "Mã lô TT", "Số lượng"};
+        lotTableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }   
+        };
+        tblLots = new JTable(lotTableModel);
+
+        tblLots.getSelectionModel().addListSelectionListener(e -> {
+            if(!e.getValueIsAdjusting() && tblLots.getSelectedRow() != -1) {
+                tblSelectedDetails.clearSelection();
+                loadLotDetails();
+                btnAdd.setEnabled(true);
+                btnEdit.setEnabled(false);
+                btnDelete.setEnabled(false);
+            }
+        });
+
+        panel.add(searchPanel, BorderLayout.NORTH);
+        panel.add(new JScrollPane(tblLots), BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private JPanel createCheckDetailsPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new EmptyBorder(5,5,5,5));
         panel.setBackground(Color.WHITE);
 
-        // Provider
-        JPanel providerPn = new JPanel(new GridLayout(2, 1, 5, 5));
-        providerPn.setBackground(Color.WHITE);
-        providerPn.add(new JLabel("Nhà cung cấp"));
-        cbxProvider = new JComboBox<>();
-        ArrayList<ProviderDTO> providers = providerBLL.getProviderList();
-        for (ProviderDTO p : providers) {
-            cbxProvider.addItem(p.getProviderName());
-        }
-        providerPn.add(cbxProvider);
 
         // Product name
         JPanel prdNamePn = new JPanel(new GridLayout(2, 1, 5, 5));
@@ -175,56 +219,50 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         JPanel idIsbnPn = new JPanel(new GridLayout(1, 2, 5, 5));
         idIsbnPn.setBackground(Color.WHITE);
         
-        JPanel idPn = new JPanel(new GridLayout(2, 1, 5, 5));
-        idPn.setBackground(Color.WHITE);
-        idPn.add(new JLabel("Mã sản phẩm"));
+        JPanel PrdIdPn = new JPanel(new GridLayout(2, 1, 5, 5));
+        PrdIdPn.setBackground(Color.WHITE);
+        PrdIdPn.add(new JLabel("Mã sản phẩm"));
         txtProductId = new JTextField();
         txtProductId.setEditable(false);
-        idPn.add(txtProductId);
+        PrdIdPn.add(txtProductId);
         
         JPanel isbnPn = new JPanel(new GridLayout(2, 1, 5, 5));
         isbnPn.setBackground(Color.WHITE);
         isbnPn.add(new JLabel("Mã lô"));
         txtLot = new JTextField();
+        txtLot.setEditable(false);
         isbnPn.add(txtLot);
         
-        idIsbnPn.add(idPn);
+        idIsbnPn.add(PrdIdPn);
         idIsbnPn.add(isbnPn);
 
-        // Publisher
-        JPanel publisherPn = new JPanel(new GridLayout(2, 1, 5, 5));
-        publisherPn.setBackground(Color.WHITE);
-        publisherPn.add(new JLabel("Nhà xuất bản"));
-        txtPublisher = new JTextField();
-        txtPublisher.setEditable(false);
-        publisherPn.add(txtPublisher);
-
         // Price & Quantity
-        JPanel priceQtyPn = new JPanel(new GridLayout(1, 2, 5, 5));
-        priceQtyPn.setBackground(Color.WHITE);
+        JPanel qtyPanel = new JPanel(new GridLayout(1, 2, 5, 5));
+        qtyPanel.setBackground(Color.WHITE);
         
-        JPanel pricePn = new JPanel(new GridLayout(2, 1, 5, 5));
-        pricePn.setBackground(Color.WHITE);
-        pricePn.add(new JLabel("Giá nhập"));
-        txtPrice = new JTextField();
-        pricePn.add(txtPrice);
+        JPanel sysQtyPn = new JPanel(new GridLayout(2, 1, 5, 5));
+        sysQtyPn.setBackground(Color.WHITE);
+        sysQtyPn.add(new JLabel("Số lượng HT"));
+        txtSysQty = new JTextField();
+        txtSysQty.setEditable(false);
+        sysQtyPn.add(txtSysQty);
         
         JPanel qtyPn = new JPanel(new GridLayout(2, 1, 5, 5));
         qtyPn.setBackground(Color.WHITE);
-        qtyPn.add(new JLabel("Số lượng"));
+        qtyPn.add(new JLabel("Số lượng TT"));
         txtQuantity = new JTextField();
         qtyPn.add(txtQuantity);
         
-        priceQtyPn.add(pricePn);
-        priceQtyPn.add(qtyPn);
+        qtyPanel.add(sysQtyPn);
+        qtyPanel.add(qtyPn);
 
         JPanel btnPn = new JPanel();
         btnPn.setLayout(new FlowLayout());
         btnPn.setBackground(Color.WHITE);
-        // btnPn.setBorder(new EmptyBorder(5,0,5, 0));
+        btnPn.setBorder(new EmptyBorder(80,0,5, 0));
 
         btnAdd = new JButton("Thêm sản phẩm");
-        btnAdd.setBackground(new Color(112,119,183));        
+        btnAdd.setBackground(new Color(112,119,183));    
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setFocusPainted(false);
         btnAdd.addActionListener(this);
@@ -237,8 +275,8 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         btnEdit.setEnabled(false);
         
         btnDelete = new JButton("Xóa sản phẩm");
-        btnDelete.setBackground(new Color(112,119,183));        
-        btnDelete.setForeground(Color.WHITE);
+        btnDelete.setBackground(new Color(112,119,183));
+        btnDelete.setForeground(Color.WHITE);   
         btnDelete.setFocusPainted(false);
         btnDelete.addActionListener(this);
         btnDelete.setEnabled(false);
@@ -247,60 +285,47 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         btnPn.add(btnEdit);
         btnPn.add(btnDelete);
 
-        panel.add(providerPn);
         panel.add(prdNamePn);
         panel.add(idIsbnPn);
-        panel.add(publisherPn);
-        panel.add(priceQtyPn);
+        panel.add(qtyPanel);
         panel.add(btnPn);
 
         return panel;
     }
 
-    private JPanel createSelectedLotsPanel() {
+    private JPanel createSelectedDetailsPanel() {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.setBackground(Color.WHITE);
         panel.setPreferredSize(new Dimension(0, 250));
 
         // Table
-        String[] columns = {"STT", "Mã SP", "Tên sản phẩm", "Đơn giá", "Số lượng"};
-        selectedLotsTableModel = new DefaultTableModel(columns, 0) {
+        String[] columns = {"STT", "Mã SP", "Tên sản phẩm", "Mã lô","Số lượng HT", "Số lượng TT"};
+        selectedDetailsTableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-        tblSelectedLots = new JTable(selectedLotsTableModel);
-        tblSelectedLots.getSelectionModel().addListSelectionListener(e -> {
-            if(!e.getValueIsAdjusting() && tblSelectedLots.getSelectedRow() != -1) {
+        tblSelectedDetails = new JTable(selectedDetailsTableModel);
+        tblSelectedDetails.getSelectionModel().addListSelectionListener(e -> {
+            if(!e.getValueIsAdjusting() && tblSelectedDetails.getSelectedRow() != -1) {
                 btnEdit.setEnabled(true);
                 btnDelete.setEnabled(true);
                 btnAdd.setEnabled(false);
                 tblProducts.clearSelection();
-                loadImportDetails();
-            } 
-
-            
+                tblLots.clearSelection();
+                loadCheckDetails();
+            }          
         });
         
         // Bottom panel with total and buttons
         JPanel bottomPn = new JPanel(new BorderLayout());
         bottomPn.setBackground(Color.WHITE);
         
-        JPanel totalPn = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        totalPn.setBackground(Color.WHITE);
-        JLabel lblTotal = new JLabel("TỔNG TIỀN:");
-        lblTotal.setFont(new Font("Arial", Font.BOLD, 14));
-        lblTotalPrice = new JLabel("0đ");
-        lblTotalPrice.setFont(new Font("Arial", Font.BOLD, 14));
-        lblTotalPrice.setForeground(new Color(220, 53, 69));
-        totalPn.add(lblTotal);
-        totalPn.add(lblTotalPrice);
-        
         JPanel buttonPn = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPn.setBackground(Color.WHITE);
         
-        btnImport = new JButton("Nhập hàng");
+        btnImport = new JButton("Kiểm kê");
         btnImport.setBackground(new Color(40, 167, 69));
         btnImport.setForeground(Color.WHITE);
         btnImport.setFocusPainted(false);
@@ -315,10 +340,9 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         buttonPn.add(btnImport);
         buttonPn.add(btnCancel);
         
-        bottomPn.add(totalPn, BorderLayout.NORTH);
         bottomPn.add(buttonPn, BorderLayout.CENTER);
 
-        panel.add(new JScrollPane(tblSelectedLots), BorderLayout.CENTER);
+        panel.add(new JScrollPane(tblSelectedDetails), BorderLayout.CENTER);
         panel.add(bottomPn, BorderLayout.SOUTH);
 
         return panel;
@@ -330,13 +354,23 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             productTableModel.addRow(new Object[]{
                 product.getProductId(),
                 product.getProductName(),
-                product.getQuantity()
+            });
+        }
+    }
+
+    private void loadLotTable() {
+        lotTableModel.setRowCount(0);
+        for (LotDTO lot : filteredLots) {
+            lotTableModel.addRow(new Object[]{
+                lot.getLotId(),
+                lot.getLotCode(),
+                lot.getQuantity(),
             });
         }
     }
 
     private void filterProducts() {
-        String searchText = txtSearch.getText().trim().toLowerCase();
+        String searchText = txtPrSearch.getText().trim().toLowerCase();
         filteredProducts.clear();
         
         if (searchText.isEmpty()) {
@@ -352,171 +386,152 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         loadProductTable();
     }
 
-    private void loadProductDetails() {
-        int selectedRow = tblProducts.getSelectedRow();
-        if (selectedRow >= 0) {
-            ProductDTO product = filteredProducts.get(selectedRow);
+    private void filterLots() {
+        String searchText = txtLotSearch.getText().trim().toLowerCase();
+        filteredLots.clear();
+        
+        if (searchText.isEmpty()) {
+            filteredLots.addAll(lotList);
+        } else {
+            for (LotDTO lot : lotList) {
+                if (lot.getLotCode().toLowerCase().contains(searchText)) {
+                    filteredLots.add(lot);
+                }
+            }
+        }
+        loadLotTable();
+        
+    }
+
+    private void loadLotDetails() {
+        int selectedLot = tblLots.getSelectedRow();
+        int selectedPrd = tblProducts.getSelectedRow();
+        if (selectedLot >= 0) {
+            ProductDTO product = filteredProducts.get(selectedPrd);
+            LotDTO lot = filteredLots.get(selectedLot);
             txtProductId.setText(String.valueOf(product.getProductId()));
             txtProductName.setText(product.getProductName());
-            txtPublisher.setText(product.getPublisher());
-            txtPrice.setText(product.getPrice().toString());
-            txtLot.setText("");
+            txtSysQty.setText(String.valueOf(lot.getQuantity()));
+            txtLot.setText(lot.getLotCode());
             txtQuantity.setText("");
         }
     }
 
-    private void loadImportDetails() {
-        int selectedRow = tblSelectedLots.getSelectedRow();
+    private void loadCheckDetails() {
+        int selectedRow = tblSelectedDetails.getSelectedRow();
         if (selectedRow >= 0) {
-            LotDTO lot = selectedLots.get(selectedRow);
-            txtProductId.setText(String.valueOf(lot.getProductId()));
-            ProductDTO product = productBLL.getProductById(lot.getProductId());
+            CheckDetailDTO detail = selectedDetails.get(selectedRow);
+            ProductDTO product = productBLL.getProductByLotId(detail.getLotId());
+            LotDTO lot = lotBLL.getLotById(detail.getLotId());
+            System.out.println(lot.toString());
+
+            txtProductId.setText(String.valueOf(product.getProductId()));
             txtProductName.setText(product.getProductName());
-            txtPublisher.setText(product.getPublisher());
-            txtPrice.setText(lot.getImportPrice().toString());
+            txtSysQty.setText(String.valueOf(detail.getSystemQuantity()));
             txtLot.setText(lot.getLotCode());
-            txtQuantity.setText(String.valueOf(lot.getQuantity()));
+            txtQuantity.setText(String.valueOf(detail.getActualQuantity()));
         }
     }
 
-    public boolean validateInput(String lotText, String oldLotText,String qtyText, String priceText) {
-        if (txtProductId.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+    public boolean validateInput(String lotText, String qtyText, String sysQtyText, int initQty) {
+        if (txtProductId.getText().trim().isEmpty() || lotText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm và lô hàng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
-        }
-                
-        if (lotText.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập mã lô!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        else if (lotBLL.isLotCodeExist(lotText)) {
-            JOptionPane.showMessageDialog(this, "Mã lô đã tồn tại! Vui lòng nhập mã lô khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        else {
-            for (LotDTO lot : selectedLots) {
-                if (!oldLotText.isEmpty() && lot.getLotCode().equals(oldLotText)) 
-                    continue;
-                if (lot.getLotCode().equals(lotText)) {
-                    JOptionPane.showMessageDialog(this, "Mã lô đã được thêm trong danh sách! Vui lòng nhập mã lô khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-            }
         }
 
-
-        if (qtyText.isEmpty() || priceText.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ số lượng và giá nhập!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        if (qtyText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ số lượng thực tế!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
-        }    
-        
-        int quantity = Integer.parseInt(qtyText);
-        BigDecimal price = new BigDecimal(priceText);
+        } 
+        int quantity = Integer.parseInt(qtyText);      
        
-        if (quantity <= 0 || price.compareTo(BigDecimal.ZERO) <= 0) {
-            JOptionPane.showMessageDialog(this, "Số lượng và giá nhập phải lớn hơn 0!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        if (quantity < 0) {
+            JOptionPane.showMessageDialog(this, "Số lượng thực tế không được âm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
         }
+        else if (quantity > initQty) {
+            JOptionPane.showMessageDialog(this, "Số lượng thực tế không được lớn hơn số lượng lúc mới nhập!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
         return true;
     }
 
-    private void addLot() {
+    private void addCheckDetails() {
         try {
+            LotDTO selectedLot = filteredLots.get(tblLots.getSelectedRow());
             String qtyText = txtQuantity.getText().trim();
-            String priceText = txtPrice.getText().trim();
+            String sysQtyText = txtSysQty.getText().trim();
             String lotText = txtLot.getText().trim();
+            int initQty = selectedLot.getInitialQuantity();
+            
             // Validate inputs
-            if (!validateInput(lotText, "", qtyText, priceText)) {
+            if (!validateInput(lotText, qtyText, sysQtyText, initQty)) {
                 return;
             }
             
-            BigDecimal price = new BigDecimal(priceText);
             int quantity = Integer.parseInt(qtyText);
             int productId = Integer.parseInt(txtProductId.getText());
             String productName = txtProductName.getText();
+
+            CheckDetailDTO detail = new CheckDetailDTO();
+            detail.setLotId(selectedLot.getLotId());
+            detail.setActualQuantity(quantity);
+            detail.setSystemQuantity(Integer.parseInt(sysQtyText));
+            detail.setDifference(quantity - initQty);
             
-            // Create lot
-            LotDTO lot = new LotDTO();
-            lot.setProductId(productId);
-            lot.setLotCode(lotText);
-            lot.setQuantity(quantity);
-            lot.setInitialQuantity(quantity);
-            lot.setImportPrice(price);
-            lot.setImportDate(LocalDateTime.now());
-            lot.setPrintYear(LocalDateTime.now().getYear());
-            lot.setStatus("Con");
-            
-            selectedLots.add(lot);
+            selectedDetails.add(detail);
             
             // Add to table
-            selectedLotsTableModel.addRow(new Object[]{
-                selectedLotsTableModel.getRowCount() + 1,
+            selectedDetailsTableModel.addRow(new Object[]{
+                selectedDetailsTableModel.getRowCount() + 1,
                 productId,
                 productName,
-                price + "đ",
+                selectedLot.getLotCode(),
+                sysQtyText,
                 quantity
             });
-            
-            lblTotalPrice.setText(calTotalPrice() + "đ");
-            clearLotInputs();
             tblProducts.clearSelection();
+            tblLots.clearSelection();
+            clearLotInputs();
             
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Số lượng và giá nhập phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Số lượng phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void clearLotInputs() {
-        txtLot.setText("");
-        txtQuantity.setText("");
-        txtPrice.setText("");
-        txtPublisher.setText("");
         txtProductId.setText("");
         txtProductName.setText("");
-    }
-    
-    private BigDecimal calTotalPrice() {
-        BigDecimal total = BigDecimal.ZERO;
-        for (LotDTO lot : selectedLots) {
-            total = total.add(lot.getImportPrice().multiply(new BigDecimal(lot.getQuantity())));
-        }
-        return total;
+        txtSysQty.setText("");
+        txtLot.setText("");
+        txtQuantity.setText("");
     }
 
-    private void importProducts() {
-        if (selectedLots.isEmpty()) {
+    private void importChecks() {
+        if (selectedDetails.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng thêm ít nhất một sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
-        if (cbxProvider.getSelectedIndex() == -1) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn nhà cung cấp!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
         try {
-            BigDecimal totalPrice = calTotalPrice();     
-            int providerId = providerBLL.getPrdIdByIdx(cbxProvider.getSelectedIndex());
             
             // Create import receipt
-            ImportDTO importDTO = new ImportDTO();
-            importDTO.setProviderId(providerId);
-            importDTO.setUserId(USERID);
-            importDTO.setTotalPrice(totalPrice);
-            importDTO.setStatus(1);
-            importDTO.setCreatedDate(LocalDateTime.now());
-            System.out.println(importDTO);
+            InventoryCheckDTO checkDTO = new InventoryCheckDTO();
+            checkDTO.setUserId(USERID);
+            checkDTO.setStatus(1);
+            checkDTO.setCheckDate(LocalDateTime.now());
+            System.out.println(checkDTO);
             
             // Save to database
-            boolean success = importBLL.addImport(importDTO, selectedLots);
-            // boolean success = false;
+            boolean success = checkBLL.addCheck(checkDTO, selectedDetails);
             
             if (success) {
-                JOptionPane.showMessageDialog(this, "Nhập hàng thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Kiểm kê thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                 
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "Nhập hàng thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Kiểm kê thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
             
         } catch (Exception e) {
@@ -528,42 +543,41 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnAdd) {
-            addLot();
+            addCheckDetails();
         } 
         else if (e.getSource() == btnImport) {
-            importProducts();
+            importChecks();
         }
         else if (e.getSource() == btnCancel) {
             dispose();
         } 
         else if (e.getSource() == btnEdit) {
-            int selectedRow = tblSelectedLots.getSelectedRow();
+            int selectedRow = tblSelectedDetails.getSelectedRow();
             if (selectedRow >= 0) {
                 try {
+                    // LotDTO selectedLot = filteredLots.get(tblSelectedDetails.getSelectedRow());
+                    CheckDetailDTO selectedDetail = selectedDetails.get(selectedRow);
+                    LotDTO selectedLot = lotBLL.getLotById(selectedDetail.getLotId());
                     String qtyText = txtQuantity.getText().trim();
-                    String priceText = txtPrice.getText().trim();
+                    String sysQtyText = txtSysQty.getText().trim();
                     String lotText = txtLot.getText().trim();
-                    LotDTO lot = selectedLots.get(selectedRow);
-                    if (!validateInput(lotText, lot.getLotCode(), qtyText, priceText)) {
+                    int initQty = selectedLot.getInitialQuantity();
+                    
+                    // Validate inputs
+                    if (!validateInput(lotText, qtyText, sysQtyText, initQty)) {
                         return;
                     }
                     
-                    int quantity = Integer.parseInt(txtQuantity.getText().trim());
-                    BigDecimal price = new BigDecimal(txtPrice.getText().trim());
-                    lot.setQuantity(quantity);
-                    lot.setImportPrice(price);
-                    lot.setLotCode(lotText);
+                    int quantity = Integer.parseInt(qtyText);
 
-                    selectedLotsTableModel.setValueAt(price + "đ", selectedRow, 3);
-                    selectedLotsTableModel.setValueAt(quantity, selectedRow, 4);
-
-                    lblTotalPrice.setText(calTotalPrice() + "đ");
+                    selectedDetail.setActualQuantity(quantity);
+                    selectedDetailsTableModel.setValueAt(quantity, selectedRow, 5);
                     clearLotInputs();
 
                     btnEdit.setEnabled(false);
                     btnDelete.setEnabled(false);
                     btnAdd.setEnabled(true);
-                    tblSelectedLots.clearSelection();
+                    tblSelectedDetails.clearSelection();
 
                 } catch (NumberFormatException err) {
                     JOptionPane.showMessageDialog(this, "Số lượng và giá nhập phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -571,20 +585,19 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             }
         }
         else if (e.getSource() == btnDelete) {
-            int selectedRow = tblSelectedLots.getSelectedRow();
+            int selectedRow = tblSelectedDetails.getSelectedRow();
             if (selectedRow >= 0) {
-                selectedLots.remove(selectedRow);
-                selectedLotsTableModel.removeRow(selectedRow);
+                selectedDetails.remove(selectedRow);
+                selectedDetailsTableModel.removeRow(selectedRow);
 
-                for (int i = 0; i < selectedLotsTableModel.getRowCount(); i++) {
-                    selectedLotsTableModel.setValueAt(i + 1, i, 0);
+                for (int i = 0; i < selectedDetailsTableModel.getRowCount(); i++) {
+                    selectedDetailsTableModel.setValueAt(i + 1, i, 0);
                 }
-                lblTotalPrice.setText(calTotalPrice() + "đ");
                 clearLotInputs();
                 btnEdit.setEnabled(false);
                 btnDelete.setEnabled(false);
                 btnAdd.setEnabled(true);
-                tblSelectedLots.clearSelection();
+                tblSelectedDetails.clearSelection();
             }
         }
         

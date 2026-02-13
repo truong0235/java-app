@@ -21,39 +21,43 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import com.bat.BLL.InventoryCheckBLL;
 import com.bat.BLL.LotBLL;
-import com.bat.BLL.ProviderBLL;
+import com.bat.BLL.ProductBLL;
 import com.bat.BLL.UserBLL;
-import com.bat.DTO.ImportDTO;
+import com.bat.DTO.CheckDetailDTO;
+import com.bat.DTO.InventoryCheckDTO;
 import com.bat.DTO.LotDTO;
 import com.bat.DTO.ProductDTO;
 
-public class ReceiptDetailDialog extends JDialog implements ActionListener {
-    private ImportDTO importDTO;
-    private ArrayList<ProductDTO> prList;
+public class CheckDetailDialog extends JDialog implements ActionListener {
+    private InventoryCheckDTO checkDTO;
+    private ArrayList<CheckDetailDTO> detailList;
 
+    
     private LotBLL lotBLL = new LotBLL();
+    private InventoryCheckBLL checkBLL = new InventoryCheckBLL();
     private UserBLL userBLL = new UserBLL();
-    private ProviderBLL prdBLL = new ProviderBLL();
+    private ProductBLL productBLL = new ProductBLL();
 
-    private JPanel mainPn, main_topPn, main_blPn, main_brPn, main_btnPn, main_bPn;
-    private JTextField txtImportId, txtUser, txtProvider, txtCreatedDate;
-    private JTable table, tableLots;
-    private JScrollPane scrollTbl, scrollTblLots;
-    private DefaultTableModel tblMode, tblLotsModel;
+    private JPanel mainPn, main_topPn, main_btnPn, main_bPn;
+    private JTextField txtImportId, txtUser, txtCreatedDate;
+    private JTable table;
+    private JScrollPane scrollTbl;
+    private DefaultTableModel tblMode;
     private JButton btnClose, btnPDF;
 
 
-    public ReceiptDetailDialog(JFrame main, String title, ImportDTO importDTO) { // chp cột STT bên phải nhỏ lại (để có chỗ cho mã lô)
-        super(main, title, true);
-        this.importDTO = importDTO;
-        this.prList = lotBLL.getPrdInImport(importDTO.getReceiptId());
-        initComponent(title, "import");
-        initImport();
+    public CheckDetailDialog(JFrame main, InventoryCheckDTO checkDTO) { 
+        super(main, "Chi tiết phiếu kiểm kho", true);
+        this.checkDTO = checkDTO;
+        this.detailList = checkBLL.getCheckDetails(checkDTO.getCheckId());
+        initComponent("Chi tiết phiếu kiểm kho");
+        initCheck();
         this.setVisible(true); 
     }
 
-    public void initComponent(String title, String type) {
+    public void initComponent(String title) {
         this.setTitle(title);
         this.setLayout(new BorderLayout(0,0));
         this.setSize(800, 600);
@@ -75,7 +79,7 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
         mainPn.setBorder(new EmptyBorder(5,5,5,5));
         mainPn.setBackground(Color.WHITE);
         
-        main_topPn = new JPanel(new GridLayout(1,4, 10, 10));
+        main_topPn = new JPanel(new GridLayout(1,3, 10, 10));
         main_topPn.setBackground(Color.WHITE);
 
         JPanel impPn = new JPanel();
@@ -95,15 +99,6 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
         userPn.add(userLbl);
         userPn.add(txtUser);
         
-        JPanel prdPn = new JPanel();
-        prdPn.setLayout(new GridLayout(2,1));
-        prdPn.setBackground(Color.WHITE);
-        String txt = type.equals("import") ? "Nhà cung cấp: " : "Khách hàng: ";
-        JLabel prdLbl =  new JLabel(txt);
-        txtProvider = new JTextField();   
-        prdPn.add(prdLbl);
-        prdPn.add(txtProvider);
-
         JPanel datePn = new JPanel();
         datePn.setLayout(new GridLayout(2,1));
         datePn.setBackground(Color.WHITE);
@@ -115,21 +110,18 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
         txtCreatedDate.setEnabled(false);
         txtImportId.setEnabled(false);
         txtUser.setEnabled(false);
-        txtProvider.setEnabled(false);
 
         main_topPn.add(impPn);
         main_topPn.add(userPn);
-        main_topPn.add(prdPn);
         main_topPn.add(datePn);
 
         main_bPn = new JPanel(new BorderLayout());
         main_bPn.setBackground(Color.WHITE);
         main_bPn.setBorder(new EmptyBorder(5,5,5,5));
 
-        main_blPn = new JPanel(new BorderLayout());
         table = new JTable();
         scrollTbl = new JScrollPane();
-        String[] cols = new String[] {"Mã SP", "Tên sản phẩm", "Số lượng", "Thành tiền"};
+        String[] cols = new String[] {"STT", "Mã SP", "Tên sản phẩm", "Mã lô TT", "Số lượng HT", "Số lượng TT"};
         tblMode = new DefaultTableModel(cols, 0){
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -139,39 +131,14 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
         table.setModel(tblMode);
 
         table.getColumnModel().getColumn(0).setPreferredWidth(50);
-        table.getColumnModel().getColumn(1).setPreferredWidth(150);
-        table.getColumnModel().getColumn(2).setPreferredWidth(50);
+        table.getColumnModel().getColumn(1).setPreferredWidth(50);
+        table.getColumnModel().getColumn(2).setPreferredWidth(150);
         table.getColumnModel().getColumn(3).setPreferredWidth(150);
-
+        table.getColumnModel().getColumn(4).setPreferredWidth(150);
+        table.getColumnModel().getColumn(5).setPreferredWidth(150);
         scrollTbl.setViewportView(table);
-        table.getSelectionModel().addListSelectionListener(e -> {
-            int idx = table.getSelectedRow();
-            if (idx != -1) {
-                LoadLotsData(lotBLL.getLotsByProductIdInImport(importDTO.getReceiptId(), prList.get(idx).getProductId()));
-            } 
-        });
-        main_blPn.add(scrollTbl);
-
-        main_brPn = new JPanel(new BorderLayout());
-        main_brPn.setBackground(Color.WHITE);
-        main_brPn.setPreferredSize(new Dimension(300,0));
-        main_brPn.setBorder(new EmptyBorder(0,10,0,0));
-
-        tableLots = new JTable();
-        scrollTblLots = new JScrollPane();
-        String[] lotCols = new String[] {"STT", "Mã lô", "Số lượng", "Đơn giá"};
-        tblLotsModel = new DefaultTableModel(lotCols, 0){
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        tableLots.setModel(tblLotsModel);
-        scrollTblLots.setViewportView(tableLots);
-        main_brPn.add(scrollTblLots);
-
-        main_bPn.add(main_blPn, BorderLayout.CENTER);
-        main_bPn.add(main_brPn, BorderLayout.EAST);
+        
+        main_bPn.add(scrollTbl);
 
         main_btnPn = new JPanel(new FlowLayout());
         main_btnPn.setBorder(new EmptyBorder(10,0,10,0));
@@ -202,45 +169,33 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
         this.setLocationRelativeTo(null);
     }
 
-    public void initImport() {
-        txtImportId.setText(String.valueOf(importDTO.getReceiptId()));
-        txtUser.setText(userBLL.getUserNameById(importDTO.getUserId()));
-        txtProvider.setText(prdBLL.getProviderNameById(importDTO.getProviderId()));
-        txtCreatedDate.setText(importDTO.getCreatedDate().toString());
-        LoadImportDetailData();
-
+    public void initCheck(){
+        txtImportId.setText(String.valueOf(checkDTO.getCheckId()));
+        txtUser.setText(userBLL.getUserNameById(checkDTO.getUserId()));
+        txtCreatedDate.setText(checkDTO.getCheckDate().toString());
+        LoadCheckDetailData();
     }
 
-    public void LoadImportDetailData() {
+    public void LoadCheckDetailData() {
         tblMode.setRowCount(0);
-        for (ProductDTO prd : prList) {
+        for (CheckDetailDTO check : detailList) {
+            ProductDTO product = productBLL.getProductByLotId(check.getLotId());
+            LotDTO lot = lotBLL.getLotById(check.getLotId());
             Object[] rowData = new Object[] {
-                prd.getProductId(),
-                prd.getProductName(),
-                prd.getQuantity(),
-                prd.getPrice()
+                tblMode.getRowCount() + 1,
+                product.getProductId(),
+                product.getProductName(),
+                lot.getLotCode(),
+                check.getSystemQuantity(),
+                check.getActualQuantity()
             };
             tblMode.addRow(rowData);
         }
     }
 
-    public void LoadLotsData(ArrayList<LotDTO> lotList) {
-        tblLotsModel.setRowCount(0);
-        for (LotDTO lot : lotList) {
-            Object[] rowData = new Object[] {
-                lot.getLotId(),
-                lot.getLotCode(),
-                lot.getQuantity(),
-                lot.getImportPrice()
-            };
-            tblLotsModel.addRow(rowData);
-        }
-    }
-
-    
-
     @Override
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'actionPerformed'");
-    }}
+    }
+}
