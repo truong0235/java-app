@@ -34,7 +34,7 @@ public class CustomerBLL {
         if (!c.getPhone().matches("\\d{10,11}")) return "Số điện thoại phải là 10-11 chữ số!";
 
         int newId = customerDAL.getAutoIncrement();
-        c.setCustomerId(newId); // Đã sửa
+        c.setCustomerId(newId);
 
         if (customerDAL.add(c)) {
             return "Thêm khách hàng thành công!";
@@ -58,4 +58,5 @@ public class CustomerBLL {
         }
         return "Xóa thất bại!";
     }
+
 }
