@@ -13,7 +13,7 @@ public class ProviderDAL {
 
     public ArrayList<ProviderDTO> getProviders() {
         ArrayList<ProviderDTO> providers = new ArrayList<>();
-        String query = "SELECT * FROM provider WHERE status = 0";
+        String query = "SELECT * FROM provider WHERE status = 1";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -87,7 +87,7 @@ public class ProviderDAL {
     }
 
     public boolean delete(int id) {
-        String query = "UPDATE provider SET status = 1 WHERE provider_id = ?";
+        String query = "UPDATE provider SET status = 0 WHERE provider_id = ?";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
