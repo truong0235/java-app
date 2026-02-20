@@ -19,7 +19,7 @@ public class CustomerDAL {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 CustomerDTO customer = new CustomerDTO(
-                        rs.getInt("customer_id"),
+                        rs.getInt("customer_id"), 
                         rs.getString("fullname"),
                         rs.getString("birthday"),
                         rs.getString("phone"),
@@ -54,7 +54,7 @@ public class CustomerDAL {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
-            ps.setInt(1, c.getCustomer_id());
+            ps.setInt(1, c.getCustomerId()); 
             ps.setString(2, c.getFullName());
             ps.setString(3, c.getBirthday());
             ps.setString(4, c.getPhone());
@@ -76,7 +76,7 @@ public class CustomerDAL {
             ps.setString(2, c.getBirthday());
             ps.setString(3, c.getPhone());
             ps.setString(4, c.getAddress());
-            ps.setInt(5, c.getCustomer_id());
+            ps.setInt(5, c.getCustomerId()); 
             int result = ps.executeUpdate();
             db.closeConnection();
             return result > 0;
