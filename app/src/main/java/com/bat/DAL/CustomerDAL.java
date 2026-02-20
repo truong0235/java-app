@@ -11,7 +11,7 @@ public class CustomerDAL {
 
     public ArrayList<CustomerDTO> getCustomers() {
         ArrayList<CustomerDTO> customers = new ArrayList<>();
-        String query = "SELECT * FROM customer WHERE status = 0";
+        String query = "SELECT * FROM customer WHERE status = 1";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -85,7 +85,7 @@ public class CustomerDAL {
     }
 
     public boolean delete(int id) {
-        String query = "UPDATE customer SET status = 1 WHERE customer_id = ?";
+        String query = "UPDATE customer SET status = 0 WHERE customer_id = ?";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -100,3 +100,4 @@ public class CustomerDAL {
         return false;
     }
 }
+
