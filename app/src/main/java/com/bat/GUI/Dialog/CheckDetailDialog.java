@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -46,6 +47,8 @@ public class CheckDetailDialog extends JDialog implements ActionListener {
     private JScrollPane scrollTbl;
     private DefaultTableModel tblMode;
     private JButton btnClose, btnPDF;
+    
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
 
     public CheckDetailDialog(JFrame main, InventoryCheckDTO checkDTO) { 
@@ -172,7 +175,11 @@ public class CheckDetailDialog extends JDialog implements ActionListener {
     public void initCheck(){
         txtImportId.setText(String.valueOf(checkDTO.getCheckId()));
         txtUser.setText(userBLL.getUserNameById(checkDTO.getUserId()));
-        txtCreatedDate.setText(checkDTO.getCheckDate().toString());
+        
+        // Format date
+        String formattedDate = checkDTO.getCheckDate() != null ? checkDTO.getCheckDate().format(DATE_FORMATTER) : "";
+        txtCreatedDate.setText(formattedDate);
+        
         LoadCheckDetailData();
     }
 

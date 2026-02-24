@@ -30,4 +30,11 @@ public class ProductBLL {
     public ProductDTO getProductByLotId(int lotId){
         return productDAL.getProductByLotId(lotId);
     }
+
+    public int getProductIdByIdx(int idx) {
+        if (idx >= 0 && idx < productList.size()) {
+            return productList.get(idx).getProductId();
+        }
+        return -1;
+    }
 }

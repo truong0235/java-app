@@ -18,6 +18,15 @@ public class ProviderBLL {
         return providerDAL.getProviders();
     }
 
+    public ProviderDTO getProviderById(int providerId) {
+        for (ProviderDTO provider : providers) {
+            if (provider.getProviderId() == providerId) {
+                return provider;
+            }
+        }
+        return null;
+    }
+
     public String getProviderNameById(int providerId) {
         for (ProviderDTO provider : providers) {
             if (provider.getProviderId() == providerId) {

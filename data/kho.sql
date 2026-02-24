@@ -99,7 +99,7 @@ CREATE TABLE lot (
     quantity INT NOT NULL,
     print_year INT,
     import_price DECIMAL(18, 2),
-    status enum ("Xoa", "Het", "Loi", "Con"),
+    status enum ("Xóa", "Hết", "Lỗi", "Còn"),
     import_id INT,
     product_id INT,
     FOREIGN KEY (import_id) REFERENCES import_receipt(import_id),

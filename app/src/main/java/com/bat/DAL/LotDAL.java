@@ -180,7 +180,7 @@ public class LotDAL {
     }
 
     public boolean delete(int lotId) {
-        String query = "UPDATE lot SET status = 'Xoa' WHERE lot_id = ?";
+        String query = "UPDATE lot SET status = 'Xóa' WHERE lot_id = ?";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -195,7 +195,7 @@ public class LotDAL {
     }
 
     public boolean deleteByImpId(int impId) {
-        String query = "UPDATE lot SET status = 'Xoa' WHERE import_id = ?";
+        String query = "UPDATE lot SET status = 'Xóa' WHERE import_id = ?";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -231,6 +231,22 @@ public class LotDAL {
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, quantity);
+            ps.setInt(2, lotId);
+            int affected = ps.executeUpdate();
+            return affected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateStatus(int lotId, String status) {
+        String query = "UPDATE lot SET status = ? WHERE lot_id = ?";
+        try {
+            DBConnectHelper db = new DBConnectHelper();
+            Connection conn = db.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setString(1, status);
             ps.setInt(2, lotId);
             int affected = ps.executeUpdate();
             return affected > 0;

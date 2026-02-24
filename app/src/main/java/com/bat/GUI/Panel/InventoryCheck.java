@@ -13,6 +13,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +57,8 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
     JComboBox<String> userCbx;
     JDateChooser fromDateChooser, toDateChooser;
     Main main;
+    
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public InventoryCheck(Main main) {
         this.main = main;
@@ -234,10 +237,12 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
     public void loadDataTable(ArrayList<InventoryCheckDTO> checkData) {
         tableModel.setRowCount(0);
         for (InventoryCheckDTO check : checkData) {
+            String formattedDate = check.getCheckDate() != null ? check.getCheckDate().format(DATE_FORMATTER) : "";
+            
             Object[] rowData = {
                 check.getCheckId(),
                 userBLL.getUserNameById(check.getUserId()),
-                check.getCheckDate(),
+                formattedDate,
             };
             tableModel.addRow(rowData);
         }

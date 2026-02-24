@@ -31,6 +31,15 @@ public class ImportBLL {
         importList = importDAL.getImports();
     }
 
+    public ImportDTO getImportById(int importId) {
+        for (ImportDTO imp : importList) {
+            if (imp.getReceiptId() == importId) {
+                return imp;
+            }
+        }
+        return null;
+    }
+
     public boolean addImport(ImportDTO imp, ArrayList<LotDTO> lotList) {
         int result = importDAL.add(imp);
         if (result != -1) {

@@ -444,7 +444,7 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             lot.setImportPrice(price);
             lot.setImportDate(LocalDateTime.now());
             lot.setPrintYear(LocalDateTime.now().getYear());
-            lot.setStatus("Con");
+            lot.setStatus("Còn");
             
             selectedLots.add(lot);
             

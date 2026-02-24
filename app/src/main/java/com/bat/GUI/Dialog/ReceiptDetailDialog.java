@@ -8,7 +8,10 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -42,6 +45,9 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
     private JScrollPane scrollTbl, scrollTblLots;
     private DefaultTableModel tblMode, tblLotsModel;
     private JButton btnClose, btnPDF;
+    
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
 
 
     public ReceiptDetailDialog(JFrame main, String title, ImportDTO importDTO) { // chp cột STT bên phải nhỏ lại (để có chỗ cho mã lô)
@@ -206,7 +212,11 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
         txtImportId.setText(String.valueOf(importDTO.getReceiptId()));
         txtUser.setText(userBLL.getUserNameById(importDTO.getUserId()));
         txtProvider.setText(prdBLL.getProviderNameById(importDTO.getProviderId()));
-        txtCreatedDate.setText(importDTO.getCreatedDate().toString());
+        
+        // Format date
+        String formattedDate = importDTO.getCreatedDate() != null ? importDTO.getCreatedDate().format(DATE_FORMATTER) : "";
+        txtCreatedDate.setText(formattedDate);
+        
         LoadImportDetailData();
 
     }
@@ -214,11 +224,13 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
     public void LoadImportDetailData() {
         tblMode.setRowCount(0);
         for (ProductDTO prd : prList) {
+            String formattedPrice = prd.getPrice() != null ? CURRENCY_FORMATTER.format(prd.getPrice()) : "0 ₫";
+            
             Object[] rowData = new Object[] {
                 prd.getProductId(),
                 prd.getProductName(),
                 prd.getQuantity(),
-                prd.getPrice()
+                formattedPrice
             };
             tblMode.addRow(rowData);
         }
@@ -227,11 +239,13 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
     public void LoadLotsData(ArrayList<LotDTO> lotList) {
         tblLotsModel.setRowCount(0);
         for (LotDTO lot : lotList) {
+            String formattedPrice = lot.getImportPrice() != null ? CURRENCY_FORMATTER.format(lot.getImportPrice()) : "0 ₫";
+            
             Object[] rowData = new Object[] {
                 lot.getLotId(),
                 lot.getLotCode(),
                 lot.getQuantity(),
-                lot.getImportPrice()
+                formattedPrice
             };
             tblLotsModel.addRow(rowData);
         }
