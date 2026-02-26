@@ -22,4 +22,15 @@ public class ImportDTO extends ReceiptDTO {
         this.providerId = providerId;
     }
     
+    @Override
+    public String toString() {
+        return "ImportDTO{" +
+               "receiptId=" + getReceiptId() +
+               ", userId=" + getUserId() +
+               ", totalPrice=" + getTotalPrice() +
+               ", status=" + getStatus() +
+               ", createdDate=" + getCreatedDate() +
+               ", providerId=" + providerId +
+               '}';
+    }
 }

@@ -12,7 +12,7 @@ import com.bat.utils.helper.DBConnectHelper;
 public class LotTransactionDAL {
     public ArrayList<LotTransactionDTO> getLotTransactionsByLotId(int lotId) {
        ArrayList<LotTransactionDTO> transList = new ArrayList<>();
-       String query = "SELECT trans_id, lot_id, ref_id, quantity_change, quantity, date, type FROM LotTransaction WHERE lot_id = ?";
+       String query = "SELECT trans_id, lot_id, ref_id, quantity_change, quantity, date, type FROM lot_transaction WHERE lot_id = ?";
        try {   
            DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -40,7 +40,7 @@ public class LotTransactionDAL {
     }
 
     public int add(LotTransactionDTO tx){
-        String query = "INSERT INTO LotTransaction (lot_id, ref_id, quantity_change, quantity, date, type) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO lot_transaction (lot_id, ref_id, quantity_change, quantity, date, type) VALUES (?, ?, ?, ?, ?, ?)";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -66,7 +66,7 @@ public class LotTransactionDAL {
     }
 
     public boolean delete(int refId) {
-        String query = "DELETE FROM LotTransaction WHERE ref_id = ?";
+        String query = "DELETE FROM lot_transaction WHERE ref_id = ?";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();

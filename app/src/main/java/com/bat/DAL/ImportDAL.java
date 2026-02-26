@@ -16,7 +16,7 @@ public class ImportDAL {
         try {
             DBConnectHelper db = new DBConnectHelper();
             String query = "SELECT import_id, import_date, status, total_price, provider_id, user_id " +
-                           "FROM import_receipt ORDER BY import_date DESC";
+                           "FROM import_receipt WHERE status = 1";
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = (ResultSet) ps.executeQuery();

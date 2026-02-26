@@ -19,7 +19,8 @@ CREATE TABLE provider (
     provider_name VARCHAR(255) NOT NULL,
     address VARCHAR(500),
     phone VARCHAR(20),
-    email VARCHAR(100)
+    email VARCHAR(100),
+    status TINYINT DEFAULT 1
 );
 -- 3. Bảng Customer (Khách hàng)
 CREATE TABLE customer (
@@ -27,7 +28,9 @@ CREATE TABLE customer (
     fullname VARCHAR(255) NOT NULL,
     birthday DATE,
     phone VARCHAR(20),
-    address VARCHAR(500)
+    address VARCHAR(500),
+	status TINYINT DEFAULT 1
+
 );
 -- 4. Bảng Functions
 CREATE TABLE functions (
@@ -99,7 +102,7 @@ CREATE TABLE lot (
     quantity INT NOT NULL,
     print_year INT,
     import_price DECIMAL(18, 2),
-    status enum ("Xoa", "Het", "Loi", "Con"),
+    status enum ("Xóa", "Hết", "Lỗi", "Còn"),
     import_id INT,
     product_id INT,
     FOREIGN KEY (import_id) REFERENCES import_receipt(import_id),

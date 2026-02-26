@@ -70,6 +70,38 @@ public class ProductDAL {
         }
         return product;
     }
+
+    public ProductDTO getProductByLotId(int lotId){
+        ProductDTO product = new ProductDTO();
+        try {
+            String query = "SELECT p.* FROM product p JOIN lot l ON p.product_id = l.product_id WHERE l.lot_id = ?";
+            DBConnectHelper db = new DBConnectHelper();
+            Connection conn = db.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setInt(1, lotId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                product = new ProductDTO(
+                    rs.getInt("product_id"),
+                    rs.getString("product_name"),
+                    rs.getString("pic"),
+                    rs.getInt("category_id"),
+                    rs.getString("publisher"),
+                    rs.getInt("publish_year"),
+                    rs.getString("author"),
+                    rs.getString("language"),
+                    rs.getBigDecimal("price"),
+                    rs.getInt("quantity"),
+                    rs.getInt("status")
+                );
+            }
+            db.closeConnection();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return product;
+    }
+
     public boolean update(ProductDTO product) {
         String query = "UPDATE product SET product_name = ?, pic = ?, category_id = ?, publisher = ?, publish_year = ?, author = ?, language = ?, price = ?, quantity = ?, status = ? WHERE product_id = ?";
         try {
