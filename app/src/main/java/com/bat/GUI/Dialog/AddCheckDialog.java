@@ -463,7 +463,7 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
             String qtyText = txtQuantity.getText().trim();
             String sysQtyText = txtSysQty.getText().trim();
             String lotText = txtLot.getText().trim();
-            int initQty = selectedLot.getInitialQuantity();
+            int initQty = selectedLot.getQuantity();
             
             // Validate inputs
             if (!validateInput(lotText, qtyText, sysQtyText, initQty)) {
@@ -528,7 +528,6 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
             
             if (success) {
                 JOptionPane.showMessageDialog(this, "Kiểm kê thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                
                 dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "Kiểm kê thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);

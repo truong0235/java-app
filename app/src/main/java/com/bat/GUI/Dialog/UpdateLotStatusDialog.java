@@ -66,7 +66,7 @@ public class UpdateLotStatusDialog extends JDialog implements ActionListener {
 
     private JPanel createHeaderPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 15));
-        panel.setBackground(new Color(13, 39, 51));
+        panel.setBackground(new Color(22, 122, 198));
         
         JLabel lblTitle = new JLabel("CẬP NHẬT TRẠNG THÁI LÔ HÀNG");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
@@ -130,7 +130,7 @@ public class UpdateLotStatusDialog extends JDialog implements ActionListener {
         
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        String[] statusOptions = {"Còn", "Hết", "Lỗi", "Xóa"};
+        String[] statusOptions = {"Còn", "Hết", "Lỗi"};
         cboStatus = new JComboBox<>(statusOptions);
         cboStatus.setPreferredSize(new Dimension(300, 35));
         cboStatus.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -148,7 +148,7 @@ public class UpdateLotStatusDialog extends JDialog implements ActionListener {
         btnSave = new JButton("Lưu");
         btnSave.setPreferredSize(new Dimension(100, 35));
         btnSave.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnSave.setBackground(new Color(13, 39, 51));
+        btnSave.setBackground(new Color(22, 122, 198));
         btnSave.setForeground(Color.WHITE);
         btnSave.setFocusPainted(false);
         btnSave.setBorderPainted(false);

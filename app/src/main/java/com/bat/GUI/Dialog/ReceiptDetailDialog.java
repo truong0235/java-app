@@ -33,7 +33,7 @@ import com.bat.DTO.ProductDTO;
 
 public class ReceiptDetailDialog extends JDialog implements ActionListener {
     private ImportDTO importDTO;
-    private ArrayList<ProductDTO> prList;
+    private ArrayList<ProductDTO> prInImportList;
 
     private LotBLL lotBLL = new LotBLL();
     private UserBLL userBLL = new UserBLL();
@@ -53,7 +53,7 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
     public ReceiptDetailDialog(JFrame main, String title, ImportDTO importDTO) { // chp cột STT bên phải nhỏ lại (để có chỗ cho mã lô)
         super(main, title, true);
         this.importDTO = importDTO;
-        this.prList = lotBLL.getPrdInImport(importDTO.getReceiptId());
+        this.prInImportList = lotBLL.getPrdInImport(importDTO.getReceiptId());
         initComponent(title, "import");
         initImport();
         this.setVisible(true); 
@@ -153,7 +153,7 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
         table.getSelectionModel().addListSelectionListener(e -> {
             int idx = table.getSelectedRow();
             if (idx != -1) {
-                LoadLotsData(lotBLL.getLotsByProductIdInImport(importDTO.getReceiptId(), prList.get(idx).getProductId()));
+                LoadLotsData(lotBLL.getLotsByProductIdInImport(importDTO.getReceiptId(), prInImportList.get(idx).getProductId()));
             } 
         });
         main_blPn.add(scrollTbl);
@@ -223,7 +223,7 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
 
     public void LoadImportDetailData() {
         tblMode.setRowCount(0);
-        for (ProductDTO prd : prList) {
+        for (ProductDTO prd : prInImportList) {
             String formattedPrice = prd.getPrice() != null ? CURRENCY_FORMATTER.format(prd.getPrice()) : "0 ₫";
             
             Object[] rowData = new Object[] {
@@ -244,17 +244,17 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
             Object[] rowData = new Object[] {
                 lot.getLotId(),
                 lot.getLotCode(),
-                lot.getQuantity(),
+                lot.getInitialQuantity(),
                 formattedPrice
             };
             tblLotsModel.addRow(rowData);
         }
     }
 
-    
-
     @Override
     public void actionPerformed(ActionEvent e) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'actionPerformed'");
-    }}
+        if (e.getSource() == btnClose) {
+            this.dispose();
+        }
+    }
+}

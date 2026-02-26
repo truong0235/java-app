@@ -42,6 +42,7 @@ import com.bat.DTO.ProviderDTO;
 import com.bat.DTO.UserDTO;
 import com.bat.GUI.Dialog.AddImportDialog;
 import com.bat.GUI.Dialog.ReceiptDetailDialog;
+import com.bat.GUI.Dialog.UpdateImportDialog;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
@@ -321,6 +322,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         int index = table.getSelectedRow();
         if (index == -1) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn phiếu nhập");
+            return -1;
         }
         return index;
     }
@@ -336,11 +338,19 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
                 loadDataTable(importList);
                 break;
             case "update":
-                System.out.println("Update button clicked");
+                int updateIdx = getRowSelected();
+                if (updateIdx != -1) {
+                    ImportDTO selectedImport = importList.get(updateIdx);
+                    UpdateImportDialog updateDialog = new UpdateImportDialog(main, selectedImport);
+                    updateDialog.setVisible(true);
+                    importList = importBLL.getImportList();
+                    loadDataTable(importList);
+                }
                 break;
             case "delete":
                 // System.out.println("Delete button clicked");
                 int selectedRow = getRowSelected();
+                if (selectedRow == -1) return;
                 int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu nhập đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
                 if (confirm == 0) {
                     ImportDTO selectedImport = importList.get(selectedRow);

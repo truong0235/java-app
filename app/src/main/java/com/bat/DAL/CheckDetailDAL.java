@@ -64,6 +64,7 @@ public class CheckDetailDAL {
 
                 boolean trResult = lotTransactionDAL.add(lt) != -1;
                 int lotId = detail.getLotId();
+                System.out.println("Lot ID: " + lotId + ", Difference: " + detail.getDifference());
                 boolean lResult = lotDAL.updateQuantity(lotId, detail.getDifference()); 
 
                 boolean pResult = productDAL.updateQuantityByLotId(lotId, detail.getDifference());

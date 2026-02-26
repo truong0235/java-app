@@ -51,6 +51,13 @@ public class ImportBLL {
         return result != -1;
     }
 
+    public boolean updateImport(ImportDTO imp, ArrayList<LotDTO> lotList) {
+        boolean result = importDAL.update(imp);
+        if (result) {
+            result = lotDAL.update(lotList, imp.getReceiptId());
+        }
+        return result;
+    }
 
     public boolean cancelImport(int importId) { // xoá import, các lot liên quan, lịch sử nhập kho và kiểm tra trước khi xoá
         boolean isChecked = importDAL.checkUsedLot(importId);

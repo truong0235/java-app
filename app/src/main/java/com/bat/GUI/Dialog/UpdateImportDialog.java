@@ -39,12 +39,13 @@ import com.bat.DTO.LotDTO;
 import com.bat.DTO.ProductDTO;
 import com.bat.DTO.ProviderDTO;
 
-public class AddImportDialog extends JDialog implements ActionListener { // vde: lưu provider id trong db
+public class UpdateImportDialog extends JDialog implements ActionListener {
     private ProductBLL productBLL = new ProductBLL();
     private ProviderBLL providerBLL = new ProviderBLL();
     private ImportBLL importBLL = new ImportBLL();
     private LotBLL lotBLL = new LotBLL();
 
+    private ImportDTO importDTO;
     private ArrayList<ProductDTO> productList;
     private ArrayList<ProductDTO> filteredProducts;
     private ArrayList<LotDTO> selectedLots = new ArrayList<>();
@@ -63,18 +64,18 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
     private JTable tblSelectedLots;
     private DefaultTableModel selectedLotsTableModel;
     private JLabel lblTotalPrice;
-    private JButton btnImport, btnCancel;
+    private JButton btnUpdate, btnCancel;
 
-    private  static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
-    private int USERID = 1;
+    private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
 
-    public AddImportDialog(JFrame parent) {
-        super(parent, "Thêm phiếu nhập", true);
-        // this.currentUserId = userId;
+    public UpdateImportDialog(JFrame parent, ImportDTO importDTO) {
+        super(parent, "Sửa phiếu nhập", true);
+        this.importDTO = importDTO;
         productList = productBLL.getProductsList();
         filteredProducts = new ArrayList<>(productList);
         
         initComponents();
+        loadImportData();
         setSize(1000, 700);
         setLocationRelativeTo(parent);
     }
@@ -174,7 +175,7 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         txtProductName.setEditable(false);
         prdNamePn.add(txtProductName);
 
-        // Product ID & ISBN
+        // Product ID & Lot Code
         JPanel idIsbnPn = new JPanel(new GridLayout(1, 2, 5, 5));
         idIsbnPn.setBackground(Color.WHITE);
         
@@ -224,7 +225,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         JPanel btnPn = new JPanel();
         btnPn.setLayout(new FlowLayout());
         btnPn.setBackground(Color.WHITE);
-        // btnPn.setBorder(new EmptyBorder(5,0,5, 0));
 
         btnAdd = new JButton("Thêm sản phẩm");
         btnAdd.setBackground(new Color(112,119,183));        
@@ -281,9 +281,7 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
                 btnAdd.setEnabled(false);
                 tblProducts.clearSelection();
                 loadImportDetails();
-            } 
-
-            
+            }
         });
         
         // Bottom panel with total and buttons
@@ -303,11 +301,11 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         JPanel buttonPn = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPn.setBackground(Color.WHITE);
         
-        btnImport = new JButton("Nhập hàng");
-        btnImport.setBackground(new Color(40, 167, 69));
-        btnImport.setForeground(Color.WHITE);
-        btnImport.setFocusPainted(false);
-        btnImport.addActionListener(this);
+        btnUpdate = new JButton("Cập nhật");
+        btnUpdate.setBackground(new Color(40, 167, 69));
+        btnUpdate.setForeground(Color.WHITE);
+        btnUpdate.setFocusPainted(false);
+        btnUpdate.addActionListener(this);
         
         btnCancel = new JButton("Hủy");
         btnCancel.setBackground(new Color(220, 53, 69));
@@ -315,7 +313,7 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         btnCancel.setFocusPainted(false);
         btnCancel.addActionListener(this);
         
-        buttonPn.add(btnImport);
+        buttonPn.add(btnUpdate);
         buttonPn.add(btnCancel);
         
         bottomPn.add(totalPn, BorderLayout.NORTH);
@@ -325,6 +323,34 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         panel.add(bottomPn, BorderLayout.SOUTH);
 
         return panel;
+    }
+
+    private void loadImportData() {
+        // Load existing lots for this import
+        selectedLots = lotBLL.getLotsByImportId(importDTO.getReceiptId());
+        
+        // Set provider
+        int providerIdx = providerBLL.getIdxByProviderId(importDTO.getProviderId());
+        if (providerIdx != -1) {
+            cbxProvider.setSelectedIndex(providerIdx);
+        }
+        
+        // Load lots into table
+        selectedLotsTableModel.setRowCount(0);
+        int stt = 1;
+        for (LotDTO lot : selectedLots) {
+            ProductDTO product = productBLL.getProductById(lot.getProductId());
+            selectedLotsTableModel.addRow(new Object[]{
+                stt++,
+                lot.getProductId(),
+                product.getProductName(),
+                CURRENCY_FORMATTER.format(lot.getImportPrice()),
+                lot.getInitialQuantity()
+            });
+        }
+        
+        // Update total price
+        lblTotalPrice.setText(CURRENCY_FORMATTER.format(calTotalPrice()));
     }
 
     private void loadProductTable() {
@@ -365,6 +391,9 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             txtPrice.setText("");
             txtLot.setText("");
             txtQuantity.setText("");
+            txtQuantity.setEditable(true);
+            txtLot.setEditable(true);
+            txtPrice.setEditable(true);
         }
     }
 
@@ -378,11 +407,23 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             txtPublisher.setText(product.getPublisher());
             txtPrice.setText(CURRENCY_FORMATTER.format(lot.getImportPrice()));
             txtLot.setText(lot.getLotCode());
-            txtQuantity.setText(String.valueOf(lot.getQuantity()));
+            txtQuantity.setText(String.valueOf(lot.getInitialQuantity()));
+            if (lot.getQuantity() < lot.getInitialQuantity()) {
+                txtQuantity.setEditable(false);
+                txtLot.setEditable(false);
+                txtPrice.setEditable(false);
+                btnDelete.setEnabled(false);
+                btnEdit.setEnabled(false);
+            }
+            else {
+                txtQuantity.setEditable(true);
+                txtLot.setEditable(true);
+                txtPrice.setEditable(true);
+            }
         }
     }
 
-    public boolean validateInput(String lotText, String oldLotText,String qtyText, String priceText) {
+    public boolean validateInput(String lotText, String oldLotText, String qtyText, String priceText) {
         if (txtProductId.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
@@ -392,11 +433,14 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             JOptionPane.showMessageDialog(this, "Vui lòng nhập mã lô!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
         }
-        else if (lotBLL.isLotCodeExist(lotText)) {
-            JOptionPane.showMessageDialog(this, "Mã lô đã tồn tại! Vui lòng nhập mã lô khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        else {
+        
+        // Check if lot code exists (but skip if it's the same as old lot code during edit)
+        if (!lotText.equals(oldLotText)) {
+            if (lotBLL.isLotCodeExist(lotText)) {
+                JOptionPane.showMessageDialog(this, "Mã lô đã tồn tại! Vui lòng nhập mã lô khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            
             for (LotDTO lot : selectedLots) {
                 if (!oldLotText.isEmpty() && lot.getLotCode().equals(oldLotText)) 
                     continue;
@@ -406,7 +450,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
                 }
             }
         }
-
 
         if (qtyText.isEmpty() || priceText.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ số lượng và giá nhập!", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -428,6 +471,7 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             String qtyText = txtQuantity.getText().trim();
             String priceText = txtPrice.getText().trim();
             String lotText = txtLot.getText().trim();
+            
             // Validate inputs
             if (!validateInput(lotText, "", qtyText, priceText)) {
                 return;
@@ -448,6 +492,7 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             lot.setImportDate(LocalDateTime.now());
             lot.setPrintYear(LocalDateTime.now().getYear());
             lot.setStatus("Còn");
+            lot.setImportId(importDTO.getReceiptId());
             
             selectedLots.add(lot);
             
@@ -456,11 +501,11 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
                 selectedLotsTableModel.getRowCount() + 1,
                 productId,
                 productName,
-                CURRENCY_FORMATTER.format(price),
+                price + "đ",
                 quantity
             });
             
-            lblTotalPrice.setText(CURRENCY_FORMATTER.format(calTotalPrice()));
+            lblTotalPrice.setText(calTotalPrice() + "đ");
             clearLotInputs();
             tblProducts.clearSelection();
             
@@ -486,7 +531,7 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         return total;
     }
 
-    private void importProducts() {
+    private void updateImport() {
         if (selectedLots.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng thêm ít nhất một sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
@@ -501,25 +546,18 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             BigDecimal totalPrice = calTotalPrice();     
             int providerId = providerBLL.getPrdIdByIdx(cbxProvider.getSelectedIndex());
             
-            // Create import receipt
-            ImportDTO importDTO = new ImportDTO();
+            // Update import receipt
             importDTO.setProviderId(providerId);
-            importDTO.setUserId(USERID);
             importDTO.setTotalPrice(totalPrice);
-            importDTO.setStatus(1);
-            importDTO.setCreatedDate(LocalDateTime.now());
-            System.out.println(importDTO);
             
             // Save to database
-            boolean success = importBLL.addImport(importDTO, selectedLots);
-            // boolean success = false;
+            boolean success = importBLL.updateImport(importDTO, selectedLots);
             
             if (success) {
-                JOptionPane.showMessageDialog(this, "Nhập hàng thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                
+                JOptionPane.showMessageDialog(this, "Cập nhật phiếu nhập thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "Nhập hàng thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Cập nhật phiếu nhập thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
             
         } catch (Exception e) {
@@ -533,11 +571,11 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         if (e.getSource() == btnAdd) {
             addLot();
         } 
-        else if (e.getSource() == btnImport) {
-            importProducts();
+        else if (e.getSource() == btnUpdate) {
+            updateImport();
         }
         else if (e.getSource() == btnCancel) {
-            dispose();
+            this.dispose();
         } 
         else if (e.getSource() == btnEdit) {
             int selectedRow = tblSelectedLots.getSelectedRow();
@@ -547,17 +585,19 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
                     String priceText = txtPrice.getText().trim();
                     String lotText = txtLot.getText().trim();
                     LotDTO lot = selectedLots.get(selectedRow);
+                    
                     if (!validateInput(lotText, lot.getLotCode(), qtyText, priceText)) {
                         return;
                     }
                     
-                    int quantity = Integer.parseInt(txtQuantity.getText().trim());
-                    BigDecimal price = new BigDecimal(txtPrice.getText().trim());
+                    int quantity = Integer.parseInt(qtyText);
+                    BigDecimal price = new BigDecimal(priceText);
                     lot.setQuantity(quantity);
+                    lot.setInitialQuantity(quantity);
                     lot.setImportPrice(price);
                     lot.setLotCode(lotText);
 
-                    selectedLotsTableModel.setValueAt(price + "đ", selectedRow, 3);
+                    selectedLotsTableModel.setValueAt(CURRENCY_FORMATTER.format(price), selectedRow, 3);
                     selectedLotsTableModel.setValueAt(quantity, selectedRow, 4);
 
                     lblTotalPrice.setText(CURRENCY_FORMATTER.format(calTotalPrice()));
@@ -579,9 +619,11 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
                 selectedLots.remove(selectedRow);
                 selectedLotsTableModel.removeRow(selectedRow);
 
+                // Renumber STT column
                 for (int i = 0; i < selectedLotsTableModel.getRowCount(); i++) {
                     selectedLotsTableModel.setValueAt(i + 1, i, 0);
                 }
+                
                 lblTotalPrice.setText(CURRENCY_FORMATTER.format(calTotalPrice()));
                 clearLotInputs();
                 btnEdit.setEnabled(false);
@@ -590,6 +632,5 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
                 tblSelectedLots.clearSelection();
             }
         }
-        
     }
 }

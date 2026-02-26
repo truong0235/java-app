@@ -45,6 +45,15 @@ public class ProviderBLL {
         return -1; // or throw an exception
     }
 
+    public int getIdxByProviderId(int providerId) {
+        for (int i = 0; i < providers.size(); i++) {
+            if (providers.get(i).getProviderId() == providerId) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public String add(ProviderDTO p) {
         if (p.getProviderName().trim().isEmpty()) return "Tên nhà cung cấp không được để trống!";
         if (p.getPhone().trim().isEmpty()) return "Số điện thoại không được để trống!";

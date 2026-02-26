@@ -16,7 +16,7 @@ public class LotDAL {
     public ArrayList<LotDTO> getLots() {
         ArrayList<LotDTO> lotList = new ArrayList<>();
         String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id " + 
-                        "FROM Lot";
+                        "FROM Lot WHERE status != 'Xóa'";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -46,7 +46,7 @@ public class LotDAL {
     public ArrayList<LotDTO> getLotsByImpId(int impId) {
         ArrayList<LotDTO> lotList = new ArrayList<>();
         String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id " + 
-                        "FROM Lot WHERE import_id = ?";
+                        "FROM Lot WHERE import_id = ? AND status != 'Xóa'";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -278,7 +278,7 @@ public class LotDAL {
         String query = "SELECT DISTINCT p.product_id, p.product_name, sum(l.initial_quantity) as qty, sum(l.initial_quantity * l.import_price) as price " +
                         "FROM Product p " +
                         "JOIN Lot l ON p.product_id = l.product_id " +
-                        "WHERE l.import_id = ? " +
+                        "WHERE l.import_id = ? AND l.status != 'Xóa' " +
                         "GROUP BY p.product_id, p.product_name";
         try {
             DBConnectHelper db = new DBConnectHelper();
