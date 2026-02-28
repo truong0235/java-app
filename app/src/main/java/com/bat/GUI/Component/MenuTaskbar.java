@@ -17,6 +17,8 @@ import javax.swing.border.EmptyBorder;
 
 import com.bat.GUI.Main;
 import com.bat.GUI.panel.Home;
+import com.bat.GUI.panel.Customer;
+import com.bat.GUI.panel.Provider;
 import com.bat.GUI.panel.Import;
 import com.bat.GUI.panel.InventoryCheck;
 import com.bat.GUI.panel.Lot;
@@ -41,6 +43,8 @@ public class MenuTaskbar extends JPanel{
     private final String[][] menuItem = {
         {"Trang chủ", "home.svg", "trangchu"},
         {"Sản phẩm", "product.svg", "sanpham"},
+        {"Khách hàng", "customer.svg", "khachhang"},
+        {"Nhà cung cấp", "provider.svg", "nhacungcap"},
         {"Phiếu nhập", "import.svg", "nhaphang"},
         {"Lô hàng", "lot.svg", "lohang"},
         // {"Mẫu", "import.svg", "nhaphang"},
@@ -209,6 +213,8 @@ public class MenuTaskbar extends JPanel{
         switch (menuName) {
             case "Trang chủ" -> mainFrame.setPanel(new Home());
             case "Sản phẩm" -> mainFrame.setPanel(new Product(mainFrame));
+            case "Khách hàng" -> mainFrame.setPanel(new Customer(mainFrame)); 
+            case "Nhà cung cấp" -> mainFrame.setPanel(new Provider(mainFrame)); 
             case "Phiếu kiểm kê" -> mainFrame.setPanel(new InventoryCheck(mainFrame));
             case "Phiếu nhập" -> mainFrame.setPanel(new Import(mainFrame));
             case "Lô hàng" -> mainFrame.setPanel(new Lot(mainFrame));
