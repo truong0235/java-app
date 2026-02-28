@@ -1,4 +1,4 @@
-package com.bat.GUI.Panel;
+package com.bat.GUI.panel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -35,9 +35,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.bat.BLL.CustomerBLL;
 import com.bat.DTO.CustomerDTO;
 import com.bat.GUI.Main;
-import com.bat.GUI.Component.ButtonToolbar;
-import com.bat.GUI.Component.IntegratedSearch;
-import com.bat.GUI.Component.MenuFunction;
+import com.bat.GUI.component.ButtonToolbar;
+import com.bat.GUI.component.IntegratedSearch;
+import com.bat.GUI.component.MenuFunction;
 
 public class Customer extends JPanel implements ActionListener {
     private Main main;
