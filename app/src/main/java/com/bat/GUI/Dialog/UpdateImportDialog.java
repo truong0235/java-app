@@ -405,7 +405,7 @@ public class UpdateImportDialog extends JDialog implements ActionListener {
             ProductDTO product = productBLL.getProductById(lot.getProductId());
             txtProductName.setText(product.getProductName());
             txtPublisher.setText(product.getPublisher());
-            txtPrice.setText(CURRENCY_FORMATTER.format(lot.getImportPrice()));
+            txtPrice.setText(lot.getImportPrice().toString());
             txtLot.setText(lot.getLotCode());
             txtQuantity.setText(String.valueOf(lot.getInitialQuantity()));
             if (lot.getQuantity() < lot.getInitialQuantity()) {

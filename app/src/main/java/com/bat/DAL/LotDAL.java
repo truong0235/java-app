@@ -77,7 +77,7 @@ public class LotDAL {
     public ArrayList<LotDTO> getLotsByProductId(int productId) {
         ArrayList<LotDTO> lotList = new ArrayList<>();
         String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id " + 
-                        "FROM Lot WHERE product_id = ?";
+                        "FROM Lot WHERE product_id = ? AND status != 'Xóa'";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -107,7 +107,7 @@ public class LotDAL {
 
     public LotDTO getLotById(int lotId) {
         String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id " + 
-                        "FROM Lot WHERE lot_id = ?";
+                        "FROM Lot WHERE lot_id = ? AND status != 'Xóa'";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -257,7 +257,7 @@ public class LotDAL {
     }
 
     public boolean isLotCodeExists(String lotCode) {
-        String query = "SELECT COUNT(*) AS count FROM Lot WHERE lot_code = ?";
+        String query = "SELECT COUNT(*) AS count FROM Lot WHERE lot_code = ? AND status != 'Xóa'";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -278,7 +278,7 @@ public class LotDAL {
         String query = "SELECT DISTINCT p.product_id, p.product_name, sum(l.initial_quantity) as qty, sum(l.initial_quantity * l.import_price) as price " +
                         "FROM Product p " +
                         "JOIN Lot l ON p.product_id = l.product_id " +
-                        "WHERE l.import_id = ? AND l.status != 'Xóa' " +
+                        "WHERE l.import_id = ? AND l.status != 'Xóa' AND p.status != 0" +
                         "GROUP BY p.product_id, p.product_name";
         try {
             DBConnectHelper db = new DBConnectHelper();

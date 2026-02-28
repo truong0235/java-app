@@ -113,7 +113,7 @@ public class ImportDAL {
     }
 
     public boolean checkUsedLot (int importId){
-        String query = "SELECT COUNT(*) AS count FROM lot WHERE import_id = ? AND quantity != initial_quantity";
+        String query = "SELECT COUNT(*) AS count FROM lot WHERE import_id = ? AND quantity != initial_quantity AND status != 'Xóa'";
         try {
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();

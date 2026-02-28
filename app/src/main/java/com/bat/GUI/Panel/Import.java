@@ -386,8 +386,8 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         searchPanel.cbxChoose.setSelectedIndex(0);
         providerCbx.setSelectedIndex(0);
         userCbx.setSelectedIndex(0);
-        fromDateChooser.setDate(null);
         toDateChooser.setDate(null);
+        fromDateChooser.setDate(null);
     }
 
     public boolean validateFilterInputs(){

@@ -376,7 +376,7 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             ProductDTO product = productBLL.getProductById(lot.getProductId());
             txtProductName.setText(product.getProductName());
             txtPublisher.setText(product.getPublisher());
-            txtPrice.setText(CURRENCY_FORMATTER.format(lot.getImportPrice()));
+            txtPrice.setText(lot.getImportPrice().toString());
             txtLot.setText(lot.getLotCode());
             txtQuantity.setText(String.valueOf(lot.getQuantity()));
         }

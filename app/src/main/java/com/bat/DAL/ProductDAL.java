@@ -12,7 +12,7 @@ public class ProductDAL {
     public ArrayList<ProductDTO> getProducts() {
         ArrayList<ProductDTO> products = new ArrayList<>();
         try {
-            String query = "SELECT * FROM product";
+            String query = "SELECT * FROM product WHERE status != 0";
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
@@ -43,7 +43,7 @@ public class ProductDAL {
     public ProductDTO getProductById(int productId){
         ProductDTO product = new ProductDTO();
         try {
-            String query = "SELECT * FROM product WHERE product_id = ?";
+            String query = "SELECT * FROM product WHERE product_id = ? AND status != 0";
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
@@ -74,7 +74,7 @@ public class ProductDAL {
     public ProductDTO getProductByLotId(int lotId){
         ProductDTO product = new ProductDTO();
         try {
-            String query = "SELECT p.* FROM product p JOIN lot l ON p.product_id = l.product_id WHERE l.lot_id = ?";
+            String query = "SELECT p.* FROM product p JOIN lot l ON p.product_id = l.product_id WHERE l.lot_id = ? AND p.status != 0";
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);

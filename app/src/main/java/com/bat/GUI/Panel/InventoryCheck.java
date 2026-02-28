@@ -303,8 +303,8 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
         searchPanel.txtSearchForm.setText("");
         searchPanel.cbxChoose.setSelectedIndex(0);
         userCbx.setSelectedIndex(0);
-        fromDateChooser.setDate(null);
         toDateChooser.setDate(null);
+        fromDateChooser.setDate(null);
     }
 
     public boolean validateFilterInputs(){

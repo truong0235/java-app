@@ -411,8 +411,8 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         searchPanel.cbxChoose.setSelectedIndex(0);
         providerCbx.setSelectedIndex(0);
         productCbx.setSelectedIndex(0);
-        fromDateChooser.setDate(null);
         toDateChooser.setDate(null);
+        fromDateChooser.setDate(null);
     }
 
     public boolean validateFilterInputs(){
