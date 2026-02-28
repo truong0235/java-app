@@ -12,7 +12,6 @@ import com.bat.DTO.ImportDTO;
 import com.bat.DTO.LotDTO;
 import com.bat.DTO.LotTransactionDTO;
 import com.bat.DTO.ProductDTO;
-import com.bat.DTO.ProviderDTO;
 
 public class LotBLL {
     private LotDAL lotDAL = new LotDAL();
@@ -68,7 +67,7 @@ public class LotBLL {
         for (LotDTO lot : lotList) {
             boolean matches = true;
             ImportDTO imp = importBLL.getImportById(lot.getImportId());
-            ProviderDTO provider = providerBLL.getProviderById(imp.getProviderId());
+            // ProviderDTO provider = providerBLL.getProviderById(imp.getProviderId());
             if (!searchTxt.isEmpty()) {
                 String searchLower = searchTxt.toLowerCase();
                 String lotCode = lot.getLotCode().toLowerCase();
