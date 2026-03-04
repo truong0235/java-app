@@ -14,6 +14,7 @@ import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,54 +28,49 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
-import com.bat.BLL.LotBLL;
-import com.bat.BLL.ProductBLL;
+import com.bat.BLL.ImportBLL;
 import com.bat.BLL.ProviderBLL;
-import com.bat.DTO.LotDTO;
-import com.bat.DTO.ProductDTO;
+import com.bat.BLL.UserBLL;
+import com.bat.DTO.ImportDTO;
 import com.bat.DTO.ProviderDTO;
-import com.bat.GUI.Dialog.HistoryLotDialog;
-import com.bat.GUI.Dialog.LotDetailDialog;
-import com.bat.GUI.Dialog.UpdateLotStatusDialog;
+import com.bat.DTO.UserDTO;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
+import com.bat.GUI.dialog.AddImportDialog;
+import com.bat.GUI.dialog.ReceiptDetailDialog;
 import com.toedter.calendar.JDateChooser;
 
-public class Lot extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {
-    // UserBLL userBLL = new UserBLL();
+public class Export extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {
+    UserBLL userBLL = new UserBLL();
     ProviderBLL providerBLL = new ProviderBLL();
-    LotBLL lotBLL = new LotBLL();
-    ProductBLL productBLL = new ProductBLL();
-    // ImportBLL importBLL = new ImportBLL();
-
+    ImportBLL exportBLL = new ImportBLL();
 
     DefaultTableModel tableModel;
     JTable table;
-    // ArrayList<ImportDTO> importList;
-    ArrayList<LotDTO> lotList;
+    ArrayList<ImportDTO> exportList;
     
 
     IntegratedSearch searchPanel;
     MenuFunction menuFunction;
-    JComboBox<String> providerCbx, productCbx;
+    JComboBox<String> providerCbx, userCbx;
     JDateChooser fromDateChooser, toDateChooser;
     Main main;
     
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
 
-    // private boolean isInitialized = false;
-
-    public Lot(Main main) {
+    public Export(Main main) {
         this.main = main;
         initComponent();
-        // importList = importBLL.getImportList();
-        lotList = lotBLL.getLotList();
-        loadDataTable(lotList);
+        exportList = exportBLL.getImportList();
+        loadDataTable(exportList);
     }
 
     public void initComponent() {
@@ -82,10 +78,10 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         this.setBackground(new Color(228, 238, 255));
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
         
-        // Config cho trang quản lý phiếu nhập
-        String[] importButtons = {"detail", "history", "update", "export"};
+        // Config cho trang quản lý phiếu xuất
+        String[] exportButtons = {"detail", "create", "update", "delete", "export"};
         
-        String[] importSearchOptions = {"Tất cả", "Mã lô", "Mã lô TT", "Tên sản phẩm"};
+        String[] exportSearchOptions = {"Tất cả", "Mã phiếu xuất", "Nhà cung cấp", "Nhân viên xuất"};
 
         JPanel menuBar = new JPanel(new BorderLayout());
         menuBar.setBackground(new Color(228, 238, 255));
@@ -100,12 +96,12 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
         titlePanel.setOpaque(false);
         
-        JLabel titleLabel = new JLabel("Quản lý Lô hàng");
+        JLabel titleLabel = new JLabel("Quản lý phiếu xuất");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         titleLabel.setForeground(new Color(33, 37, 41));
         titleLabel.setAlignmentX(LEFT_ALIGNMENT);
         
-        JLabel subtitleLabel = new JLabel("Danh sách lô hàng");
+        JLabel subtitleLabel = new JLabel("Danh sách phiếu xuất hàng hóa");
         subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
         subtitleLabel.setForeground(new Color(108, 117, 125));
         subtitleLabel.setAlignmentX(LEFT_ALIGNMENT);
@@ -118,8 +114,8 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         headerPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
         
         // Tạo MenuFunction instance để truy cập buttons HashMap
-        menuFunction = new MenuFunction(importButtons);
-        for (String btnKey : importButtons) {
+        menuFunction = new MenuFunction(exportButtons);
+        for (String btnKey : exportButtons) {
             JButton btn = menuFunction.buttons.get(btnKey);
             btn.setActionCommand(btnKey);
             btn.addActionListener(this);
@@ -129,9 +125,9 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         menuBar.add(headerPanel, BorderLayout.NORTH);
         
         // Search panel ở dưới nếu có config
-        if (importSearchOptions != null) {
-            searchPanel = new IntegratedSearch(importSearchOptions);
-            searchPanel.txtSearchForm.putClientProperty("JTextField.placeholderText", "Nhập mã lô hàng, ..."); 
+        if (exportSearchOptions != null) {
+            searchPanel = new IntegratedSearch(exportSearchOptions);
+            searchPanel.txtSearchForm.putClientProperty("JTextField.placeholderText", "Nhập mã phiếu, nhà cung cấp..."); 
             searchPanel.btnReset.setActionCommand("reset");
             searchPanel.btnReset.addActionListener(this);
             menuBar.add(searchPanel, BorderLayout.SOUTH);
@@ -140,8 +136,8 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
 
         this.add(menuBar, BorderLayout.NORTH);
         
-        // Tạo table content cho lô hàng
-        JPanel tablePanel = createLotTablePanel();
+        // Tạo table content cho phiếu nhập
+        JPanel tablePanel = createImportTablePanel();
         JPanel filterPanel = creatFilterPanel();
         this.add(filterPanel, BorderLayout.WEST);
         this.add(tablePanel, BorderLayout.CENTER);
@@ -156,8 +152,7 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         panel.setBorder(new EmptyBorder(0, 10, 250, 10));
 
         List<ProviderDTO> prdList = providerBLL.getProviderList();
-        // List<UserDTO> userList = userBLL.getUserList();
-        List<ProductDTO> productList = productBLL.getProductsList();
+        List<UserDTO> userList = userBLL.getUserList();
 
         JPanel prdPn = new JPanel();
         prdPn.setLayout(new GridLayout(2,1));
@@ -171,21 +166,18 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         prdPn.add(prdLbl);
         prdPn.add(providerCbx);
 
-        JPanel productPn = new JPanel();
-        productPn.setLayout(new GridLayout(2,1));
-        productPn.setBackground(Color.WHITE);
-        JLabel userLbl = new JLabel("Tên sản phẩm:");
-        productCbx = new JComboBox<>();
-        productCbx.addItem("Tất cả");
-        // for (UserDTO user : userList) {
-        //     userCbx.addItem(user.getUsername());
-        // }
-        for (ProductDTO prd : productList) {
-            productCbx.addItem(prd.getProductName());
+        JPanel userPn = new JPanel();
+        userPn.setLayout(new GridLayout(2,1));
+        userPn.setBackground(Color.WHITE);
+        JLabel userLbl = new JLabel("Nhân viên xuat:");
+        userCbx = new JComboBox<>();
+        userCbx.addItem("Tất cả");
+        for (UserDTO user : userList) {
+            userCbx.addItem(user.getUsername());
         }
-        productPn.add(userLbl);
-        productPn.add(productCbx);
-        productCbx.addItemListener(this); 
+        userPn.add(userLbl);
+        userPn.add(userCbx);
+        userCbx.addItemListener(this); 
         providerCbx.addItemListener(this);
 
         JPanel fromDatePn = new JPanel();
@@ -211,20 +203,20 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
 
 
         panel.add(prdPn);
-        panel.add(productPn);
+        panel.add(userPn);
         panel.add(fromDatePn);
         panel.add(toDatePn);
 
         return panel;
     }
 
-    private JPanel createLotTablePanel() {
+    private JPanel createImportTablePanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(228, 238, 255));
         panel.setBorder(new EmptyBorder(0, 10, 0, 0));
         
-        // Tạo table với dữ liệu mẫu phiếu nhập
-        String[] columns = {"Mã lô", "Mã lô TT", "Tên sản phẩm", "Số lượng BĐ" ,"Số lượng HT", "Giá nhập", "Trạng thái"};
+        // Tạo table với dữ liệu mẫu phiếu xuất
+        String[] columns = {"Mã phiếu", "Ngày xuất" ,"Tổng tiền", "Trạng thái", "order_id", "userid", "user_id"};
         tableModel = new DefaultTableModel(null, columns) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -250,29 +242,28 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         header.setBorder(new EmptyBorder(12, 0, 12, 0));
         
         // Column widths
-        table.getColumnModel().getColumn(0).setPreferredWidth(50);
-        table.getColumnModel().getColumn(1).setPreferredWidth(150);
-        table.getColumnModel().getColumn(2).setPreferredWidth(200);
+        table.getColumnModel().getColumn(0).setPreferredWidth(80);
+        table.getColumnModel().getColumn(1).setPreferredWidth(200);
+        table.getColumnModel().getColumn(2).setPreferredWidth(100);
         table.getColumnModel().getColumn(3).setPreferredWidth(100);
         table.getColumnModel().getColumn(4).setPreferredWidth(100);
         table.getColumnModel().getColumn(5).setPreferredWidth(100);
-        table.getColumnModel().getColumn(6).setPreferredWidth(100);
         
         // Cell renderer for status column
         // table.getColumnModel().getColumn(4).setCellRenderer(new ImportStatusCellRenderer());
         
         // Center align for some columns
-        // DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        // centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        // table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-        // table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
-        // table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-        // table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+        table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
+        table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
         
         // Right align for money column
-        // DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-        // rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
-        // table.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
+        table.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
         
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(null);
@@ -307,21 +298,20 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
     //     }
     // }
 
-    public void loadDataTable(ArrayList<LotDTO> lotData) {
-        // importList = importBLL.getImportList();
+    public void loadDataTable(ArrayList<ImportDTO> exportData) {
+        // exportList = exportBLL.getImportList();
         tableModel.setRowCount(0);
-        for (LotDTO lot : lotData) {
-            ProductDTO prd = productBLL.getProductById(lot.getProductId());
-            String formattedPrice = lot.getImportPrice() != null ? CURRENCY_FORMATTER.format(lot.getImportPrice()) : "0 ₫";
+        for (ImportDTO imp : exportData) {
+            String formattedDate = imp.getCreatedDate() != null ? imp.getCreatedDate().format(DATE_FORMATTER) : "";
+            String formattedPrice = imp.getTotalPrice() != null ? CURRENCY_FORMATTER.format(imp.getTotalPrice()) : "0 ₫";
             
             Object[] rowData = {
-                lot.getLotId(),
-                lot.getLotCode(),
-                prd.getProductName(),
-                lot.getInitialQuantity(),
-                lot.getQuantity(),
+                imp.getReceiptId(),
+                providerBLL.getProviderNameById(imp.getProviderId()),
+                formattedDate,
+                userBLL.getUserNameById(imp.getUserId()),
                 formattedPrice,
-                lot.getStatus()
+                imp.getStatus()
             };
             tableModel.addRow(rowData);
         }
@@ -330,7 +320,7 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
     public int getRowSelected() {
         int index = table.getSelectedRow();
         if (index == -1) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn lô hàng");
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn phiếu xuất");
         }
         return index;
     }
@@ -339,63 +329,38 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
         switch (command) {
-        //     case "create":
-        //         AddImportDialog dialog = new AddImportDialog(main);
-        //         dialog.setVisible(true);
-        //         importList = importBLL.getImportList();
-        //         loadDataTable(importList);
-        //         break;
-        //     case "update":
-        //         System.out.println("Update button clicked");
-        //         break;
-        //     case "delete":
-        //         // System.out.println("Delete button clicked");
-        //         int selectedRow = getRowSelected();
-        //         int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu nhập đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-        //         if (confirm == 0) {
-        //             ImportDTO selectedImport = importList.get(selectedRow);
-        //             if (importBLL.cancelImport(selectedImport.getReceiptId())) {
-        //                 importList = importBLL.getImportList();
-        //                 JOptionPane.showMessageDialog(null, "Xóa phiếu nhập thành công.");
-        //                 loadDataTable(importList);
-        //             }
-        //             else {
-        //                 JOptionPane.showMessageDialog(null, "Sản phẩm trong phiếu này đã được xuất kho, không thể xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-        //             }
-        //         }
-        //         break;
-        //     case "detail":
-        //         int idx = getRowSelected();
-        //         ReceiptDetailDialog detailDialog = new ReceiptDetailDialog(main, "Chi tiết phiếu nhập", importList.get(idx));
-        //         // detailDialog.setVisible(true);
-        //         break;
-        //     case "export":
-        //         System.out.println("Export button clicked");
-        //         break;
-            case "detail":
-                int detailRow = getRowSelected();
-                if (detailRow != -1) {
-                    LotDTO detailLot = lotList.get(detailRow);
-                    new LotDetailDialog(main, detailLot);
-                }
-                break;
-            case "history":
-                int selectedRow = getRowSelected();
-                if (selectedRow != -1) {
-                    LotDTO selectedLot = lotList.get(selectedRow);
-                    new HistoryLotDialog(main, selectedLot);
-                }
+            case "create":
+                AddImportDialog dialog = new AddImportDialog(main);
+                dialog.setVisible(true);
+                exportList = exportBLL.getImportList();
+                loadDataTable(exportList);
                 break;
             case "update":
-                int updateRow = getRowSelected();
-                if (updateRow != -1) {
-                    LotDTO updateLot = lotList.get(updateRow);
-                    UpdateLotStatusDialog updateDialog = new UpdateLotStatusDialog(main, updateLot);
-                    // Reload table if status was updated
-                    if (updateDialog.isUpdated()) {
-                        filter();
+                System.out.println("Update button clicked");
+                break;
+            case "delete":
+                // System.out.println("Delete button clicked");
+                int selectedRow = getRowSelected();
+                int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu nhập đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                if (confirm == 0) {
+                    ImportDTO selectedImport = exportList.get(selectedRow);
+                    if (exportBLL.cancelImport(selectedImport.getReceiptId())) {
+                        exportList = exportBLL.getImportList();
+                        JOptionPane.showMessageDialog(null, "Xóa phiếu nhập thành công.");
+                        loadDataTable(exportList);
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, "Sản phẩm trong phiếu này đã được xuất kho, không thể xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                     }
                 }
+                break;
+            case "detail":
+                int idx = getRowSelected();
+                ReceiptDetailDialog detailDialog = new ReceiptDetailDialog(main, "Chi tiết phiếu nhập", exportList.get(idx));
+                // detailDialog.setVisible(true);
+                break;
+            case "export":
+                System.out.println("Export button clicked");
                 break;
             case "reset":
                 System.out.println("Reset button clicked");
@@ -410,32 +375,21 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         searchPanel.txtSearchForm.setText("");
         searchPanel.cbxChoose.setSelectedIndex(0);
         providerCbx.setSelectedIndex(0);
-        productCbx.setSelectedIndex(0);
-        toDateChooser.setDate(null);
+        userCbx.setSelectedIndex(0);
         fromDateChooser.setDate(null);
+        toDateChooser.setDate(null);
     }
 
     public boolean validateFilterInputs(){
         // System.out.println();
         Date fromDate = fromDateChooser.getDate();
         Date toDate = toDateChooser.getDate();
-        Date currentDate = new Date();
 
-        if (fromDate != null && fromDate.after(currentDate)) {
-            JOptionPane.showMessageDialog(this, "Ngày bắt đầu không được lớn hơn ngày hiện tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            fromDateChooser.setDate(null);
-            return false;
-        }
-        if (toDate != null && toDate.after(currentDate)) {
-            JOptionPane.showMessageDialog(this, "Ngày kết thúc không được lớn hơn ngày hiện tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            toDateChooser.setDate(null);
-            return false;
-        }
         if (fromDate != null && toDate != null && fromDate.after(toDate))
         {
             JOptionPane.showMessageDialog(this, "Ngày bắt đầu không được lớn hơn ngày kết thúc.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            fromDateChooser.setDate(null);
             toDateChooser.setDate(null);
+            //fromDateChooser.setDate(null);
             return false;
         }
         if (fromDate == null && toDate != null)
@@ -450,18 +404,18 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         if (validateFilterInputs()) {
             String searchTxt = searchPanel.txtSearchForm.getText().trim();            
             int prdId = providerCbx.getSelectedIndex() == 0 ? 0 : providerBLL.getPrdIdByIdx(providerCbx.getSelectedIndex() - 1);
-            int productId = productCbx.getSelectedIndex() == 0 ? 0 : productBLL.getProductIdByIdx(productCbx.getSelectedIndex() - 1);
+            int userId = userCbx.getSelectedIndex() == 0 ? 0 : userBLL.getUserIdByIdx(userCbx.getSelectedIndex() - 1);
             int searchOpt = searchPanel.cbxChoose.getSelectedIndex();
             Date fromDate = fromDateChooser.getDate() == null ? null : fromDateChooser.getDate();
             Date toDate = toDateChooser.getDate() == null ? null : toDateChooser.getDate();
-            ArrayList<LotDTO> filteredLots = lotBLL.searchLots(searchTxt, prdId, productId, searchOpt, fromDate, toDate);
-            loadDataTable(filteredLots);
+            ArrayList<ImportDTO> filteredImports = exportBLL.searchImports(searchTxt, prdId, userId, searchOpt, fromDate, toDate);
+            loadDataTable(filteredImports);
         }
     }
 
     @Override
     public void itemStateChanged(ItemEvent ie) {
-        if (ie.getSource() == providerCbx || ie.getSource() == productCbx) {
+        if (ie.getSource() == providerCbx || ie.getSource() == userCbx) {
             filter();
         }
     }
@@ -469,11 +423,13 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
     @Override
     public void keyTyped(KeyEvent ke) {
         // throw new UnsupportedOperationException("Not supported yet.");
+        // System.out.println("Key typed");
     }
 
     @Override
     public void keyPressed(KeyEvent ke) {
         // throw new UnsupportedOperationException("Not supported yet.");
+        // System.out.println("Key pressed");
     }
 
     @Override
