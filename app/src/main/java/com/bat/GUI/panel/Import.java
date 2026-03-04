@@ -40,6 +40,7 @@ import com.bat.BLL.UserBLL;
 import com.bat.DTO.ImportDTO;
 import com.bat.DTO.ProviderDTO;
 import com.bat.DTO.UserDTO;
+import com.bat.GUI.dialog.UpdateImportDialog;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
