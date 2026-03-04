@@ -1,4 +1,4 @@
-package com.bat.GUI.Dialog;
+package com.bat.GUI.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

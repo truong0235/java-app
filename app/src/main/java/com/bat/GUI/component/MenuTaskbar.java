@@ -16,6 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 import com.bat.GUI.Main;
+import com.bat.GUI.panel.Export;
 import com.bat.GUI.panel.Home;
 import com.bat.GUI.panel.Customer;
 import com.bat.GUI.panel.Provider;
@@ -44,6 +45,7 @@ public class MenuTaskbar extends JPanel{
 
     // Đã thêm mục Danh mục vào đây
     private final String[][] menuItem = {
+<<<<<<< HEAD:app/src/main/java/com/bat/GUI/Component/MenuTaskbar.java
             {"Trang chủ", "home.svg", "trangchu"},
             {"Sản phẩm", "product.svg", "sanpham"},
             {"Danh mục", "category.svg", "danhmuc"},
@@ -54,6 +56,18 @@ public class MenuTaskbar extends JPanel{
             // {"Mẫu", "import.svg", "nhaphang"},
             {"Phiếu kiểm kê", "check.svg", "kiemke"},
             {"Đăng xuất", "log_out.svg", "dangxuat"},
+=======
+        {"Trang chủ", "home.svg", "trangchu"},
+        {"Sản phẩm", "product.svg", "sanpham"},
+        {"Khách hàng", "customer.svg", "khachhang"},
+        {"Nhà cung cấp", "provider.svg", "nhacungcap"},
+        {"Phiếu nhập", "import.svg", "nhaphang"},
+        {"Lô hàng", "lot.svg", "lohang"},
+        // {"Mẫu", "import.svg", "nhaphang"},
+        {"xuat", "lot.svg", "xuat"},
+        {"Phiếu kiểm kê", "check.svg", "kiemke"},
+        {"Đăng xuất", "log_out.svg", "dangxuat"},
+>>>>>>> main:app/src/main/java/com/bat/GUI/component/MenuTaskbar.java
     };
 
     @SuppressWarnings("OverridableMethodCallInConstructor")
@@ -224,6 +238,7 @@ public class MenuTaskbar extends JPanel{
             case "Phiếu nhập" -> mainFrame.setPanel(new Import(mainFrame));
             case "Lô hàng" -> mainFrame.setPanel(new Lot(mainFrame));
             // case "Mẫu" -> mainFrame.setPanel(new ImportManagement(mainFrame));
+            case "xuat" -> mainFrame.setPanel(new Export(mainFrame));
             default -> JOptionPane.showMessageDialog(mainFrame, "Chức năng đang phát triển!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         }
     }

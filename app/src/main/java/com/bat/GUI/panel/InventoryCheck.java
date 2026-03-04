@@ -13,12 +13,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -34,44 +32,39 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
-import com.bat.BLL.ImportBLL;
-import com.bat.BLL.ProviderBLL;
+import com.bat.BLL.InventoryCheckBLL;
 import com.bat.BLL.UserBLL;
-import com.bat.DTO.ImportDTO;
-import com.bat.DTO.ProviderDTO;
+import com.bat.DTO.InventoryCheckDTO;
 import com.bat.DTO.UserDTO;
-import com.bat.GUI.Dialog.AddImportDialog;
-import com.bat.GUI.Dialog.ReceiptDetailDialog;
-import com.bat.GUI.Dialog.UpdateImportDialog;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
+import com.bat.GUI.dialog.AddCheckDialog;
+import com.bat.GUI.dialog.CheckDetailDialog;
 import com.toedter.calendar.JDateChooser;
 
-public class Import extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {
+public class InventoryCheck extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {
     UserBLL userBLL = new UserBLL();
-    ProviderBLL providerBLL = new ProviderBLL();
-    ImportBLL importBLL = new ImportBLL();
+    InventoryCheckBLL checkBLL = new InventoryCheckBLL();
 
     DefaultTableModel tableModel;
     JTable table;
-    ArrayList<ImportDTO> importList;
+    ArrayList<InventoryCheckDTO> checkList;
     
 
     IntegratedSearch searchPanel;
     MenuFunction menuFunction;
-    JComboBox<String> providerCbx, userCbx;
+    JComboBox<String> userCbx;
     JDateChooser fromDateChooser, toDateChooser;
     Main main;
     
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-    private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
 
-    public Import(Main main) {
+    public InventoryCheck(Main main) {
         this.main = main;
         initComponent();
-        importList = importBLL.getImportList();
-        loadDataTable(importList);
+        checkList = checkBLL.getCheckList();
+        loadDataTable(checkList);
     }
 
     public void initComponent() {
@@ -79,10 +72,10 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         this.setBackground(new Color(228, 238, 255));
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
         
-        // Config cho trang quản lý phiếu nhập
-        String[] importButtons = {"detail", "create", "update", "delete", "export"};
+        // Config cho trang quản lý phiếu kiểm kê
+        String[] checkButtons = {"detail", "create", "delete", "export"};
         
-        String[] importSearchOptions = {"Tất cả", "Mã phiếu nhập", "Nhà cung cấp", "Nhân viên nhập"};
+        String[] checkSearchOptions = {"Tất cả", "Mã phiếu kiểm kê", "Nhân viên kiểm kê"};
 
         JPanel menuBar = new JPanel(new BorderLayout());
         menuBar.setBackground(new Color(228, 238, 255));
@@ -97,12 +90,12 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
         titlePanel.setOpaque(false);
         
-        JLabel titleLabel = new JLabel("Quản lý phiếu nhập");
+        JLabel titleLabel = new JLabel("Quản lý phiếu kiểm kê");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         titleLabel.setForeground(new Color(33, 37, 41));
         titleLabel.setAlignmentX(LEFT_ALIGNMENT);
         
-        JLabel subtitleLabel = new JLabel("Danh sách phiếu nhập hàng hóa");
+        JLabel subtitleLabel = new JLabel("Danh sách phiếu kiểm kê hàng hóa");
         subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
         subtitleLabel.setForeground(new Color(108, 117, 125));
         subtitleLabel.setAlignmentX(LEFT_ALIGNMENT);
@@ -115,8 +108,8 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         headerPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
         
         // Tạo MenuFunction instance để truy cập buttons HashMap
-        menuFunction = new MenuFunction(importButtons);
-        for (String btnKey : importButtons) {
+        menuFunction = new MenuFunction(checkButtons);
+        for (String btnKey : checkButtons) {
             JButton btn = menuFunction.buttons.get(btnKey);
             btn.setActionCommand(btnKey);
             btn.addActionListener(this);
@@ -126,9 +119,9 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         menuBar.add(headerPanel, BorderLayout.NORTH);
         
         // Search panel ở dưới nếu có config
-        if (importSearchOptions != null) {
-            searchPanel = new IntegratedSearch(importSearchOptions);
-            searchPanel.txtSearchForm.putClientProperty("JTextField.placeholderText", "Nhập mã phiếu, nhà cung cấp..."); 
+        if (checkSearchOptions != null) {
+            searchPanel = new IntegratedSearch(checkSearchOptions);
+            searchPanel.txtSearchForm.putClientProperty("JTextField.placeholderText", "Nhập nội dung tìm kiếm"); 
             searchPanel.btnReset.setActionCommand("reset");
             searchPanel.btnReset.addActionListener(this);
             menuBar.add(searchPanel, BorderLayout.SOUTH);
@@ -138,7 +131,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         this.add(menuBar, BorderLayout.NORTH);
         
         // Tạo table content cho phiếu nhập
-        JPanel tablePanel = createImportTablePanel();
+        JPanel tablePanel = createCheckTablePanel();
         JPanel filterPanel = creatFilterPanel();
         this.add(filterPanel, BorderLayout.WEST);
         this.add(tablePanel, BorderLayout.CENTER);
@@ -152,20 +145,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         panel.setBackground(Color.WHITE);
         panel.setBorder(new EmptyBorder(0, 10, 250, 10));
 
-        List<ProviderDTO> prdList = providerBLL.getProviderList();
         List<UserDTO> userList = userBLL.getUserList();
-
-        JPanel prdPn = new JPanel();
-        prdPn.setLayout(new GridLayout(2,1));
-        prdPn.setBackground(Color.WHITE);
-        JLabel prdLbl = new JLabel("Nhà cung cấp:");
-        providerCbx = new JComboBox<>();
-        providerCbx.addItem("Tất cả");
-        for (ProviderDTO prd : prdList) {
-            providerCbx.addItem(prd.getProviderName());
-        }
-        prdPn.add(prdLbl);
-        prdPn.add(providerCbx);
 
         JPanel userPn = new JPanel();
         userPn.setLayout(new GridLayout(2,1));
@@ -179,7 +159,6 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         userPn.add(userLbl);
         userPn.add(userCbx);
         userCbx.addItemListener(this); 
-        providerCbx.addItemListener(this);
 
         JPanel fromDatePn = new JPanel();
         fromDatePn.setLayout(new GridLayout(2,1));
@@ -203,7 +182,6 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         toDateChooser.addPropertyChangeListener(this);
 
 
-        panel.add(prdPn);
         panel.add(userPn);
         panel.add(fromDatePn);
         panel.add(toDatePn);
@@ -211,13 +189,13 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         return panel;
     }
 
-    private JPanel createImportTablePanel() {
+    private JPanel createCheckTablePanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(228, 238, 255));
         panel.setBorder(new EmptyBorder(0, 10, 0, 0));
         
         // Tạo table với dữ liệu mẫu phiếu nhập
-        String[] columns = {"Mã phiếu", "Nhà cung cấp", "Ngày nhập", "Nhân viên nhập" ,"Tổng tiền", "Trạng thái"};
+        String[] columns = {"Mã phiếu", "Nhân viên kiểm kê", "Ngày kiểm kê" };
         tableModel = new DefaultTableModel(null, columns) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -242,29 +220,11 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         header.setFont(new Font("Segoe UI", Font.BOLD, 13));
         header.setBorder(new EmptyBorder(12, 0, 12, 0));
         
-        // Column widths
-        table.getColumnModel().getColumn(0).setPreferredWidth(80);
-        table.getColumnModel().getColumn(1).setPreferredWidth(200);
-        table.getColumnModel().getColumn(2).setPreferredWidth(100);
-        table.getColumnModel().getColumn(3).setPreferredWidth(100);
-        table.getColumnModel().getColumn(4).setPreferredWidth(100);
-        table.getColumnModel().getColumn(5).setPreferredWidth(100);
-        
-        // Cell renderer for status column
-        // table.getColumnModel().getColumn(4).setCellRenderer(new ImportStatusCellRenderer());
-        
         // Center align for some columns
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
-        table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-        table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
-        
-        // Right align for money column
-        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-        rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
-        table.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
         
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(null);
@@ -273,46 +233,16 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         
         return panel;
     }
-    
-    // Custom renderer for status column
-    // private class ImportStatusCellRenderer extends DefaultTableCellRenderer {
-    //     @Override
-    //     public Component getTableCellRendererComponent(JTable table, Object value,
-    //             boolean isSelected, boolean hasFocus, int row, int column) {
-            
-    //         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            
-    //         if (value != null) {
-    //             String status = value.toString();
-    //             if (status.equals("Đã duyệt")) {
-    //                 setForeground(new Color(22, 163, 74));
-    //             } else if (status.equals("Chờ duyệt")) {
-    //                 setForeground(new Color(245, 158, 11));
-    //             } else if (status.equals("Đã hủy")) {
-    //                 setForeground(new Color(220, 38, 38));
-    //             }
-    //             setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
-    //         }
-            
-    //         setHorizontalAlignment(SwingConstants.CENTER);
-    //         return this;
-    //     }
-    // }
 
-    public void loadDataTable(ArrayList<ImportDTO> importData) {
-        // importList = importBLL.getImportList();
+    public void loadDataTable(ArrayList<InventoryCheckDTO> checkData) {
         tableModel.setRowCount(0);
-        for (ImportDTO imp : importData) {
-            String formattedDate = imp.getCreatedDate() != null ? imp.getCreatedDate().format(DATE_FORMATTER) : "";
-            String formattedPrice = imp.getTotalPrice() != null ? CURRENCY_FORMATTER.format(imp.getTotalPrice()) : "0 ₫";
+        for (InventoryCheckDTO check : checkData) {
+            String formattedDate = check.getCheckDate() != null ? check.getCheckDate().format(DATE_FORMATTER) : "";
             
             Object[] rowData = {
-                imp.getReceiptId(),
-                providerBLL.getProviderNameById(imp.getProviderId()),
+                check.getCheckId(),
+                userBLL.getUserNameById(check.getUserId()),
                 formattedDate,
-                userBLL.getUserNameById(imp.getUserId()),
-                formattedPrice,
-                imp.getStatus()
             };
             tableModel.addRow(rowData);
         }
@@ -321,8 +251,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
     public int getRowSelected() {
         int index = table.getSelectedRow();
         if (index == -1) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn phiếu nhập");
-            return -1;
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn phiếu kiểm kê");
         }
         return index;
     }
@@ -332,32 +261,21 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         String command = e.getActionCommand();
         switch (command) {
             case "create":
-                AddImportDialog dialog = new AddImportDialog(main);
+                AddCheckDialog dialog = new AddCheckDialog(main);
                 dialog.setVisible(true);
-                importList = importBLL.getImportList();
-                loadDataTable(importList);
-                break;
-            case "update":
-                int updateIdx = getRowSelected();
-                if (updateIdx != -1) {
-                    ImportDTO selectedImport = importList.get(updateIdx);
-                    UpdateImportDialog updateDialog = new UpdateImportDialog(main, selectedImport);
-                    updateDialog.setVisible(true);
-                    importList = importBLL.getImportList();
-                    loadDataTable(importList);
-                }
+                checkList = checkBLL.getCheckList();
+                loadDataTable(checkList);
                 break;
             case "delete":
                 // System.out.println("Delete button clicked");
                 int selectedRow = getRowSelected();
-                if (selectedRow == -1) return;
-                int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu nhập đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu kiểm kê đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
                 if (confirm == 0) {
-                    ImportDTO selectedImport = importList.get(selectedRow);
-                    if (importBLL.cancelImport(selectedImport.getReceiptId())) {
-                        importList = importBLL.getImportList();
-                        JOptionPane.showMessageDialog(null, "Xóa phiếu nhập thành công.");
-                        loadDataTable(importList);
+                    InventoryCheckDTO selectedCheck = checkList.get(selectedRow);
+                    if (checkBLL.cancelCheck(selectedCheck.getCheckId())) {
+                        checkList = checkBLL.getCheckList();
+                        JOptionPane.showMessageDialog(null, "Xóa phiếu kiểm kê thành công.");
+                        loadDataTable(checkList);
                     }
                     else {
                         JOptionPane.showMessageDialog(null, "Sản phẩm trong phiếu này đã được xuất kho, không thể xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -366,12 +284,12 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
                 break;
             case "detail":
                 int idx = getRowSelected();
-                ReceiptDetailDialog detailDialog = new ReceiptDetailDialog(main, "Chi tiết phiếu nhập", importList.get(idx));
+                CheckDetailDialog detailDialog = new CheckDetailDialog(main, checkList.get(idx));
                 // detailDialog.setVisible(true);
                 break;
-            case "export":
-                System.out.println("Export button clicked");
-                break;
+        //     case "export":
+        //         System.out.println("Export button clicked");
+        //         break;
             case "reset":
                 System.out.println("Reset button clicked");
                 resetFilterInputs();
@@ -384,7 +302,6 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
     public void resetFilterInputs() {
         searchPanel.txtSearchForm.setText("");
         searchPanel.cbxChoose.setSelectedIndex(0);
-        providerCbx.setSelectedIndex(0);
         userCbx.setSelectedIndex(0);
         toDateChooser.setDate(null);
         fromDateChooser.setDate(null);
@@ -424,19 +341,18 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
     public void filter() {
         if (validateFilterInputs()) {
             String searchTxt = searchPanel.txtSearchForm.getText().trim();            
-            int prdId = providerCbx.getSelectedIndex() == 0 ? 0 : providerBLL.getPrdIdByIdx(providerCbx.getSelectedIndex() - 1);
             int userId = userCbx.getSelectedIndex() == 0 ? 0 : userBLL.getUserIdByIdx(userCbx.getSelectedIndex() - 1);
             int searchOpt = searchPanel.cbxChoose.getSelectedIndex();
             Date fromDate = fromDateChooser.getDate() == null ? null : fromDateChooser.getDate();
             Date toDate = toDateChooser.getDate() == null ? null : toDateChooser.getDate();
-            ArrayList<ImportDTO> filteredImports = importBLL.searchImports(searchTxt, prdId, userId, searchOpt, fromDate, toDate);
+            ArrayList<InventoryCheckDTO> filteredImports = checkBLL.searchImports(searchTxt, userId, searchOpt, fromDate, toDate);
             loadDataTable(filteredImports);
         }
     }
 
     @Override
     public void itemStateChanged(ItemEvent ie) {
-        if (ie.getSource() == providerCbx || ie.getSource() == userCbx) {
+        if (ie.getSource() == userCbx) {
             filter();
         }
     }

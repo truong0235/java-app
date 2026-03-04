@@ -33,13 +33,27 @@ dependencies {
     implementation ("org.apache.poi:poi-ooxml:5.2.5")
 }
 
+
+    //export pdf bill
+    // Source: https://mvnrepository.com/artifact/com.itextpdf/itextpdf
+    //implementation("com.itextpdf:itextpdf:5.5.13.5")
+
+
+
+    // Source: https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox
+    //implementation("org.apache.pdfbox:pdfbox:3.0.6")
+    
+
 // Apply a specific Java toolchain to ease working on different environments.
+
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
+    // optional: set source/target compatibility to ensure bytecode level
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
-
 application {
     mainClass = "com.bat.GUI.Main"
 
