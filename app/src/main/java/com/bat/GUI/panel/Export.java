@@ -37,6 +37,7 @@ import javax.swing.table.JTableHeader;
 import com.bat.BLL.ImportBLL;
 import com.bat.BLL.ProviderBLL;
 import com.bat.BLL.UserBLL;
+import com.bat.DTO.ExportREceiptDTO;
 import com.bat.DTO.ImportDTO;
 import com.bat.DTO.ProviderDTO;
 import com.bat.DTO.UserDTO;
@@ -298,20 +299,18 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
     //     }
     // }
 
-    public void loadDataTable(ArrayList<ImportDTO> exportData) {
+    public void loadDataTable(ArrayList<ExportREceiptDTO> exportData) {
         // exportList = exportBLL.getImportList();
         tableModel.setRowCount(0);
-        for (ImportDTO imp : exportData) {
-            String formattedDate = imp.getCreatedDate() != null ? imp.getCreatedDate().format(DATE_FORMATTER) : "";
-            String formattedPrice = imp.getTotalPrice() != null ? CURRENCY_FORMATTER.format(imp.getTotalPrice()) : "0 ₫";
+        for (ExportREceiptDTO imp : exportData) {
+            // String formattedDate = imp.getCreatedDate() != null ? imp.getCreatedDate().format(DATE_FORMATTER) : "";
+            // String formattedPrice = imp.getTotalPrice() != null ? CURRENCY_FORMATTER.format(imp.getTotalPrice()) : "0 ₫";
             
             Object[] rowData = {
-                imp.getReceiptId(),
-                providerBLL.getProviderNameById(imp.getProviderId()),
-                formattedDate,
-                userBLL.getUserNameById(imp.getUserId()),
-                formattedPrice,
-                imp.getStatus()
+                imp.getStatus() == 1 ? "Đã duyệt" : "Chờ duyệt",
+                imp.getOrder_id(),
+                imp.getUser_id(),
+                imp.getUser_id()
             };
             tableModel.addRow(rowData);
         }
