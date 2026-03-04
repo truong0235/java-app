@@ -40,11 +40,11 @@ import com.bat.BLL.UserBLL;
 import com.bat.DTO.ImportDTO;
 import com.bat.DTO.ProviderDTO;
 import com.bat.DTO.UserDTO;
-import com.bat.GUI.Dialog.AddImportDialog;
-import com.bat.GUI.Dialog.ReceiptDetailDialog;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
+import com.bat.GUI.dialog.AddImportDialog;
+import com.bat.GUI.dialog.ReceiptDetailDialog;
 import com.toedter.calendar.JDateChooser;
 
 public class Export extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {

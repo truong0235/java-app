@@ -36,11 +36,11 @@ import com.bat.BLL.InventoryCheckBLL;
 import com.bat.BLL.UserBLL;
 import com.bat.DTO.InventoryCheckDTO;
 import com.bat.DTO.UserDTO;
-import com.bat.GUI.Dialog.AddCheckDialog;
-import com.bat.GUI.Dialog.CheckDetailDialog;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
+import com.bat.GUI.dialog.AddCheckDialog;
+import com.bat.GUI.dialog.CheckDetailDialog;
 import com.toedter.calendar.JDateChooser;
 
 public class InventoryCheck extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {

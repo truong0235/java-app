@@ -37,12 +37,12 @@ import com.bat.BLL.ProviderBLL;
 import com.bat.DTO.LotDTO;
 import com.bat.DTO.ProductDTO;
 import com.bat.DTO.ProviderDTO;
-import com.bat.GUI.Dialog.HistoryLotDialog;
-import com.bat.GUI.Dialog.LotDetailDialog;
-import com.bat.GUI.Dialog.UpdateLotStatusDialog;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
+import com.bat.GUI.dialog.HistoryLotDialog;
+import com.bat.GUI.dialog.LotDetailDialog;
+import com.bat.GUI.dialog.UpdateLotStatusDialog;
 import com.toedter.calendar.JDateChooser;
 
 public class Lot extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {
