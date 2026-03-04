@@ -16,6 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 import com.bat.GUI.Main;
+import com.bat.GUI.panel.Export;
 import com.bat.GUI.panel.Home;
 import com.bat.GUI.panel.Customer;
 import com.bat.GUI.panel.Provider;
@@ -48,6 +49,7 @@ public class MenuTaskbar extends JPanel{
         {"Phiếu nhập", "import.svg", "nhaphang"},
         {"Lô hàng", "lot.svg", "lohang"},
         // {"Mẫu", "import.svg", "nhaphang"},
+        {"xuat", "lot.svg", "xuat"},
         {"Phiếu kiểm kê", "check.svg", "kiemke"},
         {"Đăng xuất", "log_out.svg", "dangxuat"},
     };
@@ -219,6 +221,7 @@ public class MenuTaskbar extends JPanel{
             case "Phiếu nhập" -> mainFrame.setPanel(new Import(mainFrame));
             case "Lô hàng" -> mainFrame.setPanel(new Lot(mainFrame));
             // case "Mẫu" -> mainFrame.setPanel(new ImportManagement(mainFrame));
+            case "xuat" -> mainFrame.setPanel(new Export(mainFrame));
             default -> JOptionPane.showMessageDialog(mainFrame, "Chức năng đang phát triển!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         }
     }
