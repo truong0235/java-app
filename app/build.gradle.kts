@@ -43,7 +43,6 @@ dependencies {
     // Source: https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox
     //implementation("org.apache.pdfbox:pdfbox:3.0.6")
     
-}   
 
 // Apply a specific Java toolchain to ease working on different environments.
 
