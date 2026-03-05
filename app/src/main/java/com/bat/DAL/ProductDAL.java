@@ -147,10 +147,11 @@ public class ProductDAL {
 
     public boolean add(ProductDTO p) {
         String query = "INSERT INTO product (product_id, product_name, pic, category_id, publisher, publish_year, author, language, price, quantity, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, p.getProductId());
             ps.setString(2, p.getProductName());
             ps.setString(3, p.getPic());
@@ -163,7 +164,6 @@ public class ProductDAL {
             ps.setInt(10, p.getQuantity());
             ps.setInt(11, p.getStatus());
             int result = ps.executeUpdate();
-            db.closeConnection();
             return result > 0;
         } catch (Exception e) { e.printStackTrace(); }
         return false;
@@ -195,13 +195,13 @@ public class ProductDAL {
 
     public boolean delete(int id) {
         String query = "UPDATE product SET status = 0 WHERE product_id = ?";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, id);
             int result = ps.executeUpdate();
-            db.closeConnection();
             return result > 0;
         } catch (Exception e) { e.printStackTrace(); }
         return false;
