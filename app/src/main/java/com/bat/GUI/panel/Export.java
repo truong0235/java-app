@@ -28,34 +28,30 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
-import com.bat.BLL.ImportBLL;
+import com.bat.BLL.ExportBLL;
 import com.bat.BLL.ProviderBLL;
 import com.bat.BLL.UserBLL;
-import com.bat.DTO.ExportREceiptDTO;
-import com.bat.DTO.ImportDTO;
+import com.bat.DTO.ExportReceiptDTO;
 import com.bat.DTO.ProviderDTO;
 import com.bat.DTO.UserDTO;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
 import com.bat.GUI.dialog.AddImportDialog;
-import com.bat.GUI.dialog.ReceiptDetailDialog;
 import com.toedter.calendar.JDateChooser;
 
 public class Export extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {
     UserBLL userBLL = new UserBLL();
     ProviderBLL providerBLL = new ProviderBLL();
-    ImportBLL exportBLL = new ImportBLL();
+    ExportBLL exportBLL = new ExportBLL();
 
     DefaultTableModel tableModel;
     JTable table;
-    ArrayList<ImportDTO> exportList;
+    ArrayList<ExportReceiptDTO> exportList;
     
 
     IntegratedSearch searchPanel;
@@ -70,7 +66,7 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
     public Export(Main main) {
         this.main = main;
         initComponent();
-        exportList = exportBLL.getImportList();
+        exportList = exportBLL.getExportList();
         loadDataTable(exportList);
     }
 
@@ -144,7 +140,6 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
         this.add(tablePanel, BorderLayout.CENTER);
     }
     
-    @SuppressWarnings("unchecked")
     private JPanel creatFilterPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(4,1,5,0));
@@ -254,17 +249,17 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
         // table.getColumnModel().getColumn(4).setCellRenderer(new ImportStatusCellRenderer());
         
         // Center align for some columns
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-        table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
-        table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-        table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
+        // DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        // centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        // table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        // table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+        // table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
+        // table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
         
         // Right align for money column
-        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-        rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
-        table.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
+        // DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        // rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
+        // table.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
         
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(null);
@@ -299,18 +294,24 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
     //     }
     // }
 
-    public void loadDataTable(ArrayList<ExportREceiptDTO> exportData) {
+    public void loadDataTable(ArrayList<ExportReceiptDTO> filteredImports) {
         // exportList = exportBLL.getImportList();
         tableModel.setRowCount(0);
-        for (ExportREceiptDTO imp : exportData) {
-            // String formattedDate = imp.getCreatedDate() != null ? imp.getCreatedDate().format(DATE_FORMATTER) : "";
-            // String formattedPrice = imp.getTotalPrice() != null ? CURRENCY_FORMATTER.format(imp.getTotalPrice()) : "0 ₫";
-            
+        for (ExportReceiptDTO imp : filteredImports) {
+            // String formattedDate = imp.getCreatedDate() != null ?
+            // imp.getCreatedDate().format(DATE_FORMATTER) : "";
+            // String formattedPrice = imp.getTotalPrice() != null ?
+            // CURRENCY_FORMATTER.format(imp.getTotalPrice()) : "0 ₫";
+
             Object[] rowData = {
-                imp.getStatus() == 1 ? "Đã duyệt" : "Chờ duyệt",
-                imp.getOrder_id(),
-                imp.getUser_id(),
-                imp.getUser_id()
+                    imp.getExport_id(),
+                    // imp.getExport_date() != null ? imp.getExport_date().format(DATE_FORMATTER) : "",
+                    imp.getExport_date(),
+                    imp.getTotal_price() + " ₫",
+                    imp.getStatus() == 1 ? "Đã duyệt" : "Chờ duyệt",
+                    imp.getOrder_id(),
+                    imp.getUser_id(),
+                    imp.getUser_id()
             };
             tableModel.addRow(rowData);
         }
@@ -331,31 +332,31 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
             case "create":
                 AddImportDialog dialog = new AddImportDialog(main);
                 dialog.setVisible(true);
-                exportList = exportBLL.getImportList();
+                exportList = exportBLL.getExportList();
                 loadDataTable(exportList);
                 break;
             case "update":
                 System.out.println("Update button clicked");
                 break;
             case "delete":
-                // System.out.println("Delete button clicked");
-                int selectedRow = getRowSelected();
-                int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu nhập đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-                if (confirm == 0) {
-                    ImportDTO selectedImport = exportList.get(selectedRow);
-                    if (exportBLL.cancelImport(selectedImport.getReceiptId())) {
-                        exportList = exportBLL.getImportList();
-                        JOptionPane.showMessageDialog(null, "Xóa phiếu nhập thành công.");
-                        loadDataTable(exportList);
-                    }
-                    else {
-                        JOptionPane.showMessageDialog(null, "Sản phẩm trong phiếu này đã được xuất kho, không thể xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
+                // // System.out.println("Delete button clicked");
+                // int selectedRow = getRowSelected();
+                // int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu nhập đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                // if (confirm == 0) {
+                //     ExportREceiptDTO selectedImport = exportList.get(selectedRow);
+                //     if (exportBLL.cancelImport(selectedImport.getReceiptId())) {
+                //         exportList = exportBLL.getExportList();
+                //         JOptionPane.showMessageDialog(null, "Xóa phiếu nhập thành công.");
+                //         loadDataTable(exportList);
+                //     }
+                //     else {
+                //         JOptionPane.showMessageDialog(null, "Sản phẩm trong phiếu này đã được xuất kho, không thể xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                //     }
+                // }
                 break;
             case "detail":
                 int idx = getRowSelected();
-                ReceiptDetailDialog detailDialog = new ReceiptDetailDialog(main, "Chi tiết phiếu nhập", exportList.get(idx));
+                // ReceiptDetailDialog detailDialog = new ReceiptDetailDialog(main, "Chi tiết phiếu nhập", exportList.get(idx));
                 // detailDialog.setVisible(true);
                 break;
             case "export":
@@ -401,14 +402,14 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
 
     public void filter() {
         if (validateFilterInputs()) {
-            String searchTxt = searchPanel.txtSearchForm.getText().trim();            
-            int prdId = providerCbx.getSelectedIndex() == 0 ? 0 : providerBLL.getPrdIdByIdx(providerCbx.getSelectedIndex() - 1);
-            int userId = userCbx.getSelectedIndex() == 0 ? 0 : userBLL.getUserIdByIdx(userCbx.getSelectedIndex() - 1);
-            int searchOpt = searchPanel.cbxChoose.getSelectedIndex();
-            Date fromDate = fromDateChooser.getDate() == null ? null : fromDateChooser.getDate();
-            Date toDate = toDateChooser.getDate() == null ? null : toDateChooser.getDate();
-            ArrayList<ImportDTO> filteredImports = exportBLL.searchImports(searchTxt, prdId, userId, searchOpt, fromDate, toDate);
-            loadDataTable(filteredImports);
+            // String searchTxt = searchPanel.txtSearchForm.getText().trim();            
+            // int prdId = providerCbx.getSelectedIndex() == 0 ? 0 : providerBLL.getPrdIdByIdx(providerCbx.getSelectedIndex() - 1);
+            // int userId = userCbx.getSelectedIndex() == 0 ? 0 : userBLL.getUserIdByIdx(userCbx.getSelectedIndex() - 1);
+            // int searchOpt = searchPanel.cbxChoose.getSelectedIndex();
+            // Date fromDate = fromDateChooser.getDate() == null ? null : fromDateChooser.getDate();
+            // Date toDate = toDateChooser.getDate() == null ? null : toDateChooser.getDate();
+            // ArrayList<ImportDTO> filteredImports = exportBLL.searchImports(searchTxt, prdId, userId, searchOpt, fromDate, toDate);
+            // loadDataTable(filteredImports);
         }
     }
 

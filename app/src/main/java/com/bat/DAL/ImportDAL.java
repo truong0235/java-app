@@ -13,13 +13,13 @@ import com.bat.utils.helper.DBConnectHelper;
 public class ImportDAL {
     public ArrayList<ImportDTO> getImports() {
         ArrayList<ImportDTO> importList = new ArrayList<>();
-        try {
+            String query = "SELECT import_id, import_date, status, total_price, provider_id, user_id FROM import_receipt WHERE status = 1";
+        try (
             DBConnectHelper db = new DBConnectHelper();
-            String query = "SELECT import_id, import_date, status, total_price, provider_id, user_id " +
-                           "FROM import_receipt WHERE status = 1";
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = (ResultSet) ps.executeQuery();
+        ){
             while (rs.next()) {
                 ImportDTO imp = new ImportDTO(
                     rs.getInt("import_id"),
@@ -39,11 +39,11 @@ public class ImportDAL {
 
     public int add(ImportDTO imp){
         String query = "INSERT INTO import_receipt (user_id, total_price, import_date, provider_id) VALUES (?, ?, ?, ?)";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
-
+        ){
             ps.setInt(1, imp.getUserId());
             ps.setBigDecimal(2, imp.getTotalPrice());
             ps.setTimestamp(3, Timestamp.valueOf(imp.getCreatedDate()));
@@ -64,10 +64,11 @@ public class ImportDAL {
 
     public boolean update(ImportDTO imp){
         String query = "UPDATE import_receipt SET total_price = ?, import_date = ?, provider_id = ? WHERE import_id = ?";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
 
             ps.setBigDecimal(1, imp.getTotalPrice());
             ps.setTimestamp(2, Timestamp.valueOf(imp.getCreatedDate()));
@@ -99,10 +100,11 @@ public class ImportDAL {
 
 
         String query = "UPDATE import_receipt SET status = 0 WHERE import_id = ?";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, importId);
             int affectedRows = ps.executeUpdate();
             return affectedRows > 0;
@@ -114,10 +116,11 @@ public class ImportDAL {
 
     public boolean checkUsedLot (int importId){
         String query = "SELECT COUNT(*) AS count FROM lot WHERE import_id = ? AND quantity != initial_quantity AND status != 'Xóa'";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, importId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {

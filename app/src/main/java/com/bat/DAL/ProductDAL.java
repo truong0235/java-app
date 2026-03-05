@@ -11,11 +11,12 @@ import com.bat.utils.helper.DBConnectHelper;
 public class ProductDAL {
     public ArrayList<ProductDTO> getProducts() {
         ArrayList<ProductDTO> products = new ArrayList<>();
-        try {
-            String query = "SELECT * FROM product WHERE status != 0";
+        String query = "SELECT * FROM product WHERE status != 0";
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 ProductDTO product = new ProductDTO(
@@ -33,7 +34,6 @@ public class ProductDAL {
                 );
                 products.add(product);
             }
-            db.closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -42,11 +42,12 @@ public class ProductDAL {
 
     public ProductDTO getProductById(int productId){
         ProductDTO product = new ProductDTO();
-        try {
-            String query = "SELECT * FROM product WHERE product_id = ? AND status != 0";
+        String query = "SELECT * FROM product WHERE product_id = ? AND status != 0";
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, productId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -64,7 +65,6 @@ public class ProductDAL {
                     rs.getInt("status")
                 );
             }
-            db.closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,11 +73,12 @@ public class ProductDAL {
 
     public ProductDTO getProductByLotId(int lotId){
         ProductDTO product = new ProductDTO();
-        try {
             String query = "SELECT p.* FROM product p JOIN lot l ON p.product_id = l.product_id WHERE l.lot_id = ? AND p.status != 0";
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, lotId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -95,7 +96,6 @@ public class ProductDAL {
                     rs.getInt("status")
                 );
             }
-            db.closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -104,10 +104,11 @@ public class ProductDAL {
 
     public boolean update(ProductDTO product) {
         String query = "UPDATE product SET product_name = ?, pic = ?, category_id = ?, publisher = ?, publish_year = ?, author = ?, language = ?, price = ?, quantity = ?, status = ? WHERE product_id = ?";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setString(1, product.getProductName());
             ps.setString(2, product.getPic());
             ps.setInt(3, product.getCategoryId());
@@ -120,7 +121,6 @@ public class ProductDAL {
             ps.setInt(10, product.getStatus());
             ps.setInt(11, product.getProductId());
             int affectedRows = ps.executeUpdate();
-            db.closeConnection();
             return affectedRows > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -130,14 +130,14 @@ public class ProductDAL {
 
     public boolean updateQuantityByLotId(int lotId, int qty) {
         String query = "UPDATE product SET quantity = quantity + ? WHERE product_id = (SELECT product_id FROM lot WHERE lot_id = ?)";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, qty);
             ps.setInt(2, lotId);
             int affectedRows = ps.executeUpdate();
-            db.closeConnection();
             return affectedRows > 0;
         } catch (Exception e) {
             e.printStackTrace();

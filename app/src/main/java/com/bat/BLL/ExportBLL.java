@@ -1,6 +1,5 @@
 package com.bat.BLL;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import com.bat.DAL.ExportReceiptDAL;
