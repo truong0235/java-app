@@ -11,7 +11,6 @@ import com.bat.DAL.LotTransactionDAL;
 import com.bat.DTO.ImportDTO;
 import com.bat.DTO.LotDTO;
 import com.bat.DTO.LotTransactionDTO;
-import com.bat.DTO.ProductDTO;
 
 public class LotBLL {
     private LotDAL lotDAL = new LotDAL();
@@ -41,10 +40,6 @@ public class LotBLL {
 
     public ArrayList<LotDTO> getLotsByImportId(int importId) {
         return lotDAL.getLotsByImpId(importId);
-    }
-
-    public ArrayList<ProductDTO> getPrdInImport(int importId) {
-        return lotDAL.getPrInImport(importId);
     }
 
     public ArrayList<LotDTO> getLotsByProductIdInImport(int importId, int productId) {

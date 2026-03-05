@@ -31,12 +31,8 @@ dependencies {
     implementation ("com.toedter:jcalendar:1.4")
     implementation ("org.apache.poi:poi:5.2.5")
     implementation ("org.apache.poi:poi-ooxml:5.2.5")
+    implementation("com.itextpdf:itextpdf:5.5.13.3")
 }
-
-
-    //export pdf bill
-    // Source: https://mvnrepository.com/artifact/com.itextpdf/itextpdf
-    //implementation("com.itextpdf:itextpdf:5.5.13.5")
 
 
 

@@ -8,28 +8,38 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 import com.bat.BLL.LotBLL;
+import com.bat.BLL.ProductBLL;
 import com.bat.BLL.ProviderBLL;
 import com.bat.BLL.UserBLL;
 import com.bat.DTO.ImportDTO;
 import com.bat.DTO.LotDTO;
 import com.bat.DTO.ProductDTO;
+import com.bat.DTO.ProviderDTO;
+import com.bat.utils.helper.PDFExporter;
 
 public class ReceiptDetailDialog extends JDialog implements ActionListener {
     private ImportDTO importDTO;
@@ -38,6 +48,8 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
     private LotBLL lotBLL = new LotBLL();
     private UserBLL userBLL = new UserBLL();
     private ProviderBLL prdBLL = new ProviderBLL();
+    private ProductBLL productBLL = new ProductBLL();
+
 
     private JPanel mainPn, main_topPn, main_blPn, main_brPn, main_btnPn, main_bPn;
     private JTextField txtImportId, txtUser, txtProvider, txtCreatedDate;
@@ -53,7 +65,7 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
     public ReceiptDetailDialog(JFrame main, String title, ImportDTO importDTO) { // chp cột STT bên phải nhỏ lại (để có chỗ cho mã lô)
         super(main, title, true);
         this.importDTO = importDTO;
-        this.prInImportList = lotBLL.getPrdInImport(importDTO.getReceiptId());
+        this.prInImportList = productBLL.getPrdInImport(importDTO.getReceiptId());
         initComponent(title, "import");
         initImport();
         this.setVisible(true); 
@@ -255,6 +267,70 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnClose) {
             this.dispose();
+        } else if (e.getSource() == btnPDF) {
+            exportToPDF();
+        }
+    }
+    
+    private void exportToPDF() {
+        try {
+            // Create file chooser
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Lưu phiếu nhập PDF");
+            
+            // Set default file name
+            String defaultFileName = "PhieuNhap_" + importDTO.getReceiptId() + "_" + 
+                                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss")) + ".pdf";
+            fileChooser.setSelectedFile(new File(defaultFileName));
+            
+            // Set file filter
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("PDF Files", "pdf");
+            fileChooser.setFileFilter(filter);
+            
+            // Show save dialog
+            int userSelection = fileChooser.showSaveDialog(this);
+            
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                String filePath = fileToSave.getAbsolutePath();
+                
+                // Add .pdf extension if not present
+                if (!filePath.toLowerCase().endsWith(".pdf")) {
+                    filePath += ".pdf";
+                }
+                
+                // Get provider details
+                ProviderDTO provider = prdBLL.getProviderById(importDTO.getProviderId());
+                String userName = userBLL.getUserNameById(importDTO.getUserId());
+                
+                // Get all lots for this import
+                ArrayList<LotDTO> lots = lotBLL.getLotsByImportId(importDTO.getReceiptId());
+                
+                // Create product name map
+                Map<Integer, String> productNames = new HashMap<>();
+                for (LotDTO lot : lots) {
+                    if (!productNames.containsKey(lot.getProductId())) {
+                        String productName = productBLL.getProductById(lot.getProductId()).getProductName();
+                        productNames.put(lot.getProductId(), productName);
+                    }
+                }
+                
+                // Create PDF
+                PDFExporter pdfExporter = new PDFExporter();
+                pdfExporter.exportImportReceipt(filePath, importDTO, lots, productNames, userName, provider);
+                
+                // Show success message
+                JOptionPane.showMessageDialog(this, 
+                    "Xuất PDF thành công!\nFile đã được lưu tại: " + filePath, 
+                    "Thành công", 
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, 
+                "Lỗi khi xuất PDF: " + ex.getMessage(), 
+                "Lỗi", 
+                JOptionPane.ERROR_MESSAGE);
         }
     }
 }

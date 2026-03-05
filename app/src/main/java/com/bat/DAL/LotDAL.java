@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 import com.bat.DTO.LotDTO;
 import com.bat.DTO.LotTransactionDTO;
-import com.bat.DTO.ProductDTO;
 import com.bat.utils.helper.DBConnectHelper;
 
 public class LotDAL {
@@ -272,31 +271,5 @@ public class LotDAL {
             e.printStackTrace();
         }
         return false;
-    }
-    public ArrayList<ProductDTO> getPrInImport(int inmportId) {
-        ArrayList<ProductDTO> prInImport = new ArrayList<>();
-        String query = "SELECT DISTINCT p.product_id, p.product_name, sum(l.initial_quantity) as qty, sum(l.initial_quantity * l.import_price) as price " +
-                        "FROM Product p " +
-                        "JOIN Lot l ON p.product_id = l.product_id " +
-                        "WHERE l.import_id = ? AND l.status != 'Xóa' AND p.status != 0" +
-                        "GROUP BY p.product_id, p.product_name";
-        try {
-            DBConnectHelper db = new DBConnectHelper();
-            Connection conn = db.getConnection();
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.setInt(1, inmportId);
-            ResultSet rs = ps.executeQuery();
-            while(rs.next()) {
-                ProductDTO prd = new ProductDTO();
-                prd.setProductId(rs.getInt("product_id"));
-                prd.setProductName(rs.getString("product_name"));
-                prd.setQuantity(rs.getInt("qty"));
-                prd.setPrice(rs.getBigDecimal("price"));
-                prInImport.add(prd);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return prInImport;
     }
 }

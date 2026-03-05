@@ -37,4 +37,9 @@ public class ProductBLL {
         }
         return -1;
     }
+
+    public ArrayList<ProductDTO> getPrdInImport(int importId) {
+        return productDAL.getPrInImport(importId);
+    }
+
 }
