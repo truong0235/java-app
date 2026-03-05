@@ -41,7 +41,6 @@ public class CategoryDAL {
             ResultSet rs = ps.executeQuery();
         ){
             if (rs.next()) nextId = rs.getInt(1) + 1;
-            db.closeConnection();
         } catch (Exception e) { e.printStackTrace(); }
         return nextId;
     }
@@ -94,3 +93,6 @@ public class CategoryDAL {
         } catch (Exception e) { e.printStackTrace(); }
         return false;
     }
+
+    
+}
