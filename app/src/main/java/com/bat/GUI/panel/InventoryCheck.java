@@ -137,7 +137,6 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
         this.add(tablePanel, BorderLayout.CENTER);
     }
     
-    @SuppressWarnings("unchecked")
     private JPanel creatFilterPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(4,1,5,0));

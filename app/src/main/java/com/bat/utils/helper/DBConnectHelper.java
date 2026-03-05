@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import com.bat.utils.statics.Config;
 
-public class DBConnectHelper {
+public class DBConnectHelper implements AutoCloseable {
 
     private Connection conn;
 
@@ -22,6 +22,18 @@ public class DBConnectHelper {
     public Connection getConnection() {
         return conn;
     }
+
+    public void closeConnection() throws Exception {
+        if (conn != null) {
+            try {
+                conn.close();
+                conn = null;
+            } catch (SQLException e) {
+                throw new RuntimeException("Error closing connection: " + e.getMessage(), e);
+            }
+        }
+    }
+
     public void connect() throws Exception {
         if (conn == null) {
             try {
@@ -35,7 +47,8 @@ public class DBConnectHelper {
         }
     }
 
-    public void closeConnection() throws Exception {
+    @Override
+    public void close() throws Exception {
         if (conn != null) {
             try {
                 conn.close();
@@ -50,7 +63,7 @@ public class DBConnectHelper {
         try {
             DBConnectHelper dbhelper = new DBConnectHelper();
             System.out.println("Database connection established successfully.");
-            dbhelper.closeConnection();
+            dbhelper.close();
             System.out.println("Database connection closed successfully.");
         } catch (Exception e) {
             e.printStackTrace();
