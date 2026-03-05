@@ -134,13 +134,13 @@ public class ProductDAL {
     public int getAutoIncrement() {
         int nextId = 1;
         String query = "SELECT MAX(product_id) FROM product";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
+        ){
             if (rs.next()) nextId = rs.getInt(1) + 1;
-            db.closeConnection();
         } catch (Exception e) { e.printStackTrace(); }
         return nextId;
     }
