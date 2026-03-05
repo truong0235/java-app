@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -20,6 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 import com.bat.BLL.InventoryCheckBLL;
@@ -30,6 +32,7 @@ import com.bat.DTO.CheckDetailDTO;
 import com.bat.DTO.InventoryCheckDTO;
 import com.bat.DTO.LotDTO;
 import com.bat.DTO.ProductDTO;
+import com.bat.utils.helper.PDFExporter;
 
 public class CheckDetailDialog extends JDialog implements ActionListener {
     private InventoryCheckDTO checkDTO;
@@ -202,7 +205,56 @@ public class CheckDetailDialog extends JDialog implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'actionPerformed'");
+        if (e.getSource() == btnClose) {
+            this.dispose();
+        } else if (e.getSource() == btnPDF) {
+            exportToPDF();
+        }
+    }
+    
+    private void exportToPDF() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Lưu file PDF");
+        fileChooser.setSelectedFile(new java.io.File("PhieuKiemKe_" + checkDTO.getCheckId() + ".pdf"));
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("PDF Files (*.pdf)", "pdf");
+        fileChooser.setFileFilter(filter);
+        
+        int userSelection = fileChooser.showSaveDialog(this);
+        
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+            if (!filePath.toLowerCase().endsWith(".pdf")) {
+                filePath += ".pdf";
+            }
+            
+            try {
+                // Create maps for product names and lot codes
+                java.util.Map<Integer, String> productNames = new java.util.HashMap<>();
+                java.util.Map<Integer, String> lotCodes = new java.util.HashMap<>();
+                
+                for (CheckDetailDTO detail : detailList) {
+                    ProductDTO product = productBLL.getProductByLotId(detail.getLotId());
+                    LotDTO lot = lotBLL.getLotById(detail.getLotId());
+                    productNames.put(detail.getLotId(), product.getProductName());
+                    lotCodes.put(detail.getLotId(), lot.getLotCode());
+                }
+                
+                String userName = userBLL.getUserNameById(checkDTO.getUserId());
+                
+                PDFExporter exporter = new PDFExporter();
+                exporter.exportInventoryCheckReceipt(filePath, checkDTO, detailList, 
+                                                    productNames, lotCodes, userName);
+                
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Xuất file PDF thành công!\nĐường dẫn: " + filePath, 
+                    "Thành công", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                
+            } catch (Exception ex) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Lỗi khi xuất file: " + ex.getMessage(), 
+                    "Lỗi", javax.swing.JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        }
     }
 }

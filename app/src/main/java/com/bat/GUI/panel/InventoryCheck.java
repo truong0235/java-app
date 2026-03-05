@@ -41,6 +41,7 @@ import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
 import com.bat.GUI.dialog.AddCheckDialog;
 import com.bat.GUI.dialog.CheckDetailDialog;
+import com.bat.utils.helper.ExcelExporter;
 import com.toedter.calendar.JDateChooser;
 
 public class InventoryCheck extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {
@@ -287,9 +288,10 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
                 CheckDetailDialog detailDialog = new CheckDetailDialog(main, checkList.get(idx));
                 // detailDialog.setVisible(true);
                 break;
-        //     case "export":
-        //         System.out.println("Export button clicked");
-        //         break;
+            case "export":
+                // System.out.println("Export button clicked");
+                exportToExcel();
+                break;
             case "reset":
                 System.out.println("Reset button clicked");
                 resetFilterInputs();
@@ -379,6 +381,22 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
     public void propertyChange(PropertyChangeEvent pce) {
         if (pce.getSource() == fromDateChooser || pce.getSource() == toDateChooser) {
             filter();
+        }
+    }
+
+    private void exportToExcel() {
+        if (checkList == null || checkList.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Không có dữ liệu để xuất!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        try {
+            ExcelExporter.exportJTableToExcel(table);
+            JOptionPane.showMessageDialog(this, "Xuất file Excel thành công!", 
+                                        "Thành công", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi xuất file: " + ex.getMessage(), 
+                                        "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
