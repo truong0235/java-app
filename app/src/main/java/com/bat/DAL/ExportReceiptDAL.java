@@ -8,21 +8,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.bat.DTO.ExportREceiptDTO;
+import com.bat.DTO.ExportReceiptDTO;
 
 
 public class ExportReceiptDAL {
     
-    public ArrayList<ExportREceiptDTO> getAll(){
-        ArrayList<ExportREceiptDTO> list = new ArrayList<>();
+    public ArrayList<ExportReceiptDTO> getAll(){
+        ArrayList<ExportReceiptDTO> list = new ArrayList<>();
         String query = "SELECT export_id, export_date, status, user_id, total_price, customer_id, order_id FROM export_receipt WHERE status = 1";
 
-        try (Connection conn = new DBConnectHelper().getConnection();
-             PreparedStatement ps = conn.prepareStatement(query);
-             ResultSet rs = ps.executeQuery()) {
+        try (
+            DBConnectHelper db = new DBConnectHelper();
+            Connection conn = db.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
+        ) {
 
             while (rs.next()) {
-                ExportREceiptDTO exportReceipt = new ExportREceiptDTO(
+                ExportReceiptDTO exportReceipt = new ExportReceiptDTO(
                     rs.getInt("export_id"),
                     rs.getTimestamp("export_date").toLocalDateTime(),
                     rs.getInt("status"),
@@ -41,12 +44,14 @@ public class ExportReceiptDAL {
         return list;
     }
 
-    public boolean create(ExportREceiptDTO exportReceipt) {
+    public boolean create(ExportReceiptDTO exportReceipt) {
         String query = "INSERT INTO export_receipt (export_date, status, user_id, total_price, customer_id, order_id) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = new DBConnectHelper().getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
+        try (
+            DBConnectHelper db = new DBConnectHelper();
+            Connection conn = db.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setTimestamp(1, java.sql.Timestamp.valueOf(exportReceipt.getExport_date()));
             ps.setInt(2, exportReceipt.getStatus());
             ps.setInt(3, exportReceipt.getUser_id());
@@ -65,12 +70,14 @@ public class ExportReceiptDAL {
         }
     }
 
-    public boolean update(ExportREceiptDTO exportReceipt) {
+    public boolean update(ExportReceiptDTO exportReceipt) {
         String query = "UPDATE export_receipt SET export_date = ?, status = ?, user_id = ?, total_price = ?, customer_id = ?, order_id = ? WHERE export_id = ?";
 
-        try (Connection conn = new DBConnectHelper().getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
+        try(
+            DBConnectHelper db = new DBConnectHelper();
+            Connection conn = db.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setTimestamp(1, java.sql.Timestamp.valueOf(exportReceipt.getExport_date()));
             ps.setInt(2, exportReceipt.getStatus());
             ps.setInt(3, exportReceipt.getUser_id());
@@ -92,10 +99,12 @@ public class ExportReceiptDAL {
 
     public boolean delete(int exportId) {
         String query = "UPDATE export_receipt SET status = 0 WHERE export_id = ?";
-
-        try (Connection conn = new DBConnectHelper().getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
+        try(
+            
+            DBConnectHelper db = new DBConnectHelper();
+            Connection conn = db.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, exportId);
 
             int rowsAffected = ps.executeUpdate();
@@ -109,7 +118,7 @@ public class ExportReceiptDAL {
         }
     }
 
-    public boolean delete(ExportREceiptDTO exportReceipt) {
+    public boolean delete(ExportReceiptDTO exportReceipt) {
         return delete(exportReceipt.getExport_id());
     }
 

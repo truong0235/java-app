@@ -16,10 +16,11 @@ public class LotDAL {
         ArrayList<LotDTO> lotList = new ArrayList<>();
         String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id " + 
                         "FROM Lot WHERE status != 'Xóa'";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ResultSet rs = (ResultSet) ps.executeQuery();
             while(rs.next()) {
                 LotDTO lot = new LotDTO(
@@ -46,10 +47,11 @@ public class LotDAL {
         ArrayList<LotDTO> lotList = new ArrayList<>();
         String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id " + 
                         "FROM Lot WHERE import_id = ? AND status != 'Xóa'";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, impId);
             ResultSet rs = (ResultSet) ps.executeQuery();
             while(rs.next()) {
@@ -77,10 +79,11 @@ public class LotDAL {
         ArrayList<LotDTO> lotList = new ArrayList<>();
         String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id " + 
                         "FROM Lot WHERE product_id = ? AND status != 'Xóa'";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, productId);
             ResultSet rs = (ResultSet) ps.executeQuery();
             while(rs.next()) {
@@ -107,10 +110,11 @@ public class LotDAL {
     public LotDTO getLotById(int lotId) {
         String query = "SELECT lot_id, lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id " + 
                         "FROM Lot WHERE lot_id = ? AND status != 'Xóa'";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, lotId);
             ResultSet rs = (ResultSet) ps.executeQuery();
             if(rs.next()) {
@@ -137,10 +141,11 @@ public class LotDAL {
     public int add(LotDTO lot) { // thêm lot, update SL sp và ghi nhận lịch sử nhập kho
         String query = "INSERT INTO Lot (lot_code, product_id, import_id, initial_quantity, quantity, import_price, print_year, status, import_date) " +
                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+        ){
             ps.setString(1, lot.getLotCode());
             ps.setInt(2, lot.getProductId());
             ps.setInt(3, lot.getImportId());
@@ -180,10 +185,11 @@ public class LotDAL {
 
     public boolean delete(int lotId) {
         String query = "UPDATE lot SET status = 'Xóa' WHERE lot_id = ?";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, lotId);
             int affected = ps.executeUpdate();
             return affected > 0;
@@ -195,10 +201,11 @@ public class LotDAL {
 
     public boolean deleteByImpId(int impId) {
         String query = "UPDATE lot SET status = 'Xóa' WHERE import_id = ?";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, impId);
             int affected = ps.executeUpdate();
             return affected > 0;
@@ -225,10 +232,11 @@ public class LotDAL {
 
     public boolean updateQuantity(int lotId, int quantity) {
         String query = "UPDATE lot SET quantity = quantity + ? WHERE lot_id = ?";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, quantity);
             ps.setInt(2, lotId);
             int affected = ps.executeUpdate();
@@ -241,10 +249,11 @@ public class LotDAL {
 
     public boolean updateStatus(int lotId, String status) {
         String query = "UPDATE lot SET status = ? WHERE lot_id = ?";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setString(1, status);
             ps.setInt(2, lotId);
             int affected = ps.executeUpdate();
@@ -257,10 +266,11 @@ public class LotDAL {
 
     public boolean isLotCodeExists(String lotCode) {
         String query = "SELECT COUNT(*) AS count FROM Lot WHERE lot_code = ? AND status != 'Xóa'";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setString(1, lotCode);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {

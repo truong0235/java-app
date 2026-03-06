@@ -13,11 +13,12 @@ public class InventoryCheckDAL {
     public ArrayList<InventoryCheckDTO> getInventoryChecks() {
         ArrayList<InventoryCheckDTO> inventoryChecks = new ArrayList<>();
         String query = "SELECT check_id, user_id, check_date, status FROM inventory_check WHERE status = 1 ORDER BY check_date DESC";
-        try {
+        try(
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = (ResultSet) ps.executeQuery();
+        ){
             while (rs.next()) {
                 InventoryCheckDTO check = new InventoryCheckDTO(
                     rs.getInt("check_id"),
@@ -27,7 +28,6 @@ public class InventoryCheckDAL {
                 );
                 inventoryChecks.add(check);
             }
-            db.closeConnection();
             return inventoryChecks;
         } catch (Exception e) {
             e.printStackTrace();
@@ -37,10 +37,11 @@ public class InventoryCheckDAL {
 
     public int add(InventoryCheckDTO check){
         String query = "INSERT INTO inventory_check (user_id, status) VALUES (?, ?)";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+        ){
 
             ps.setInt(1, check.getUserId());
             ps.setInt(2, check.getStatus());
@@ -77,10 +78,11 @@ public class InventoryCheckDAL {
         lotTransactionDAL.delete(checkId);
         
         String query = "UPDATE inventory_check SET status = 0 WHERE check_id = ?";
-        try{
+        try(
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, checkId);
             int affected = ps.executeUpdate();
             return affected > 0;

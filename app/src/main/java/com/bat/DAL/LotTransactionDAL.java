@@ -13,10 +13,11 @@ public class LotTransactionDAL {
     public ArrayList<LotTransactionDTO> getLotTransactionsByLotId(int lotId) {
        ArrayList<LotTransactionDTO> transList = new ArrayList<>();
        String query = "SELECT trans_id, lot_id, ref_id, quantity_change, quantity, date, type FROM lot_transaction WHERE lot_id = ?";
-       try {   
+       try (
            DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+       ) {
             ps.setInt(1, lotId);
             ResultSet rs = (ResultSet) ps.executeQuery();
             while (rs.next()) {
@@ -31,7 +32,6 @@ public class LotTransactionDAL {
                 );
                 transList.add(trans);
             }
-            db.closeConnection();
        }
        catch (Exception e) {
               e.printStackTrace();
@@ -41,10 +41,11 @@ public class LotTransactionDAL {
 
     public int add(LotTransactionDTO tx){
         String query = "INSERT INTO lot_transaction (lot_id, ref_id, quantity_change, quantity, date, type) VALUES (?, ?, ?, ?, ?, ?)";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+        ){
             ps.setInt(1, tx.getLotId());
             ps.setInt(2, tx.getRefId());
             ps.setInt(3, tx.getQuantityChange());
@@ -67,13 +68,13 @@ public class LotTransactionDAL {
 
     public boolean delete(int refId) {
         String query = "DELETE FROM lot_transaction WHERE ref_id = ?";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, refId);
             int affectedRows = ps.executeUpdate();
-            db.closeConnection();
             return affectedRows > 0;
         } catch (Exception e) {
             e.printStackTrace();
