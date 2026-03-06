@@ -29,6 +29,7 @@ CREATE TABLE customer (
     birthday DATE,
     phone VARCHAR(20),
     address VARCHAR(500),
+	image VARCHAR(255) DEFAULT NULL,
 	status TINYINT DEFAULT 1
 
 );
