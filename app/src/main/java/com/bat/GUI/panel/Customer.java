@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -19,6 +20,7 @@ import java.util.Set;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -161,12 +163,9 @@ public class Customer extends JPanel implements ActionListener {
         String[] columns = {"ID", "Tên khách hàng", "Ngày sinh", "Số điện thoại", "Địa chỉ"};
         tableModel = new DefaultTableModel(null, columns) {
             @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
+            public boolean isCellEditable(int row, int column) { return false; }
         };
         table = new JTable(tableModel);
-
         table.setRowHeight(45);
         table.setShowVerticalLines(false);
         table.setShowHorizontalLines(true);
@@ -219,18 +218,13 @@ public class Customer extends JPanel implements ActionListener {
                             new CustomerDialog((JFrame) SwingUtilities.getWindowAncestor(this), "CẬP NHẬT", c).setVisible(true);
                             refreshData();
                         }
-                    } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(this, "Lỗi lấy dữ liệu: " + ex.getMessage());
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(this, "Vui lòng chọn khách hàng cần sửa!");
-                }
+                    } catch (Exception ex) { JOptionPane.showMessageDialog(this, "Lỗi lấy dữ liệu: " + ex.getMessage()); }
+                } else { JOptionPane.showMessageDialog(this, "Vui lòng chọn khách hàng cần sửa!"); }
                 break;
             case "delete":
                 int[] selectedRows = table.getSelectedRows();
-                if (selectedRows.length == 0) {
-                    JOptionPane.showMessageDialog(this, "Vui lòng chọn khách hàng để xóa!");
-                } else {
+                if (selectedRows.length == 0) { JOptionPane.showMessageDialog(this, "Vui lòng chọn khách hàng để xóa!"); }
+                else {
                     if (JOptionPane.showConfirmDialog(this, "Xác nhận xóa " + selectedRows.length + " khách hàng?", "Xác nhận", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                         int success = 0;
                         for (int i : selectedRows) {
@@ -243,15 +237,9 @@ public class Customer extends JPanel implements ActionListener {
                     }
                 }
                 break;
-            case "export":
-                exportExcel();
-                break;
-            case "import":
-                importExcel();
-                break;
-            case "reset":
-                resetForm();
-                break;
+            case "export": exportExcel(); break;
+            case "import": importExcel(); break;
+            case "reset": resetForm(); break;
             case "detail":
                 int rowDetail = table.getSelectedRow();
                 if (rowDetail != -1) {
@@ -261,12 +249,8 @@ public class Customer extends JPanel implements ActionListener {
                         if (c != null) {
                             new CustomerDetailDialog((JFrame) SwingUtilities.getWindowAncestor(this), c).setVisible(true);
                         }
-                    } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage());
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(this, "Vui lòng chọn khách hàng để xem chi tiết!");
-                }
+                    } catch (Exception ex) { JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage()); }
+                } else { JOptionPane.showMessageDialog(this, "Vui lòng chọn khách hàng để xem chi tiết!"); }
                 break;
         }
     }
@@ -291,9 +275,7 @@ public class Customer extends JPanel implements ActionListener {
                 case "Địa chỉ": if (address.contains(keyword)) matchKey = true; break;
                 default: if (name.contains(keyword) || phone.contains(keyword) || address.contains(keyword)) matchKey = true; break;
             }
-
             boolean matchAddr = addrFilter.equals("Tất cả") || address.contains(addrFilter.toLowerCase());
-
             if (matchKey && matchAddr) result.add(c);
         }
         loadDataTable(result);
@@ -302,35 +284,22 @@ public class Customer extends JPanel implements ActionListener {
     private String extractCity(String address) {
         if (address == null || address.trim().isEmpty()) return "Khác";
         String[] parts = address.split(",");
-        if (parts.length > 0) {
-            return parts[parts.length - 1].trim();
-        }
+        if (parts.length > 0) return parts[parts.length - 1].trim();
         return address;
     }
 
     private void loadFilterData() {
         ActionListener[] listeners = cbbAddressFilter.getActionListeners();
-        for (ActionListener al : listeners) {
-            cbbAddressFilter.removeActionListener(al);
-        }
-
+        for (ActionListener al : listeners) cbbAddressFilter.removeActionListener(al);
         cbbAddressFilter.removeAllItems();
         cbbAddressFilter.addItem("Tất cả");
 
         Set<String> cities = new HashSet<>();
         for (CustomerDTO c : customerBLL.getCustomerList()) {
-            if (c.getAddress() != null && !c.getAddress().isEmpty()) {
-                cities.add(extractCity(c.getAddress()));
-            }
+            if (c.getAddress() != null && !c.getAddress().isEmpty()) cities.add(extractCity(c.getAddress()));
         }
-
-        for (String city : cities) {
-            cbbAddressFilter.addItem(city);
-        }
-
-        for (ActionListener al : listeners) {
-            cbbAddressFilter.addActionListener(al);
-        }
+        for (String city : cities) cbbAddressFilter.addItem(city);
+        for (ActionListener al : listeners) cbbAddressFilter.addActionListener(al);
     }
 
     private void refreshData() {
@@ -415,7 +384,7 @@ public class Customer extends JPanel implements ActionListener {
                         } catch (Exception e) { phone = row.getCell(3).getStringCellValue(); }
                     }
                     if (row.getCell(4) != null) address = row.getCell(4).getStringCellValue();
-                    CustomerDTO c = new CustomerDTO(0, name, dob, phone, address);
+                    CustomerDTO c = new CustomerDTO(0, name, dob, phone, address, "");
                     String result = customerBLL.add(c);
                     if (result.contains("thành công")) count++;
                 }
@@ -425,10 +394,36 @@ public class Customer extends JPanel implements ActionListener {
         }
     }
 
+    private ImageIcon getScaledImage(String path, int width, int height) {
+        try {
+            Image img = null;
+            if (path != null && !path.trim().isEmpty()) {
+                File file = new File(path);
+                if (file.exists()) {
+                    img = new ImageIcon(path).getImage();
+                }
+            }
+
+            if (img == null) {
+                java.net.URL defaultUrl = getClass().getResource("/icon/default_avatar.png");
+                if (defaultUrl != null) {
+                    img = new ImageIcon(defaultUrl).getImage();
+                } else {
+                    return null;
+                }
+            }
+
+            return new ImageIcon(img.getScaledInstance(width, height, Image.SCALE_SMOOTH));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     class CustomerDetailDialog extends JDialog {
         public CustomerDetailDialog(JFrame parent, CustomerDTO data) {
             super(parent, "XEM CHI TIẾT KHÁCH HÀNG", true);
-            setSize(600, 450);
+            setSize(750, 450);
             setLocationRelativeTo(parent);
             setLayout(new BorderLayout());
 
@@ -441,8 +436,27 @@ public class Customer extends JPanel implements ActionListener {
             pnlHeader.add(lblTitle);
             add(pnlHeader, BorderLayout.NORTH);
 
+            JPanel pnlMain = new JPanel(new BorderLayout());
+            pnlMain.setBackground(Color.WHITE);
+
+            JPanel pnlImage = new JPanel(new BorderLayout());
+            pnlImage.setBackground(Color.WHITE);
+            pnlImage.setPreferredSize(new Dimension(250, 0));
+            pnlImage.setBorder(new EmptyBorder(20, 20, 20, 10));
+
+            JLabel lblImage = new JLabel("", SwingConstants.CENTER);
+            lblImage.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+
+            ImageIcon icon = getScaledImage(data.getImage(), 210, 280);
+            if (icon != null) {
+                lblImage.setIcon(icon);
+            }
+
+            pnlImage.add(lblImage, BorderLayout.CENTER);
+            pnlMain.add(pnlImage, BorderLayout.WEST);
+
             JPanel pnlBody = new JPanel(new GridLayout(4, 1, 0, 15));
-            pnlBody.setBorder(new EmptyBorder(20, 40, 20, 40));
+            pnlBody.setBorder(new EmptyBorder(20, 10, 20, 40));
             pnlBody.setBackground(Color.WHITE);
 
             addReadOnlyField(pnlBody, "Tên khách hàng", data.getFullName());
@@ -450,13 +464,14 @@ public class Customer extends JPanel implements ActionListener {
             addReadOnlyField(pnlBody, "Số điện thoại", data.getPhone());
             addReadOnlyField(pnlBody, "Địa chỉ", data.getAddress());
 
-            add(pnlBody, BorderLayout.CENTER);
+            pnlMain.add(pnlBody, BorderLayout.CENTER);
+            add(pnlMain, BorderLayout.CENTER);
 
             JPanel pnlFooter = new JPanel();
             pnlFooter.setBackground(Color.WHITE);
             pnlFooter.setBorder(new EmptyBorder(0, 0, 20, 0));
 
-            JButton btnCancel = new JButton("Huỷ bỏ");
+            JButton btnCancel = new JButton("Đóng");
             btnCancel.setBackground(new Color(220, 53, 69));
             btnCancel.setForeground(Color.WHITE);
             btnCancel.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -471,10 +486,8 @@ public class Customer extends JPanel implements ActionListener {
         private void addReadOnlyField(JPanel pnl, String title, String content) {
             JPanel p = new JPanel(new BorderLayout(0, 5));
             p.setBackground(Color.WHITE);
-
             JLabel lbl = new JLabel(title);
             lbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
-
             JTextField txt = new JTextField(content);
             txt.setFont(new Font("Segoe UI", Font.PLAIN, 14));
             txt.setEditable(false);
@@ -484,7 +497,6 @@ public class Customer extends JPanel implements ActionListener {
                     BorderFactory.createLineBorder(new Color(200, 200, 200)),
                     new EmptyBorder(0, 10, 0, 10)
             ));
-
             p.add(lbl, BorderLayout.NORTH);
             p.add(txt, BorderLayout.CENTER);
             pnl.add(p);
@@ -493,11 +505,15 @@ public class Customer extends JPanel implements ActionListener {
 
     class CustomerDialog extends JDialog {
         JTextField txtName, txtDob, txtPhone, txtAddress;
+        JLabel lblImage;
+        String selectedImagePath = "";
+
         public CustomerDialog(JFrame parent, String title, CustomerDTO data) {
             super(parent, title, true);
-            setSize(600, 450);
+            setSize(750, 450);
             setLocationRelativeTo(parent);
             setLayout(new BorderLayout());
+
             JPanel pnlHeader = new JPanel();
             pnlHeader.setBackground(new Color(13, 110, 253));
             JLabel lblTitle = new JLabel(title);
@@ -505,21 +521,65 @@ public class Customer extends JPanel implements ActionListener {
             lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
             pnlHeader.add(lblTitle);
             add(pnlHeader, BorderLayout.NORTH);
+
+            JPanel pnlMain = new JPanel(new BorderLayout());
+            pnlMain.setBackground(Color.WHITE);
+
+            JPanel pnlImage = new JPanel(new BorderLayout(0, 10));
+            pnlImage.setBackground(Color.WHITE);
+            pnlImage.setPreferredSize(new Dimension(250, 0));
+            pnlImage.setBorder(new EmptyBorder(20, 20, 20, 10));
+
+            lblImage = new JLabel("", SwingConstants.CENTER);
+            lblImage.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            JButton btnChooseImage = new JButton("Chọn ảnh");
+            btnChooseImage.setPreferredSize(new Dimension(0, 35));
+
+            pnlImage.add(lblImage, BorderLayout.CENTER);
+            pnlImage.add(btnChooseImage, BorderLayout.SOUTH);
+            pnlMain.add(pnlImage, BorderLayout.WEST);
+
             JPanel pnlCenter = new JPanel(new GridLayout(4, 2, 10, 20));
-            pnlCenter.setBorder(new EmptyBorder(20, 40, 20, 40));
+            pnlCenter.setBorder(new EmptyBorder(20, 10, 20, 40));
             pnlCenter.setBackground(Color.WHITE);
             txtName = new JTextField(); txtDob = new JTextField(); txtPhone = new JTextField(); txtAddress = new JTextField();
             addInput(pnlCenter, "Họ và tên:", txtName);
             addInput(pnlCenter, "Ngày sinh:", txtDob);
             addInput(pnlCenter, "Số điện thoại:", txtPhone);
             addInput(pnlCenter, "Địa chỉ:", txtAddress);
+
             if (data != null) {
                 txtName.setText(data.getFullName());
                 txtDob.setText(data.getBirthday());
                 txtPhone.setText(data.getPhone());
                 txtAddress.setText(data.getAddress());
+
+                selectedImagePath = data.getImage();
             }
-            add(pnlCenter, BorderLayout.CENTER);
+
+            ImageIcon startIcon = getScaledImage(selectedImagePath, 210, 240);
+            if (startIcon != null) {
+                lblImage.setIcon(startIcon);
+            }
+
+            pnlMain.add(pnlCenter, BorderLayout.CENTER);
+            add(pnlMain, BorderLayout.CENTER);
+
+            btnChooseImage.addActionListener(e -> {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Chọn ảnh khách hàng");
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("Hình ảnh (JPG, PNG, GIF)", "jpg", "png", "jpeg", "gif");
+                fileChooser.setFileFilter(filter);
+
+                if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                    selectedImagePath = fileChooser.getSelectedFile().getAbsolutePath();
+                    ImageIcon icon = getScaledImage(selectedImagePath, 210, 240);
+                    if (icon != null) {
+                        lblImage.setIcon(icon);
+                    }
+                }
+            });
+
             JPanel pnlBottom = new JPanel();
             pnlBottom.setBackground(Color.WHITE);
             JButton btnSave = new JButton("Lưu");
@@ -528,20 +588,23 @@ public class Customer extends JPanel implements ActionListener {
             btnSave.setPreferredSize(new Dimension(100, 35));
             pnlBottom.add(btnSave);
             add(pnlBottom, BorderLayout.SOUTH);
+
             btnSave.addActionListener(e -> {
                 String name = txtName.getText();
                 String dob = txtDob.getText();
                 String phone = txtPhone.getText();
                 String address = txtAddress.getText();
                 if (name.isEmpty()) { JOptionPane.showMessageDialog(this, "Tên khách hàng không được để trống!"); return; }
+
                 if (data == null) {
-                    CustomerDTO newCustomer = new CustomerDTO(0, name, dob, phone, address);
+                    CustomerDTO newCustomer = new CustomerDTO(0, name, dob, phone, address, selectedImagePath);
                     JOptionPane.showMessageDialog(this, customerBLL.add(newCustomer));
                 } else {
                     data.setFullName(name);
                     data.setBirthday(dob);
                     data.setPhone(phone);
                     data.setAddress(address);
+                    data.setImage(selectedImagePath);
                     JOptionPane.showMessageDialog(this, customerBLL.update(data));
                 }
                 dispose();
