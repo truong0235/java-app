@@ -6,16 +6,18 @@ public class CustomerDTO {
     private String birthday;
     private String phone;
     private String address;
+    private String image;
 
     public CustomerDTO() {
     }
 
-    public CustomerDTO(int customerId, String fullName, String birthday, String phone, String address) {
+    public CustomerDTO(int customerId, String fullName, String birthday, String phone, String address, String image) {
         this.customerId = customerId;
         this.fullName = fullName;
         this.birthday = birthday;
         this.phone = phone;
         this.address = address;
+        this.image = image;
     }
 
     public int getCustomerId() {
@@ -57,4 +59,8 @@ public class CustomerDTO {
     public void setAddress(String address) {
         this.address = address;
     }
+
+    public String getImage() { return image; }
+
+    public void setImage(String image) { this.image = image; }
 }
