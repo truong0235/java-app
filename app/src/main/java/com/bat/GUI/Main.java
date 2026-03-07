@@ -12,6 +12,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
+import com.bat.DTO.UserDTO; // ĐÃ THÊM IMPORT NÀY
 import com.bat.GUI.component.MenuTaskbar;
 import com.bat.GUI.panel.Home;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -21,9 +22,21 @@ import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
 public class Main extends JFrame {
     Color MainColor = new Color(250, 250, 250);
     private JPanel MainContent;
-
     private MenuTaskbar menuTaskbar;
     private Home home;
+
+    // ĐÃ THÊM: Biến lưu trữ người dùng hiện tại
+    private UserDTO currentUser;
+
+    // ĐÃ SỬA: Constructor nhận UserDTO
+    public Main(UserDTO user) {
+        this.currentUser = user;
+    }
+
+    // ĐÃ THÊM: Hàm Getter để các Panel khác lấy thông tin User
+    public UserDTO getCurrentUser() {
+        return currentUser;
+    }
 
     public static void main(String[] args) {
         // Cài đặt font Roboto trước
@@ -61,10 +74,10 @@ public class Main extends JFrame {
         
         // Khởi tạo application trên EDT
         SwingUtilities.invokeLater(() -> {
-            new Main().init();
+            // ĐÃ SỬA: Truyền null hoặc tạo mới một UserDTO rỗng khi test độc lập file Main
+            new Main(new UserDTO()).init();
         });
     }
-
 
     public void init() {
         this.setTitle("Hệ thống quản lý kho sách");  
@@ -100,5 +113,4 @@ public class Main extends JFrame {
         MainContent.revalidate();
         MainContent.repaint();
     }
-     
 }

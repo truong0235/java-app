@@ -51,7 +51,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 application {
-    mainClass = "com.bat.GUI.Main"
+    mainClass = "com.bat.GUI.LoginJFrame"
 
     if (hasProperty("launch")) {
         mainClass.set("${property("launch")}")
