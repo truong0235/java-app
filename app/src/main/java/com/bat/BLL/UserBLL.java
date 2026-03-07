@@ -63,13 +63,19 @@ public class UserBLL {
         return "Thông tin xác minh (Tên đăng nhập, SĐT hoặc Email) không chính xác!";
     }
 
-    public String getUserNameById(int userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUserNameById'");
+     public String getUserNameById(int userId) {
+        for (UserDTO user : users) {
+            if (user.getUserId() == userId) {
+                return user.getUsername();
+            }
+        }
+        return null;
     }
 
-    public int getUserIdByIdx(int i) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUserIdByIdx'");
+    public int getUserIdByIdx(int index) {
+        if (index >= 0 && index < users.size()) {
+            return users.get(index).getUserId();
+        }
+        return -1; // or throw an exception
     }
 }
