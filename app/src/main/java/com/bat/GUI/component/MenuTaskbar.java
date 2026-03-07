@@ -24,6 +24,7 @@ import com.bat.GUI.panel.Import;
 import com.bat.GUI.panel.InventoryCheck;
 import com.bat.GUI.panel.Lot;
 import com.bat.GUI.panel.Product;
+import com.bat.GUI.panel.Category; // Đã thêm Import Category
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 
@@ -31,27 +32,30 @@ public class MenuTaskbar extends JPanel{
     JScrollPane scrollPane;
     public ItemTaskbar[] listitem;
     Main mainFrame;
-    
+
     //tasbarMenu chia thành 3 phần chính là pnlCenter, pnlTop, pnlBottom
     JPanel pnlCenter, pnlTop, pnlBottom, bar1, bar2, bar3, bar4;
     JLabel lblUsername, lblTenNhomQuyen;
 
-    
+
     Color FontColor = new Color(96, 125, 139);
     Color DefaultColor = new Color(255, 255, 255);
     Color HowerFontColor = new Color(1, 87, 155);
     Color HowerBackgroundColor = new Color(187, 222, 251);
+
+    // Đã thêm mục Danh mục vào đây
     private final String[][] menuItem = {
-        {"Trang chủ", "home.svg", "trangchu"},
-        {"Sản phẩm", "product.svg", "sanpham"},
-        {"Khách hàng", "customer.svg", "khachhang"},
-        {"Nhà cung cấp", "provider.svg", "nhacungcap"},
-        {"Phiếu nhập", "import.svg", "nhaphang"},
-        {"Lô hàng", "lot.svg", "lohang"},
-        // {"Mẫu", "import.svg", "nhaphang"},
-        {"xuat", "lot.svg", "xuat"},
-        {"Phiếu kiểm kê", "check.svg", "kiemke"},
-        {"Đăng xuất", "log_out.svg", "dangxuat"},
+            { "Trang chủ", "home.svg", "trangchu" },
+            { "Sản phẩm", "product.svg", "sanpham" },
+            { "Danh mục", "category.svg", "danhmuc" },
+            { "Khách hàng", "customer.svg", "khachhang" },
+            { "Nhà cung cấp", "provider.svg", "nhacungcap" },
+            { "Phiếu nhập", "import.svg", "nhaphang" },
+            { "Lô hàng", "lot.svg", "lohang" },
+            // {"Mẫu", "import.svg", "nhaphang"},
+            { "xuat", "lot.svg", "xuat" },
+            { "Phiếu kiểm kê", "check.svg", "kiemke" },
+            { "Đăng xuất", "log_out.svg", "dangxuat" },
     };
 
     @SuppressWarnings("OverridableMethodCallInConstructor")
@@ -95,7 +99,7 @@ public class MenuTaskbar extends JPanel{
         pnlCenter.setPreferredSize(new Dimension(230, 600));
         pnlCenter.setBackground(DefaultColor);
         pnlCenter.setLayout(new FlowLayout(0, 0, 5));
-        
+
         bar3 = new JPanel();
         bar3.setBackground(new Color(204, 214, 219));
         bar3.setPreferredSize(new Dimension(1, 1));
@@ -215,8 +219,9 @@ public class MenuTaskbar extends JPanel{
         switch (menuName) {
             case "Trang chủ" -> mainFrame.setPanel(new Home());
             case "Sản phẩm" -> mainFrame.setPanel(new Product(mainFrame));
-            case "Khách hàng" -> mainFrame.setPanel(new Customer(mainFrame)); 
-            case "Nhà cung cấp" -> mainFrame.setPanel(new Provider(mainFrame)); 
+            case "Danh mục" -> mainFrame.setPanel(new Category(mainFrame)); // Đã thêm logic click vào đây
+            case "Khách hàng" -> mainFrame.setPanel(new Customer(mainFrame));
+            case "Nhà cung cấp" -> mainFrame.setPanel(new Provider(mainFrame));
             case "Phiếu kiểm kê" -> mainFrame.setPanel(new InventoryCheck(mainFrame));
             case "Phiếu nhập" -> mainFrame.setPanel(new Import(mainFrame));
             case "Lô hàng" -> mainFrame.setPanel(new Lot(mainFrame));

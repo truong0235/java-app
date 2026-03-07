@@ -2,7 +2,7 @@ package com.bat.DTO;
 
 import java.time.LocalDateTime;
 
-public class ExportREceiptDTO {
+public class ExportReceiptDTO {
     private int export_id;
     private LocalDateTime export_date;
     private int status;
@@ -11,11 +11,10 @@ public class ExportREceiptDTO {
     private int customer_id;
     private int order_id;
     
-    public ExportREceiptDTO() {
+    public ExportReceiptDTO() {
     }
 
-    public ExportREceiptDTO(int export_id, LocalDateTime export_date, int status, int user_id, int total_price,
-            int customer_id, int order_id) {
+    public ExportReceiptDTO(int export_id, LocalDateTime export_date, int status, int user_id, int total_price, int customer_id, int order_id) {
         this.export_id = export_id;
         this.export_date = export_date;
         this.status = status;

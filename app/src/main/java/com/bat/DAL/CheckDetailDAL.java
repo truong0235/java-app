@@ -11,11 +11,12 @@ import com.bat.utils.helper.DBConnectHelper;
 public class CheckDetailDAL {
     public ArrayList<CheckDetailDTO> getCheckDetails (int checkId){
         ArrayList<CheckDetailDTO> list = new ArrayList<>();
-        try {
-            DBConnectHelper db = new DBConnectHelper();
             String query = "SELECT * FROM inventory_check_detail WHERE check_id = ?";
+        try (
+            DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, checkId);
             java.sql.ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -36,10 +37,11 @@ public class CheckDetailDAL {
 
     public boolean add (CheckDetailDTO detail){
         String query = "INSERT INTO inventory_check_detail (check_id, lot_id, difference, actual_quantity, system_quantity) VALUES (?, ?, ?, ?, ?)";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
 
             ps.setInt(1, detail.getCheckId());
             ps.setInt(2, detail.getLotId());
@@ -80,10 +82,11 @@ public class CheckDetailDAL {
     public boolean delete(int checkId){
         // cân nhắc xóa mềm 
         String query = "DELETE FROM inventory_check_detail WHERE check_id = ?";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, checkId);
             int affectedRows = ps.executeUpdate();
             return affectedRows > 0;

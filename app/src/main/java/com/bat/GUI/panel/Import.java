@@ -40,12 +40,13 @@ import com.bat.BLL.UserBLL;
 import com.bat.DTO.ImportDTO;
 import com.bat.DTO.ProviderDTO;
 import com.bat.DTO.UserDTO;
-import com.bat.GUI.dialog.UpdateImportDialog;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
 import com.bat.GUI.dialog.AddImportDialog;
 import com.bat.GUI.dialog.ReceiptDetailDialog;
+import com.bat.GUI.dialog.UpdateImportDialog;
+import com.bat.utils.helper.ExcelExporter;
 import com.toedter.calendar.JDateChooser;
 
 public class Import extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {
@@ -144,7 +145,6 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         this.add(tablePanel, BorderLayout.CENTER);
     }
     
-    @SuppressWarnings("unchecked")
     private JPanel creatFilterPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(4,1,5,0));
@@ -370,7 +370,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
                 // detailDialog.setVisible(true);
                 break;
             case "export":
-                System.out.println("Export button clicked");
+                exportToExcel();
                 break;
             case "reset":
                 System.out.println("Reset button clicked");
@@ -463,6 +463,22 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
     public void propertyChange(PropertyChangeEvent pce) {
         if (pce.getSource() == fromDateChooser || pce.getSource() == toDateChooser) {
             filter();
+        }
+    }
+    
+    private void exportToExcel() {
+        if (importList == null || importList.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Không có dữ liệu để xuất!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        try {
+            ExcelExporter.exportJTableToExcel(table);
+            JOptionPane.showMessageDialog(this, "Xuất file Excel thành công!", 
+                                        "Thành công", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi xuất file: " + ex.getMessage(), 
+                                        "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

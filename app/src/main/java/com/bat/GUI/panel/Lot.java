@@ -43,6 +43,7 @@ import com.bat.GUI.component.MenuFunction;
 import com.bat.GUI.dialog.HistoryLotDialog;
 import com.bat.GUI.dialog.LotDetailDialog;
 import com.bat.GUI.dialog.UpdateLotStatusDialog;
+import com.bat.utils.helper.ExcelExporter;
 import com.toedter.calendar.JDateChooser;
 
 public class Lot extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {
@@ -147,7 +148,6 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         this.add(tablePanel, BorderLayout.CENTER);
     }
     
-    @SuppressWarnings("unchecked")
     private JPanel creatFilterPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(4,1,5,0));
@@ -397,6 +397,9 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
                     }
                 }
                 break;
+            case "export":
+                exportToExcel();
+                break;
             case "reset":
                 System.out.println("Reset button clicked");
                 resetFilterInputs();
@@ -486,6 +489,22 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
     public void propertyChange(PropertyChangeEvent pce) {
         if (pce.getSource() == fromDateChooser || pce.getSource() == toDateChooser) {
             filter();
+        }
+    }
+    
+    private void exportToExcel() {
+        if (lotList == null || lotList.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Không có dữ liệu để xuất!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        try {
+            ExcelExporter.exportJTableToExcel(table);
+            JOptionPane.showMessageDialog(this, "Xuất file Excel thành công!", 
+                                        "Thành công", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi xuất file: " + ex.getMessage(), 
+                                        "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
