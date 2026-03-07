@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -14,6 +15,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,6 +24,7 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -35,6 +39,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -65,8 +70,26 @@ public class Product extends JPanel implements ActionListener {
     private JComboBox<String> cbbBrandFilter;
     private final DecimalFormat priceFormatter = new DecimalFormat("###,###,###");
 
+    // Đã cấu hình chính xác đường dẫn theo cấu trúc: app/src/main/resources/image_product/
+    private final String IMAGE_DIR;
+
     public Product(Main main) {
         this.main = main;
+
+        // Thiết lập đường dẫn động để tương thích với cấu trúc "java-app-main\app\..."
+        String userDir = System.getProperty("user.dir");
+        if (userDir.endsWith("app")) {
+            IMAGE_DIR = userDir + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "image_product" + File.separator;
+        } else {
+            IMAGE_DIR = userDir + File.separator + "app" + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "image_product" + File.separator;
+        }
+
+        // Tự động tạo thư mục nếu chưa tồn tại
+        File directory = new File(IMAGE_DIR);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
         initComponent();
         loadDataTable(productBLL.getProductList());
         loadFilterData();
@@ -172,8 +195,7 @@ public class Product extends JPanel implements ActionListener {
         panel.setBackground(new Color(228, 238, 255));
         panel.setBorder(new EmptyBorder(0, 10, 0, 0));
 
-        // Bổ sung "Hình ảnh" vào bảng
-        String[] columns = {"ID", "Tên SP", "Thương hiệu", "Năm XB", "Tác giả", "Ngôn ngữ", "Loại", "Giá", "Số lượng", "Trạng thái", "Hình ảnh"};
+        String[] columns = {"ID", "Tên SP", "Thương hiệu", "Năm XB", "Tác giả", "Ngôn ngữ", "Mã loại", "Giá", "Số lượng", "Trạng thái"};
         tableModel = new DefaultTableModel(null, columns) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -202,19 +224,17 @@ public class Product extends JPanel implements ActionListener {
         DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
         rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
 
-        // Chỉnh lại kích thước 11 cột
         TableColumnModel col = table.getColumnModel();
         col.getColumn(0).setPreferredWidth(30); col.getColumn(0).setCellRenderer(centerRenderer);
-        col.getColumn(1).setPreferredWidth(140); // Tên SP
-        col.getColumn(2).setPreferredWidth(90);  // Thương hiệu
-        col.getColumn(3).setPreferredWidth(50);  col.getColumn(3).setCellRenderer(centerRenderer); // Năm XB
-        col.getColumn(4).setPreferredWidth(100); // Tác giả
-        col.getColumn(5).setPreferredWidth(60);  // Ngôn ngữ
-        col.getColumn(6).setPreferredWidth(40);  col.getColumn(6).setCellRenderer(centerRenderer); // Mã loại
-        col.getColumn(7).setPreferredWidth(70);  col.getColumn(7).setCellRenderer(rightRenderer); // Giá
-        col.getColumn(8).setPreferredWidth(50);  col.getColumn(8).setCellRenderer(centerRenderer); // Số lượng
-        col.getColumn(9).setPreferredWidth(70);  col.getColumn(9).setCellRenderer(centerRenderer); // Trạng thái
-        col.getColumn(10).setPreferredWidth(80); // Hình ảnh (Link Pic)
+        col.getColumn(1).setPreferredWidth(160);
+        col.getColumn(2).setPreferredWidth(100);
+        col.getColumn(3).setPreferredWidth(60);  col.getColumn(3).setCellRenderer(centerRenderer);
+        col.getColumn(4).setPreferredWidth(120);
+        col.getColumn(5).setPreferredWidth(70);
+        col.getColumn(6).setPreferredWidth(50);  col.getColumn(6).setCellRenderer(centerRenderer);
+        col.getColumn(7).setPreferredWidth(80);  col.getColumn(7).setCellRenderer(rightRenderer);
+        col.getColumn(8).setPreferredWidth(60);  col.getColumn(8).setCellRenderer(centerRenderer);
+        col.getColumn(9).setPreferredWidth(80);  col.getColumn(9).setCellRenderer(centerRenderer);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(null);
@@ -350,8 +370,7 @@ public class Product extends JPanel implements ActionListener {
                         p.getProductId(), p.getProductName(), p.getPublisher(), p.getPublishYear(),
                         p.getAuthor(), p.getLanguage(), p.getCategoryId(),
                         p.getPrice() != null ? priceFormatter.format(p.getPrice()) : "0",
-                        p.getQuantity(), p.getStatus() == 1 ? "Đang bán" : "Ngừng bán",
-                        p.getPic() // Đẩy cột Hình ảnh ra bảng
+                        p.getQuantity(), p.getStatus() == 1 ? "Đang bán" : "Ngừng bán"
                 });
             }
         }
@@ -369,7 +388,7 @@ public class Product extends JPanel implements ActionListener {
                 font.setBold(true);
                 style.setFont(font);
 
-                String[] columns = {"Mã SP", "Tên SP", "Thương hiệu", "Năm XB", "Tác giả", "Ngôn ngữ", "Giá", "Số lượng", "Mã Loại", "Hình ảnh"};
+                String[] columns = {"Mã SP", "Tên SP", "Thương hiệu", "Năm XB", "Tác giả", "Ngôn ngữ", "Giá", "Số lượng", "Mã loại", "Hình ảnh"};
                 for (int i = 0; i < columns.length; i++) {
                     Cell cell = header.createCell(i);
                     cell.setCellValue(columns[i]);
@@ -433,10 +452,39 @@ public class Product extends JPanel implements ActionListener {
         }
     }
 
+    // Tự động tìm và hiển thị ảnh
+    private void displayImageToLabel(String path, JLabel label, int width, int height) {
+        if (path != null && !path.trim().isEmpty()) {
+            try {
+                File file = new File(path);
+                // Nếu path chỉ là tên file hoặc đường dẫn sai, thử tìm trong thư mục resources
+                if (!file.exists()) {
+                    file = new File(IMAGE_DIR + path);
+                }
+
+                if (file.exists()) {
+                    ImageIcon icon = new ImageIcon(file.getAbsolutePath());
+                    Image img = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                    label.setIcon(new ImageIcon(img));
+                    label.setText("");
+                } else {
+                    label.setIcon(null);
+                    label.setText("Ảnh không tồn tại");
+                }
+            } catch (Exception ex) {
+                label.setIcon(null);
+                label.setText("Lỗi tải ảnh");
+            }
+        } else {
+            label.setIcon(null);
+            label.setText("Chưa có ảnh");
+        }
+    }
+
     class ProductDetailDialog extends JDialog {
         public ProductDetailDialog(JFrame parent, ProductDTO data) {
             super(parent, "CHI TIẾT SẢN PHẨM", true);
-            setSize(700, 500);
+            setSize(750, 500);
             setLocationRelativeTo(parent);
             setLayout(new BorderLayout());
 
@@ -449,22 +497,35 @@ public class Product extends JPanel implements ActionListener {
             pnlHeader.add(lblTitle);
             add(pnlHeader, BorderLayout.NORTH);
 
-            JPanel pnlBody = new JPanel(new GridLayout(5, 2, 15, 15));
-            pnlBody.setBorder(new EmptyBorder(20, 40, 20, 40));
-            pnlBody.setBackground(Color.WHITE);
+            JPanel pnlMain = new JPanel(new BorderLayout(20, 0));
+            pnlMain.setBorder(new EmptyBorder(20, 20, 20, 20));
+            pnlMain.setBackground(Color.WHITE);
 
-            addReadOnlyField(pnlBody, "Tên SP", data.getProductName());
-            addReadOnlyField(pnlBody, "Thương hiệu", data.getPublisher());
-            addReadOnlyField(pnlBody, "Năm XB", String.valueOf(data.getPublishYear()));
-            addReadOnlyField(pnlBody, "Tác giả", data.getAuthor());
-            addReadOnlyField(pnlBody, "Ngôn ngữ", data.getLanguage());
-            addReadOnlyField(pnlBody, "Mã loại", String.valueOf(data.getCategoryId()));
-            addReadOnlyField(pnlBody, "Giá bán", (data.getPrice() != null ? priceFormatter.format(data.getPrice()) : "0") + " VNĐ");
-            addReadOnlyField(pnlBody, "Số lượng", String.valueOf(data.getQuantity()));
-            addReadOnlyField(pnlBody, "Trạng thái", data.getStatus() == 1 ? "Đang kinh doanh" : "Ngừng bán");
-            addReadOnlyField(pnlBody, "Hình ảnh (Link)", data.getPic());
+            JPanel pnlInfo = new JPanel(new GridLayout(4, 2, 15, 15));
+            pnlInfo.setBackground(Color.WHITE);
 
-            add(pnlBody, BorderLayout.CENTER);
+            addReadOnlyField(pnlInfo, "Tên SP", data.getProductName());
+            addReadOnlyField(pnlInfo, "Thương hiệu", data.getPublisher());
+            addReadOnlyField(pnlInfo, "Năm XB", String.valueOf(data.getPublishYear()));
+            addReadOnlyField(pnlInfo, "Tác giả", data.getAuthor());
+            addReadOnlyField(pnlInfo, "Ngôn ngữ", data.getLanguage());
+            addReadOnlyField(pnlInfo, "Mã loại", String.valueOf(data.getCategoryId()));
+            addReadOnlyField(pnlInfo, "Giá bán", (data.getPrice() != null ? priceFormatter.format(data.getPrice()) : "0") + " VNĐ");
+            addReadOnlyField(pnlInfo, "Số lượng", String.valueOf(data.getQuantity()));
+
+            pnlMain.add(pnlInfo, BorderLayout.CENTER);
+
+            JPanel pnlImage = new JPanel(new BorderLayout());
+            pnlImage.setBackground(Color.WHITE);
+            pnlImage.setBorder(BorderFactory.createTitledBorder("Hình ảnh sản phẩm"));
+
+            JLabel lblImage = new JLabel("Chưa có ảnh", SwingConstants.CENTER);
+            lblImage.setPreferredSize(new Dimension(200, 250));
+            displayImageToLabel(data.getPic(), lblImage, 200, 250);
+            pnlImage.add(lblImage, BorderLayout.CENTER);
+
+            pnlMain.add(pnlImage, BorderLayout.EAST);
+            add(pnlMain, BorderLayout.CENTER);
 
             JPanel pnlFooter = new JPanel();
             pnlFooter.setBackground(Color.WHITE);
@@ -498,11 +559,13 @@ public class Product extends JPanel implements ActionListener {
     }
 
     class ProductDialog extends JDialog {
-        JTextField txtName, txtBrand, txtYear, txtAuthor, txtLang, txtPrice, txtQty, txtCat, txtPic;
+        JTextField txtName, txtBrand, txtYear, txtAuthor, txtLang, txtPrice, txtQty, txtCat;
+        JLabel lblImagePreview;
+        String selectedImagePath = "";
 
         public ProductDialog(JFrame parent, String title, ProductDTO data) {
             super(parent, title, true);
-            setSize(700, 500);
+            setSize(800, 500);
             setLocationRelativeTo(parent);
             setLayout(new BorderLayout());
 
@@ -514,25 +577,60 @@ public class Product extends JPanel implements ActionListener {
             pnlHeader.add(lblTitle);
             add(pnlHeader, BorderLayout.NORTH);
 
-            JPanel pnlCenter = new JPanel(new GridLayout(5, 2, 15, 10));
-            pnlCenter.setBorder(new EmptyBorder(20, 40, 20, 40));
-            pnlCenter.setBackground(Color.WHITE);
+            JPanel pnlBody = new JPanel(new BorderLayout(20, 0));
+            pnlBody.setBorder(new EmptyBorder(20, 20, 20, 20));
+            pnlBody.setBackground(Color.WHITE);
+
+            JPanel pnlForm = new JPanel(new GridLayout(4, 2, 15, 10));
+            pnlForm.setBackground(Color.WHITE);
 
             txtName = new JTextField(); txtBrand = new JTextField();
             txtYear = new JTextField(); txtAuthor = new JTextField();
             txtLang = new JTextField(); txtCat = new JTextField();
             txtPrice = new JTextField(); txtQty = new JTextField();
-            txtPic = new JTextField();
 
-            addInput(pnlCenter, "Tên sản phẩm:", txtName);
-            addInput(pnlCenter, "Thương hiệu:", txtBrand);
-            addInput(pnlCenter, "Năm xuất bản:", txtYear);
-            addInput(pnlCenter, "Tác giả:", txtAuthor);
-            addInput(pnlCenter, "Ngôn ngữ:", txtLang);
-            addInput(pnlCenter, "Mã loại:", txtCat);
-            addInput(pnlCenter, "Giá bán:", txtPrice);
-            addInput(pnlCenter, "Số lượng tồn:", txtQty);
-            addInput(pnlCenter, "Đường dẫn ảnh:", txtPic);
+            addInput(pnlForm, "Tên sản phẩm:", txtName);
+            addInput(pnlForm, "Thương hiệu:", txtBrand);
+            addInput(pnlForm, "Năm xuất bản:", txtYear);
+            addInput(pnlForm, "Tác giả:", txtAuthor);
+            addInput(pnlForm, "Ngôn ngữ:", txtLang);
+            addInput(pnlForm, "Mã loại:", txtCat);
+            addInput(pnlForm, "Giá bán:", txtPrice);
+            addInput(pnlForm, "Số lượng tồn:", txtQty);
+
+            pnlBody.add(pnlForm, BorderLayout.CENTER);
+
+            JPanel pnlImgWrap = new JPanel(new BorderLayout(0, 10));
+            pnlImgWrap.setBackground(Color.WHITE);
+            pnlImgWrap.setBorder(BorderFactory.createTitledBorder("Ảnh sản phẩm"));
+
+            lblImagePreview = new JLabel("Chưa có ảnh", SwingConstants.CENTER);
+            lblImagePreview.setPreferredSize(new Dimension(200, 250));
+            lblImagePreview.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+
+            JButton btnChooseImage = new JButton("Chọn ảnh...");
+            btnChooseImage.setFocusPainted(false);
+            btnChooseImage.addActionListener(e -> {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Chọn hình ảnh sản phẩm");
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("Hình ảnh (JPG, PNG)", "jpg", "jpeg", "png");
+                fileChooser.setFileFilter(filter);
+
+                // Mở sẵn ở thư mục image_product để tiện chọn ảnh đã có sẵn
+                fileChooser.setCurrentDirectory(new File(IMAGE_DIR));
+
+                if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    selectedImagePath = file.getAbsolutePath();
+                    displayImageToLabel(selectedImagePath, lblImagePreview, 200, 250);
+                }
+            });
+
+            pnlImgWrap.add(lblImagePreview, BorderLayout.CENTER);
+            pnlImgWrap.add(btnChooseImage, BorderLayout.SOUTH);
+
+            pnlBody.add(pnlImgWrap, BorderLayout.EAST);
+            add(pnlBody, BorderLayout.CENTER);
 
             if (data != null) {
                 txtName.setText(data.getProductName());
@@ -543,18 +641,19 @@ public class Product extends JPanel implements ActionListener {
                 txtCat.setText(String.valueOf(data.getCategoryId()));
                 txtPrice.setText(data.getPrice() != null ? data.getPrice().toString() : "0");
                 txtQty.setText(String.valueOf(data.getQuantity()));
-                txtPic.setText(data.getPic());
-            }
 
-            add(pnlCenter, BorderLayout.CENTER);
+                selectedImagePath = data.getPic();
+                displayImageToLabel(selectedImagePath, lblImagePreview, 200, 250);
+            }
 
             JPanel pnlBottom = new JPanel();
             pnlBottom.setBackground(Color.WHITE);
             pnlBottom.setBorder(new EmptyBorder(0,0,10,0));
-            JButton btnSave = new JButton("Lưu");
+            JButton btnSave = new JButton("Lưu thông tin");
             btnSave.setBackground(new Color(13, 110, 253));
             btnSave.setForeground(Color.WHITE);
-            btnSave.setPreferredSize(new Dimension(100, 35));
+            btnSave.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            btnSave.setPreferredSize(new Dimension(150, 40));
             pnlBottom.add(btnSave);
             add(pnlBottom, BorderLayout.SOUTH);
 
@@ -568,22 +667,40 @@ public class Product extends JPanel implements ActionListener {
                     int cat = Integer.parseInt(txtCat.getText().isEmpty() ? "0" : txtCat.getText());
                     BigDecimal price = new BigDecimal(txtPrice.getText().isEmpty() ? "0" : txtPrice.getText());
                     int qty = Integer.parseInt(txtQty.getText().isEmpty() ? "0" : txtQty.getText());
-                    String pic = txtPic.getText();
+
+                    String picToSave = (data != null && data.getPic() != null) ? data.getPic() : "";
+
+                    if (selectedImagePath != null && !selectedImagePath.isEmpty() && !selectedImagePath.equals(picToSave)) {
+                        File sourceFile = new File(selectedImagePath);
+                        if (sourceFile.exists()) {
+                            String fileName = sourceFile.getName();
+                            File destFile = new File(IMAGE_DIR + fileName);
+
+                            if (!sourceFile.getAbsolutePath().equals(destFile.getAbsolutePath())) {
+                                try {
+                                    Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                                } catch (Exception ex) {
+                                    System.err.println("Lỗi copy ảnh: " + ex.getMessage());
+                                }
+                            }
+                            picToSave = fileName;
+                        }
+                    }
 
                     if (data == null) {
-                        ProductDTO newProduct = new ProductDTO(0, name, pic, cat, brand, year, author, lang, price, qty, 1);
+                        ProductDTO newProduct = new ProductDTO(0, name, picToSave, cat, brand, year, author, lang, price, qty, 1);
                         JOptionPane.showMessageDialog(this, productBLL.add(newProduct));
                     } else {
                         data.setProductName(name); data.setPublisher(brand);
                         data.setPublishYear(year); data.setAuthor(author);
                         data.setLanguage(lang); data.setCategoryId(cat);
                         data.setPrice(price); data.setQuantity(qty);
-                        data.setPic(pic);
+                        data.setPic(picToSave);
                         JOptionPane.showMessageDialog(this, productBLL.update(data));
                     }
                     dispose();
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số cho Năm XB, Loại, Giá và Số lượng!");
+                    JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số cho Năm XB, Mã loại, Giá và Số lượng!");
                 }
             });
         }
