@@ -56,17 +56,22 @@ public class ItemTaskbar extends JPanel implements MouseListener {
     }
 
     public ItemTaskbar(String linkIcon, String content1, String content2) {
-        this.setLayout(new FlowLayout(0, 20, 50));
-//        this.setPreferredSize(new Dimension(250, 45));
+        // Chỉnh lại FlowLayout (khoảng cách trên dưới) cho hợp lý
+        this.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20)); 
+        
+        // NẾU LÀ THẺ TO (Dashboard): Tăng chiều cao lên 150 để chứa đủ cái icon 110px
+        this.setPreferredSize(new Dimension(250, 150)); 
         this.setBackground(DefaultColor);
         this.putClientProperty( FlatClientProperties.STYLE, "arc: 15" );
         this.addMouseListener(this);
 
         lblIcon = new JLabel();
-        lblIcon.setPreferredSize(new Dimension(110, 110));
+        lblIcon.setPreferredSize(new Dimension(110, 110)); 
+        
         FlatSVGIcon svg2 = loadSvgIcon("/icon/" + linkIcon);
         if (svg2 != null) {
-            lblIcon.setIcon(svg2);
+            // 👉 ĐÃ SỬA: Ép kích thước ảnh SVG về 80x80 pixel để nằm vừa vặn trong cái JLabel 110x110
+            lblIcon.setIcon(svg2.derive(80, 80)); 
         }
 
         this.add(lblIcon);
@@ -77,7 +82,7 @@ public class ItemTaskbar extends JPanel implements MouseListener {
         pnlContent.setForeground(FontColor);
         this.add(pnlContent);
 
-//        box[i].setBorder(new EmptyBorder(20, 20, 20, 20));
+        // Lưu ý: Biến content2 hiện tại bạn đang truyền vào hàm nhưng lại chưa code để hiển thị nó ra (VD: add thêm 1 JLabel chứa content2)
     }
 
     public ItemTaskbar(String linkImg, String tenSP, int soLuong) {
