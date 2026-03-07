@@ -24,10 +24,15 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 
 import com.bat.BLL.UserBLL;
 import com.bat.DTO.UserDTO;
 import com.bat.GUI.component.BaseJFrame;
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
 
 public class LoginJFrame extends BaseJFrame {
     private JTextField txtUsername;
@@ -270,7 +275,30 @@ public class LoginJFrame extends BaseJFrame {
 
     public static void main(String[] args) {
         try {
-            com.formdev.flatlaf.FlatIntelliJLaf.setup();
+            FlatRobotoFont.install();
+            FlatLaf.setPreferredFontFamily(FlatRobotoFont.FAMILY);
+            FlatLaf.setPreferredLightFontFamily(FlatRobotoFont.FAMILY_LIGHT);
+            FlatLaf.setPreferredSemiboldFontFamily(FlatRobotoFont.FAMILY_SEMIBOLD);
+            FlatIntelliJLaf.registerCustomDefaultsSource("style");
+            FlatIntelliJLaf.setup();
+
+            UIManager.put("Table.showVerticalLines", false);
+            UIManager.put("Table.showHorizontalLines", true);
+            UIManager.put("TextComponent.arc", 5);
+            UIManager.put("ScrollBar.thumbArc", 999);
+            UIManager.put("ScrollBar.thumbInsets", new Insets(2, 2, 2, 2));
+            UIManager.put("Button.iconTextGap", 10);
+            UIManager.put("PasswordField.showRevealButton", true);
+            UIManager.put("Table.selectionBackground", new Color(240, 247, 250));
+            UIManager.put("Table.selectionForeground", new Color(0, 0, 0));
+            UIManager.put("Table.scrollPaneBorder", new EmptyBorder(0, 0, 0, 0));
+            UIManager.put("Table.rowHeight", 40);
+            UIManager.put("TabbedPane.selectedBackground", Color.white);
+            UIManager.put("TableHeader.height", 40);
+            UIManager.put("TableHeader.font", UIManager.getFont("h4.font"));
+            UIManager.put("TableHeader.background", new Color(242, 242, 242));
+            UIManager.put("TableHeader.separatorColor", new Color(242, 242, 242));
+            UIManager.put("TableHeader.bottomSeparatorColor", new Color(242, 242, 242));
         } catch (Exception e) {}
 
         java.awt.EventQueue.invokeLater(() -> {
