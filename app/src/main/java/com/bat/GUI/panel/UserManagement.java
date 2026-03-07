@@ -319,27 +319,42 @@ public class UserManagement extends JPanel implements ActionListener {
         lblAvatarPic.setHorizontalAlignment(SwingConstants.CENTER);
         lblAvatarPic.setBorder(BorderFactory.createLineBorder(new Color(209, 213, 219), 2));
         
-        String avatarFile = (isEdit && user.getAvatar() != null && !user.getAvatar().isEmpty()) ? user.getAvatar() : "account.svg";
+        String avatarFile = (isEdit && user.getAvatar() != null && !user.getAvatar().isEmpty()) ? user.getAvatar() : "";
         
-        try {
-            if (avatarFile.toLowerCase().endsWith(".svg")) {
-                FlatSVGIcon svgIcon = new FlatSVGIcon("icon/" + avatarFile);
-                if (svgIcon.hasFound()) {
-                    lblAvatarPic.setIcon(svgIcon.derive(100, 100)); 
-                } else {
-                    lblAvatarPic.setIcon(new FlatSVGIcon("icon/account.svg").derive(100, 100));
-                }
-            } else {
-                java.net.URL imgUrl = getClass().getResource("/icon/" + avatarFile);
-                if (imgUrl != null) {
-                    java.awt.Image img = new javax.swing.ImageIcon(imgUrl).getImage().getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
+        // Hiển thị ảnh của người dùng hoặc ảnh mặc định
+        boolean avatarLoaded = false;
+        if (!avatarFile.isEmpty()) {
+            try {
+                // Thử load ảnh từ folder image (file system)
+                File imageFile = new File("app/src/main/resources/image/" + avatarFile);
+                if (imageFile.exists() && imageFile.isFile()) {
+                    java.awt.Image img = new javax.swing.ImageIcon(imageFile.getAbsolutePath())
+                        .getImage().getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
                     lblAvatarPic.setIcon(new javax.swing.ImageIcon(img));
+                    avatarLoaded = true;
                 } else {
-                    lblAvatarPic.setIcon(new FlatSVGIcon("icon/account.svg").derive(100, 100));
+                    // Thử load từ resources nếu không tìm thấy trong file system
+                    java.net.URL imgUrl = getClass().getResource("/image/" + avatarFile);
+                    if (imgUrl != null) {
+                        java.awt.Image img = new javax.swing.ImageIcon(imgUrl)
+                            .getImage().getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
+                        lblAvatarPic.setIcon(new javax.swing.ImageIcon(img));
+                        avatarLoaded = true;
+                    }
                 }
+            } catch (Exception ex) {
+                // Nếu lỗi, dùng ảnh mặc định
             }
-        } catch (Exception ex) {
-            lblAvatarPic.setIcon(new FlatSVGIcon("icon/account.svg").derive(100, 100));
+        }
+        
+        // Nếu không load được ảnh hoặc không có ảnh, dùng ảnh mặc định
+        if (!avatarLoaded) {
+            try {
+                FlatSVGIcon defaultIcon = new FlatSVGIcon("icon/account.svg");
+                lblAvatarPic.setIcon(defaultIcon.derive(100, 100));
+            } catch (Exception ex) {
+                // Để trống nếu không load được cả ảnh mặc định
+            }
         }
 
         pnlAvatar.add(lblAvatarPic);
@@ -360,6 +375,7 @@ public class UserManagement extends JPanel implements ActionListener {
         JTextField txtPhone = new JTextField(isEdit ? user.getPhone() : "");
         JTextField txtAddress = new JTextField(isEdit ? user.getAddress() : "");
         JTextField txtAvatar = new JTextField(isEdit ? user.getAvatar() : "");
+        txtAvatar.setEditable(false); // Không cho nhập tay, chỉ chọn từ nút
         
         JComboBox<String> cbRole = new JComboBox<>(ROLES_ARRAY);
         JComboBox<String> cbStatus = new JComboBox<>(new String[]{"Bị khoá", "Hoạt động"});
@@ -381,6 +397,98 @@ public class UserManagement extends JPanel implements ActionListener {
             cbRole.setEnabled(false); cbStatus.setEnabled(false);
         }
 
+        // Tạo panel chứa txtAvatar và nút chọn ảnh ở bên cạnh
+        JPanel pnlAvatarUpload = new JPanel(new BorderLayout(5, 0));
+        pnlAvatarUpload.setBackground(Color.WHITE);
+        pnlAvatarUpload.add(txtAvatar, BorderLayout.CENTER);
+        
+        JButton btnChooseImage = new JButton("Chọn ảnh");
+        btnChooseImage.setBackground(new Color(13, 110, 253));
+        btnChooseImage.setForeground(Color.WHITE);
+        btnChooseImage.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnChooseImage.setFocusPainted(false);
+        btnChooseImage.setPreferredSize(new Dimension(100, 30));
+        
+        if (!isViewOnly) {
+            btnChooseImage.addActionListener(evt -> {
+                // Kiểm tra username đã nhập chưa
+                String username = txtUser.getText().trim();
+                if (username.isEmpty()) {
+                    JOptionPane.showMessageDialog(dialog, 
+                        "Vui lòng nhập Username trước khi chọn ảnh!", 
+                        "Cảnh báo", 
+                        JOptionPane.WARNING_MESSAGE);
+                    txtUser.requestFocus();
+                    return;
+                }
+                
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Chọn ảnh đại diện");
+                FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                    "Image Files (*.png, *.jpg, *.jpeg, *.svg)", "png", "jpg", "jpeg", "svg");
+                fileChooser.setFileFilter(filter);
+                
+                int result = fileChooser.showOpenDialog(dialog);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    String originalFileName = selectedFile.getName();
+                    
+                    // Lấy extension của file gốc
+                    String extension = "";
+                    int lastDot = originalFileName.lastIndexOf('.');
+                    if (lastDot > 0) {
+                        extension = originalFileName.substring(lastDot);
+                    }
+                    
+                    // Tạo tên file mới theo username
+                    String newFileName = username + extension;
+                    
+                    try {
+                        // Đường dẫn đến thư mục resources/image trong project
+                        String resourcePath = "src/main/resources/image/";
+                        File destDir = new File(resourcePath);
+                        if (!destDir.exists()) {
+                            destDir.mkdirs();
+                        }
+                        
+                        File destFile = new File(destDir, newFileName);
+                        
+                        // Copy file vào thư mục resources/image với tên mới
+                        java.nio.file.Files.copy(
+                            selectedFile.toPath(), 
+                            destFile.toPath(), 
+                            java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                        );
+                        
+                        // Cập nhật txtAvatar với tên file mới
+                        txtAvatar.setText(newFileName);
+                        
+                        // Cập nhật preview ảnh
+                        try {
+                            // Load ảnh từ file vừa lưu để hiển thị preview
+                            java.awt.Image img = new javax.swing.ImageIcon(destFile.getAbsolutePath())
+                                .getImage().getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
+                            lblAvatarPic.setIcon(new javax.swing.ImageIcon(img));
+                        } catch (Exception ex) {
+                            JOptionPane.showMessageDialog(dialog, "Lỗi hiển thị ảnh preview: " + ex.getMessage());
+                        }
+                        
+                        JOptionPane.showMessageDialog(dialog, 
+                            "Upload ảnh thành công!\n", 
+                            "Thành công", 
+                            JOptionPane.INFORMATION_MESSAGE);
+                            
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(dialog, 
+                            "Lỗi khi copy file: " + ex.getMessage(), 
+                            "Lỗi", 
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+            pnlAvatarUpload.add(btnChooseImage, BorderLayout.EAST);
+        }
+
         pnlCenter.add(new JLabel("Mã Nhân viên (ID):")); pnlCenter.add(txtId);
         pnlCenter.add(new JLabel("Họ và tên:")); pnlCenter.add(txtName);
         pnlCenter.add(new JLabel("Username:")); pnlCenter.add(txtUser);
@@ -388,7 +496,7 @@ public class UserManagement extends JPanel implements ActionListener {
         pnlCenter.add(new JLabel("Email:")); pnlCenter.add(txtEmail);
         pnlCenter.add(new JLabel("Số điện thoại:")); pnlCenter.add(txtPhone);
         pnlCenter.add(new JLabel("Địa chỉ:")); pnlCenter.add(txtAddress);
-        pnlCenter.add(new JLabel("Tên file Avatar:")); pnlCenter.add(txtAvatar);
+        pnlCenter.add(new JLabel("Avatar:")); pnlCenter.add(pnlAvatarUpload);
         pnlCenter.add(new JLabel("Nhóm quyền:")); pnlCenter.add(cbRole);
         pnlCenter.add(new JLabel("Trạng thái:")); pnlCenter.add(cbStatus);
         

@@ -169,7 +169,16 @@ public class LoginJFrame extends BaseJFrame {
     private void checkLogin() {
         String u = txtUsername.getText();
         String p = new String(txtPassword.getPassword());
-        
+
+        if (u.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập tên đăng nhập!");
+            return;
+        }
+        if (p.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập mật khẩu!");
+            return;
+        }
+
         UserDTO user = userBLL.login(u, p);
         if (user != null) {
             this.dispose(); 
