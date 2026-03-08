@@ -1,6 +1,5 @@
 package com.bat.GUI.panel.statistic;
 
-// import BUS.ThongKeBUS;
 import java.awt.Color;
 import java.awt.GridLayout;
 
@@ -14,10 +13,8 @@ import javax.swing.JTabbedPane;
 public final class Statistic extends JPanel {
 
     JTabbedPane tabbedPane;
-    JPanel tongquan, nhacungcap, khachhang, doanhthu;
-    // ThongKeTonKho nhapxuat;
+    JPanel dashboard;
     Color BackgroundColor = new Color(240, 247, 250);
-    // ThongKeBUS thongkeBUS = new ThongKeBUS();
 
     public Statistic() {
         initComponent();
@@ -27,14 +24,11 @@ public final class Statistic extends JPanel {
         this.setLayout(new GridLayout(1, 1));
         this.setBackground(BackgroundColor);
 
-        // tongquan = new ThongKeTongQuan(thongkeBUS);
-        // khachhang = new ThongKeKhachHang(thongkeBUS);
-        // nhacungcap = new ThongKeNhaCungCap(thongkeBUS);
-        // doanhthu = new ThongKeDoanhThu(thongkeBUS);
+        dashboard = new Dashboard();
 
-        // tabbedPane = new JTabbedPane();
-        // tabbedPane.setOpaque(false);
-        // tabbedPane.addTab("Tổng quan", tongquan);
+        tabbedPane = new JTabbedPane();
+        tabbedPane.setOpaque(false);
+        tabbedPane.addTab("Tổng quan", dashboard);
         // tabbedPane.addTab("Tồn kho", nhapxuat);
         // tabbedPane.addTab("Doanh thu", doanhthu);
         // tabbedPane.addTab("Nhà cung cấp", nhacungcap);

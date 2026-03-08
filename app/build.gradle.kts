@@ -32,6 +32,7 @@ dependencies {
     implementation ("org.apache.poi:poi:5.2.5")
     implementation ("org.apache.poi:poi-ooxml:5.2.5")
     implementation("com.itextpdf:itextpdf:5.5.13.3")
+    implementation("net.java.dev.timingframework:timingframework:1.0")
 }
 
 

@@ -28,6 +28,7 @@ import com.bat.GUI.panel.Lot;
 import com.bat.GUI.panel.Product;
 import com.bat.GUI.panel.Provider;
 import com.bat.GUI.panel.UserManagement; // ĐÃ THÊM IMPORT
+import com.bat.GUI.panel.statistic.Statistic;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 
@@ -55,6 +56,7 @@ public class MenuTaskbar extends JPanel{
             { "Lô hàng", "lot.svg", "lohang" },
             { "xuat", "lot.svg", "xuat" },
             { "Phiếu kiểm kê", "check.svg", "kiemke" },
+            { "Thống kê", "info.svg", "thongke" },
             { "Đăng xuất", "log_out.svg", "dangxuat" },
     };
 
@@ -243,6 +245,7 @@ public class MenuTaskbar extends JPanel{
             case "Phiếu nhập" -> mainFrame.setPanel(new Import(mainFrame));
             case "Lô hàng" -> mainFrame.setPanel(new Lot(mainFrame));
             case "xuat" -> mainFrame.setPanel(new Export(mainFrame));
+            case "Thống kê" -> mainFrame.setPanel(new Statistic());
             
             // Bắt sự kiện thoát
             case "Đăng xuất" -> {

@@ -93,6 +93,7 @@ public class LoginJFrame extends BaseJFrame {
         txtUsername.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, colorBorder));
         txtUsername.setCaretColor(colorTextRight);
         txtUsername.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        txtUsername.setText("admin");
         pnlRight.add(txtUsername);
 
         JLabel lblPass = new JLabel("Password");
@@ -108,6 +109,7 @@ public class LoginJFrame extends BaseJFrame {
         txtPassword.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, colorBorder));
         txtPassword.setCaretColor(colorTextRight);
         txtPassword.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        txtPassword.setText("123456");
         pnlRight.add(txtPassword);
         
         char defaultEchoChar = txtPassword.getEchoChar(); 
