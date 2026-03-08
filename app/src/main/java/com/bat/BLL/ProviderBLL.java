@@ -58,7 +58,7 @@ public class ProviderBLL {
         if (p.getProviderName().trim().isEmpty()) return "Tên nhà cung cấp không được để trống!";
         if (p.getPhone().trim().isEmpty()) return "Số điện thoại không được để trống!";
 
-        if (!p.getPhone().matches("\\d{10,11}")) return "Số điện thoại phải là 10-11 chữ số!";
+        if (!p.getPhone().matches("\\d{10}")) return "Số điện thoại phải là 10 chữ số!";
 
         int newId = providerDAL.getAutoIncrement();
         p.setProviderId(newId);
@@ -72,7 +72,7 @@ public class ProviderBLL {
     public String update(ProviderDTO p) {
         if (p.getProviderName().trim().isEmpty()) return "Tên nhà cung cấp không được để trống!";
 
-        if (!p.getPhone().matches("\\d{10,11}")) return "Số điện thoại phải là 10-11 chữ số!";
+        if (!p.getPhone().matches("\\d{10}")) return "Số điện thoại phải là 10 chữ số!";
 
         if (providerDAL.update(p)) {
             return "Cập nhật thành công!";
