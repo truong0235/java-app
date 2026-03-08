@@ -17,6 +17,9 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import com.toedter.calendar.JDateChooser;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -504,7 +507,8 @@ public class Customer extends JPanel implements ActionListener {
     }
 
     class CustomerDialog extends JDialog {
-        JTextField txtName, txtDob, txtPhone, txtAddress;
+        JTextField txtName, txtPhone, txtAddress;
+        JDateChooser dateDob;
         JLabel lblImage;
         String selectedImagePath = "";
 
@@ -542,19 +546,33 @@ public class Customer extends JPanel implements ActionListener {
             JPanel pnlCenter = new JPanel(new GridLayout(4, 2, 10, 20));
             pnlCenter.setBorder(new EmptyBorder(20, 10, 20, 40));
             pnlCenter.setBackground(Color.WHITE);
-            txtName = new JTextField(); txtDob = new JTextField(); txtPhone = new JTextField(); txtAddress = new JTextField();
+
+            txtName = new JTextField();
+            txtPhone = new JTextField();
+            txtAddress = new JTextField();
+
+            dateDob = new JDateChooser();
+            dateDob.setDateFormatString("yyyy-MM-dd");
+
             addInput(pnlCenter, "Họ và tên:", txtName);
-            addInput(pnlCenter, "Ngày sinh:", txtDob);
+            addInput(pnlCenter, "Ngày sinh:", dateDob);
             addInput(pnlCenter, "Số điện thoại:", txtPhone);
             addInput(pnlCenter, "Địa chỉ:", txtAddress);
 
             if (data != null) {
                 txtName.setText(data.getFullName());
-                txtDob.setText(data.getBirthday());
                 txtPhone.setText(data.getPhone());
                 txtAddress.setText(data.getAddress());
-
                 selectedImagePath = data.getImage();
+
+                try {
+                    if (data.getBirthday() != null && !data.getBirthday().isEmpty()) {
+                        Date date = new SimpleDateFormat("yyyy-MM-dd").parse(data.getBirthday());
+                        dateDob.setDate(date);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
 
             ImageIcon startIcon = getScaledImage(selectedImagePath, 210, 240);
@@ -568,7 +586,7 @@ public class Customer extends JPanel implements ActionListener {
             btnChooseImage.addActionListener(e -> {
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setDialogTitle("Chọn ảnh khách hàng");
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("Hình ảnh (JPG, PNG, GIF)", "jpg", "png", "jpeg", "gif");
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("Hình ảnh", "jpg", "png", "jpeg", "gif");
                 fileChooser.setFileFilter(filter);
 
                 if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
@@ -591,9 +609,17 @@ public class Customer extends JPanel implements ActionListener {
 
             btnSave.addActionListener(e -> {
                 String name = txtName.getText();
-                String dob = txtDob.getText();
                 String phone = txtPhone.getText();
                 String address = txtAddress.getText();
+
+                String dob = "";
+                if (dateDob.getDate() != null) {
+                    dob = new SimpleDateFormat("yyyy-MM-dd").format(dateDob.getDate());
+                } else {
+                    JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày sinh!");
+                    return;
+                }
+
                 if (name.isEmpty()) { JOptionPane.showMessageDialog(this, "Tên khách hàng không được để trống!"); return; }
 
                 if (data == null) {
@@ -610,7 +636,8 @@ public class Customer extends JPanel implements ActionListener {
                 dispose();
             });
         }
-        private void addInput(JPanel p, String label, JTextField field) {
+
+        private void addInput(JPanel p, String label, JComponent field) {
             JLabel lbl = new JLabel(label);
             lbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
             p.add(lbl);
