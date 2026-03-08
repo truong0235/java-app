@@ -66,7 +66,11 @@ public class CustomerDAL {
         try (DBConnectHelper db = new DBConnectHelper();
              Connection conn = db.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, c.getFullName());
             ps.setString(2, c.getBirthday());
+            ps.setString(3, c.getPhone());
+            ps.setString(4, c.getAddress());
+            ps.setString(5, c.getImage());
             ps.setInt(6, c.getCustomerId());
             int result = ps.executeUpdate();
             return result > 0;
