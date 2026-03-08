@@ -391,8 +391,6 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
         
         try {
             ExcelExporter.exportJTableToExcel(table);
-            JOptionPane.showMessageDialog(this, "Xuất file Excel thành công!", 
-                                        "Thành công", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Lỗi khi xuất file: " + ex.getMessage(), 
                                         "Lỗi", JOptionPane.ERROR_MESSAGE);

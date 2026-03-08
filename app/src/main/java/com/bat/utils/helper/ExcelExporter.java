@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableModel;
@@ -63,6 +64,8 @@ public class ExcelExporter {
                     workbook.write(fileOut);
                 }
             }
+            JOptionPane.showMessageDialog(null, "Xuất file Excel thành công!", 
+                                        "Thành công", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }

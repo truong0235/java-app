@@ -56,10 +56,6 @@ public class Dashboard extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBackground(new Color(228, 238, 255));
         setBorder(new EmptyBorder(10, 10, 10, 10));
-        
-        // Panel chứa các thẻ thống kê phía trên
-        // JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 25, 0));
-        // topPanel.setOpaque(false);
 
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new GridLayout(1, 3, 20, 0));
@@ -79,7 +75,7 @@ public class Dashboard extends JPanel {
         centerPanel.setOpaque(false);
         
         // Panel bên trái - Biểu đồ tròn với chú thích
-        JPanel leftPanel = createPanelWithTitle("Thống Kê Top 5 Danh Mục");
+        JPanel leftPanel = createPanelWithTitle("Top 5 sản phẩm bán chạy");
         leftPanel.setPreferredSize(new Dimension(400, 400));
         
         categoryPieChart = new PieChart();
