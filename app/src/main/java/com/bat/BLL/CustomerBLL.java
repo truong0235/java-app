@@ -29,7 +29,7 @@ public class CustomerBLL {
     public String add(CustomerDTO c) {
         if (c.getFullName().trim().isEmpty()) return "Tên khách hàng không được để trống!";
         if (c.getPhone().trim().isEmpty()) return "Số điện thoại không được để trống!";
-        if (!c.getPhone().matches("\\d{10,11}")) return "Số điện thoại phải là 10-11 chữ số!";
+        if (!c.getPhone().matches("\\d{10}")) return "Số điện thoại phải là 10 chữ số!";
 
         int newId = customerDAL.getAutoIncrement();
         c.setCustomerId(newId);
@@ -40,7 +40,7 @@ public class CustomerBLL {
 
     public String update(CustomerDTO c) {
         if (c.getFullName().trim().isEmpty()) return "Tên khách hàng không được để trống!";
-        if (!c.getPhone().matches("\\d{10,11}")) return "Số điện thoại phải là 10-11 chữ số!";
+        if (!c.getPhone().matches("\\d{10}")) return "Số điện thoại phải là 10 chữ số!";
 
         if (customerDAL.update(c)) return "Cập nhật thành công!";
         return "Cập nhật thất bại!";
@@ -51,3 +51,4 @@ public class CustomerBLL {
         return "Xóa thất bại!";
     }
 }
+
