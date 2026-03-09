@@ -1,6 +1,7 @@
 package com.bat.BLL;
 
 import java.util.ArrayList;
+
 import com.bat.DAL.CategoryDAL;
 import com.bat.DTO.CategoryDTO;
 
@@ -16,6 +17,15 @@ public class CategoryBLL {
     public ArrayList<CategoryDTO> getCategoryList() {
         categories = categoryDAL.getCategories();
         return categories;
+    }
+
+    public String getCategoryNameById(int id) {
+        if (categories == null) categories = categoryDAL.getCategories();
+        for (CategoryDTO c : categories) {
+            if (c.getCategoryId() == id) 
+                return c.getCategoryName();
+        }
+        return null;
     }
 
     public CategoryDTO getCategoryById(int id) {

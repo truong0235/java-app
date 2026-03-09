@@ -176,7 +176,7 @@ public class ProductDAL {
     }
 
     public boolean add(ProductDTO p) {
-        String query = "INSERT INTO product (product_id, product_name, pic, category_id, publisher, publish_year, author, language, price, quantity, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO product (product_id, product_name, pic, category_id, publisher, publish_year, author, language, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -191,8 +191,6 @@ public class ProductDAL {
             ps.setString(7, p.getAuthor());
             ps.setString(8, p.getLanguage());
             ps.setBigDecimal(9, p.getPrice());
-            ps.setInt(10, p.getQuantity());
-            ps.setInt(11, p.getStatus());
             int result = ps.executeUpdate();
             return result > 0;
         } catch (Exception e) { e.printStackTrace(); }
