@@ -35,12 +35,13 @@ import javax.swing.table.JTableHeader;
 import com.bat.BLL.ExportBLL;
 import com.bat.BLL.ProviderBLL;
 import com.bat.BLL.UserBLL;
-import com.bat.DTO.ExportReceiptDTO;
+import com.bat.DTO.ExportHandleDTO;
 import com.bat.DTO.ProviderDTO;
 import com.bat.DTO.UserDTO;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
+import com.bat.GUI.dialog.AddExportDialog;
 import com.bat.GUI.dialog.AddImportDialog;
 import com.toedter.calendar.JDateChooser;
 
@@ -51,7 +52,7 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
 
     DefaultTableModel tableModel;
     JTable table;
-    ArrayList<ExportReceiptDTO> exportList;
+    ArrayList<ExportHandleDTO> exportList;
     
 
     IntegratedSearch searchPanel;
@@ -66,7 +67,7 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
     public Export(Main main) {
         this.main = main;
         initComponent();
-        exportList = exportBLL.getExportList();
+        exportList = exportBLL.getExportHandleList();
         loadDataTable(exportList);
     }
 
@@ -212,7 +213,7 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
         panel.setBorder(new EmptyBorder(0, 10, 0, 0));
         
         // Tạo table với dữ liệu mẫu phiếu xuất
-        String[] columns = {"Mã phiếu", "Ngày xuất" ,"Tổng tiền", "Trạng thái", "order_id", "userid", "user_id"};
+        String[] columns = {"Mã phiếu", "Ngày xuất", "Nhân viên nhập", "Khách hàng", "Tổng tiền", "Trạng thái"};
         tableModel = new DefaultTableModel(null, columns) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -294,24 +295,22 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
     //     }
     // }
 
-    public void loadDataTable(ArrayList<ExportReceiptDTO> filteredImports) {
+    public void loadDataTable(ArrayList<ExportHandleDTO> filteredImports) {
         // exportList = exportBLL.getImportList();
         tableModel.setRowCount(0);
-        for (ExportReceiptDTO imp : filteredImports) {
+        for (ExportHandleDTO imp : filteredImports) {
             // String formattedDate = imp.getCreatedDate() != null ?
             // imp.getCreatedDate().format(DATE_FORMATTER) : "";
             // String formattedPrice = imp.getTotalPrice() != null ?
             // CURRENCY_FORMATTER.format(imp.getTotalPrice()) : "0 ₫";
 
             Object[] rowData = {
-                    imp.getExport_id(),
-                    // imp.getExport_date() != null ? imp.getExport_date().format(DATE_FORMATTER) : "",
-                    imp.getExport_date(),
-                    imp.getTotal_price() + " ₫",
+                    imp.getExportId(),
+                    imp.getExportDate(),
+                    imp.getWorkerName(),
+                    imp.getCustomerName(),
+                    imp.getTotalPrice() + " ₫",
                     imp.getStatus() == 1 ? "Đã duyệt" : "Chờ duyệt",
-                    imp.getOrder_id(),
-                    imp.getUser_id(),
-                    imp.getUser_id()
             };
             tableModel.addRow(rowData);
         }
@@ -330,9 +329,9 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
         String command = e.getActionCommand();
         switch (command) {
             case "create":
-                AddImportDialog dialog = new AddImportDialog(main);
+                AddExportDialog dialog = new AddExportDialog();
                 dialog.setVisible(true);
-                exportList = exportBLL.getExportList();
+                exportList = exportBLL.getExportHandleList();
                 loadDataTable(exportList);
                 break;
             case "update":
