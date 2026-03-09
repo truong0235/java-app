@@ -26,6 +26,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
+import com.toedter.calendar.JDateChooser;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -315,10 +319,12 @@ public class Customer extends JPanel implements ActionListener {
     }
 
     public void loadDataTable(ArrayList<CustomerDTO> list) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         tableModel.setRowCount(0);
         if (list != null) {
             for (CustomerDTO c : list) {
-                tableModel.addRow(new Object[]{c.getCustomerId(), c.getFullName(), c.getBirthday(), c.getPhone(), c.getAddress()});
+                String birthdayStr = (c.getBirthday() != null) ? sdf.format(c.getBirthday()) : "";
+                tableModel.addRow(new Object[]{c.getCustomerId(), c.getFullName(), birthdayStr, c.getPhone(), c.getAddress()});
             }
         }
     }
@@ -367,6 +373,7 @@ public class Customer extends JPanel implements ActionListener {
     public void importExcel() {
         JFileChooser jf = new JFileChooser();
         jf.setDialogTitle("Chọn file Excel");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         if (jf.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             try (FileInputStream fis = new FileInputStream(jf.getSelectedFile()); Workbook wb = new XSSFWorkbook(fis)) {
                 Sheet sheet = wb.getSheetAt(0);
@@ -374,9 +381,16 @@ public class Customer extends JPanel implements ActionListener {
                 for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                     Row row = sheet.getRow(i);
                     if (row == null) continue;
-                    String name = ""; String dob = ""; String phone = ""; String address = "";
+                    String name = ""; Date dob = null; String phone = ""; String address = "";
                     if (row.getCell(1) != null) name = row.getCell(1).getStringCellValue();
-                    if (row.getCell(2) != null) dob = row.getCell(2).getStringCellValue();
+                    if (row.getCell(2) != null) {
+                        try {
+                            String dobStr = row.getCell(2).getStringCellValue();
+                            dob = sdf.parse(dobStr);
+                        } catch (Exception e) {
+                            // Nếu parse lỗi, để null
+                        }
+                    }
                     if (row.getCell(3) != null) {
                         try {
                             phone = String.valueOf((long) row.getCell(3).getNumericCellValue());
@@ -459,8 +473,11 @@ public class Customer extends JPanel implements ActionListener {
             pnlBody.setBorder(new EmptyBorder(20, 10, 20, 40));
             pnlBody.setBackground(Color.WHITE);
 
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            String birthdayStr = (data.getBirthday() != null) ? sdf.format(data.getBirthday()) : "";
+            
             addReadOnlyField(pnlBody, "Tên khách hàng", data.getFullName());
-            addReadOnlyField(pnlBody, "Ngày sinh", data.getBirthday());
+            addReadOnlyField(pnlBody, "Ngày sinh", birthdayStr);
             addReadOnlyField(pnlBody, "Số điện thoại", data.getPhone());
             addReadOnlyField(pnlBody, "Địa chỉ", data.getAddress());
 
@@ -504,7 +521,8 @@ public class Customer extends JPanel implements ActionListener {
     }
 
     class CustomerDialog extends JDialog {
-        JTextField txtName, txtDob, txtPhone, txtAddress;
+        JTextField txtName, txtPhone, txtAddress;
+        JDateChooser birthDateChooser;
         JLabel lblImage;
         String selectedImagePath = "";
 
@@ -542,15 +560,20 @@ public class Customer extends JPanel implements ActionListener {
             JPanel pnlCenter = new JPanel(new GridLayout(4, 2, 10, 20));
             pnlCenter.setBorder(new EmptyBorder(20, 10, 20, 40));
             pnlCenter.setBackground(Color.WHITE);
-            txtName = new JTextField(); txtDob = new JTextField(); txtPhone = new JTextField(); txtAddress = new JTextField();
+            txtName = new JTextField(); 
+            birthDateChooser = new JDateChooser();
+            birthDateChooser.setDateFormatString("dd/MM/yyyy");
+            txtPhone = new JTextField(); 
+            txtAddress = new JTextField();
             addInput(pnlCenter, "Họ và tên:", txtName);
-            addInput(pnlCenter, "Ngày sinh:", txtDob);
+            addDateInput(pnlCenter, "Ngày sinh:", birthDateChooser);
             addInput(pnlCenter, "Số điện thoại:", txtPhone);
             addInput(pnlCenter, "Địa chỉ:", txtAddress);
 
             if (data != null) {
                 txtName.setText(data.getFullName());
-                txtDob.setText(data.getBirthday());
+                // Set ngày sinh vào JDateChooser
+                birthDateChooser.setDate(data.getBirthday());
                 txtPhone.setText(data.getPhone());
                 txtAddress.setText(data.getAddress());
 
@@ -591,26 +614,42 @@ public class Customer extends JPanel implements ActionListener {
 
             btnSave.addActionListener(e -> {
                 String name = txtName.getText();
-                String dob = txtDob.getText();
+                Date dob = birthDateChooser.getDate();
                 String phone = txtPhone.getText();
                 String address = txtAddress.getText();
-                if (name.isEmpty()) { JOptionPane.showMessageDialog(this, "Tên khách hàng không được để trống!"); return; }
-
+                
+                String result;
                 if (data == null) {
                     CustomerDTO newCustomer = new CustomerDTO(0, name, dob, phone, address, selectedImagePath);
-                    JOptionPane.showMessageDialog(this, customerBLL.add(newCustomer));
+                    result = customerBLL.add(newCustomer);
                 } else {
                     data.setFullName(name);
                     data.setBirthday(dob);
                     data.setPhone(phone);
                     data.setAddress(address);
                     data.setImage(selectedImagePath);
-                    JOptionPane.showMessageDialog(this, customerBLL.update(data));
+                    result = customerBLL.update(data);
                 }
-                dispose();
+                
+                // Chỉ đóng dialog nếu thành công
+                if (result.contains("thành công")) {
+                    JOptionPane.showMessageDialog(this, result);
+                    dispose();
+                } else {
+                    // Chỉ hiện thông báo lỗi, không đóng dialog
+                    JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
             });
         }
         private void addInput(JPanel p, String label, JTextField field) {
+            JLabel lbl = new JLabel(label);
+            lbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            p.add(lbl);
+            field.setPreferredSize(new Dimension(0, 30));
+            p.add(field);
+        }
+        
+        private void addDateInput(JPanel p, String label, JDateChooser field) {
             JLabel lbl = new JLabel(label);
             lbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
             p.add(lbl);

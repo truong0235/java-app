@@ -31,7 +31,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -491,20 +490,40 @@ public class Category extends JPanel implements ActionListener {
             add(pnlBottom, BorderLayout.SOUTH);
 
             btnSave.addActionListener(e -> {
-                String name = txtName.getText();
-                String desc = txtDesc.getText();
+                // Validate dữ liệu nhập vào
+                String validationError = validateInput();
+                if (validationError != null) {
+                    JOptionPane.showMessageDialog(this, validationError, "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
+                    return; // Không đóng dialog khi có lỗi validation
+                }
+
+                String name = txtName.getText().trim();
+                String desc = txtDesc.getText().trim();
                 int status = cbStatus.getSelectedIndex() == 0 ? 1 : 0;
 
                 if (data == null) {
                     CategoryDTO newCategory = new CategoryDTO(0, name, desc, status);
-                    JOptionPane.showMessageDialog(this, categoryBLL.add(newCategory));
+                    String result = categoryBLL.add(newCategory);
+                    if (result.contains("thành công")) {
+                        JOptionPane.showMessageDialog(this, result, "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                        dispose(); // CHỈ đóng dialog khi THÀNH CÔNG
+                    } else {
+                        JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        // KHÔNG đóng dialog khi lỗi, để user sửa lại
+                    }
                 } else {
                     data.setCategoryName(name);
                     data.setDescription(desc);
-                    data.setStatus(status); // Set trạng thái trước khi update
-                    JOptionPane.showMessageDialog(this, categoryBLL.update(data));
+                    data.setStatus(status);
+                    String result = categoryBLL.update(data);
+                    if (result.contains("thành công")) {
+                        JOptionPane.showMessageDialog(this, result, "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                        dispose(); // CHỈ đóng dialog khi THÀNH CÔNG
+                    } else {
+                        JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        // KHÔNG đóng dialog khi lỗi, để user sửa lại
+                    }
                 }
-                dispose();
             });
         }
 
@@ -518,6 +537,17 @@ public class Category extends JPanel implements ActionListener {
             field.setPreferredSize(new Dimension(0, 35));
             item.add(field, BorderLayout.CENTER);
             p.add(item);
+        }
+
+        // Phương thức validate dữ liệu nhập vào
+        private String validateInput() {
+            // Kiểm tra tên danh mục
+            if (txtName.getText().trim().isEmpty()) {
+                txtName.requestFocus();
+                return "Tên danh mục không được để trống!";
+            }
+            // Tất cả validation đều pass
+            return null;
         }
     }
 }
