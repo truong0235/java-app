@@ -15,15 +15,15 @@ public class UserDAL {
         ArrayList<UserDTO> users = new ArrayList<>();
         // Chỉ lấy user có status = 1 (Hoạt động)
         String query = "SELECT * FROM users WHERE status = 1"; 
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
+        ){
             while (rs.next()) {
                 users.add(mapResultSetToUser(rs));
             }
-            db.closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -33,17 +33,17 @@ public class UserDAL {
     public UserDTO checkLogin(String username, String password) {
         UserDTO user = null;
         String query = "SELECT * FROM users WHERE username = ? AND password = ? AND status = 1";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setString(1, username);
             ps.setString(2, password);
-            ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery(); 
             if (rs.next()) {
                 user = mapResultSetToUser(rs);
             }
-            db.closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -60,10 +60,11 @@ public class UserDAL {
                        "role_id = VALUES(role_id), email = VALUES(email), " +
                        "phone = VALUES(phone), address = VALUES(address), " +
                        "status = 1, avatar = VALUES(avatar)";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setString(1, u.getUsername());
             ps.setString(2, u.getPassword());
             ps.setString(3, u.getFullName());
@@ -75,7 +76,6 @@ public class UserDAL {
             ps.setString(9, u.getAvatar());
             
             result = ps.executeUpdate();
-            db.closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -86,10 +86,11 @@ public class UserDAL {
         int result = 0;
         // Không update password và username ở đây để bảo mật, chỉ update thông tin
         String query = "UPDATE users SET fullname=?, role_id=?, email=?, phone=?, address=?, status=?, avatar=? WHERE user_id=?";
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setString(1, u.getFullName());
             ps.setInt(2, u.getRoleId());
             ps.setString(3, u.getEmail());
@@ -99,7 +100,6 @@ public class UserDAL {
             ps.setString(7, u.getAvatar());
             ps.setInt(8, u.getUserId());
             result = ps.executeUpdate();
-            db.closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,13 +110,13 @@ public class UserDAL {
         int result = 0;
         // Xóa mềm: Chuyển status về 0 chứ không xóa hẳn database
         String query = "UPDATE users SET status = 0 WHERE user_id = ?"; 
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ){
             ps.setInt(1, userId);
             result = ps.executeUpdate();
-            db.closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -130,17 +130,17 @@ public class UserDAL {
         int result = 0;
         // Cập nhật mật khẩu nếu khớp cả username, phone VÀ email (chỉ cho user đang hoạt động)
         String query = "UPDATE users SET password = ? WHERE username = ? AND phone = ? AND email = ? AND status = 1"; 
-        try {
+        try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
+        ) {
             ps.setString(1, newPassword);
             ps.setString(2, username);
             ps.setString(3, phone);
             ps.setString(4, email);
             
             result = ps.executeUpdate(); 
-            db.closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }
