@@ -16,6 +16,7 @@ import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -330,6 +331,50 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
         toDateChooser.setDate(null);
         fromDateChooser.setDate(null);
     }
+
+    public boolean validateFilterInputs(){
+        // System.out.println();
+        Date fromDate = fromDateChooser.getDate();
+        Date toDate = toDateChooser.getDate();
+        Date currentDate = new Date();
+
+        if (fromDate != null && fromDate.after(currentDate)) {
+            JOptionPane.showMessageDialog(this, "Ngày bắt đầu không được lớn hơn ngày hiện tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            fromDateChooser.setDate(null);
+            return false;
+        }
+        if (toDate != null && toDate.after(currentDate)) {
+            JOptionPane.showMessageDialog(this, "Ngày kết thúc không được lớn hơn ngày hiện tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            toDateChooser.setDate(null);
+            return false;
+        }
+        if (fromDate != null && toDate != null && fromDate.after(toDate))
+        {
+            JOptionPane.showMessageDialog(this, "Ngày bắt đầu không được lớn hơn ngày kết thúc.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            fromDateChooser.setDate(null);
+            toDateChooser.setDate(null);
+            return false;
+        }
+        if (fromDate == null && toDate != null)
+        {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày bắt đầu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
+    // public void filter() {
+    //     if (validateFilterInputs()) {
+    //         String searchTxt = searchPanel.txtSearchForm.getText().trim();            
+    //         int prdId = customerCbx.getSelectedIndex() == 0 ? 0 : customerBLL.getCustomerIdByIdx(customerCbx.getSelectedIndex() - 1);
+    //         int userId = userCbx.getSelectedIndex() == 0 ? 0 : userBLL.getUserIdByIdx(userCbx.getSelectedIndex() - 1);
+    //         int searchOpt = searchPanel.cbxChoose.getSelectedIndex();
+    //         Date fromDate = fromDateChooser.getDate() == null ? null : fromDateChooser.getDate();
+    //         Date toDate = toDateChooser.getDate() == null ? null : toDateChooser.getDate();
+    //         ArrayList<ImportDTO> filteredImports = importBLL.searchImports(searchTxt, prdId, userId, searchOpt, fromDate, toDate);
+    //         loadDataTable(filteredImports);
+    //     }
+    // }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
