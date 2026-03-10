@@ -71,10 +71,11 @@ public class AddExportDialog extends JDialog implements ActionListener {
     private JButton btnExport, btnCancel;
 
     private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
-    private int USERID = 1;
+    private int currentUserId;
 
-    public AddExportDialog(JFrame parent) {
+    public AddExportDialog(JFrame parent, int userId) {
         super(parent, "Thêm phiếu xuất hàng", true);
+        this.currentUserId = userId;
         productList = productBLL.getProductsList();
         filteredProducts = new ArrayList<>(productList);
         
@@ -539,7 +540,7 @@ public class AddExportDialog extends JDialog implements ActionListener {
             ExportReceiptDTO exportDTO = new ExportReceiptDTO();
             exportDTO.setExport_date(LocalDateTime.now());
             exportDTO.setStatus(1);
-            exportDTO.setUser_id(USERID);
+            exportDTO.setUser_id(currentUserId);
             exportDTO.setTotal_price(totalPrice.intValue());
             exportDTO.setCustomer_id(customerId);
             

@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.compress.java.util.jar.Pack200;
+
+import com.bat.BLL.ProductBLL;
 import com.bat.DTO.CheckDetailDTO;
 import com.bat.DTO.CustomerDTO;
 import com.bat.DTO.ExportLotDTO;
@@ -17,6 +20,7 @@ import com.bat.DTO.ExportReceiptDTO;
 import com.bat.DTO.ImportDTO;
 import com.bat.DTO.InventoryCheckDTO;
 import com.bat.DTO.LotDTO;
+import com.bat.DTO.ProductDTO;
 import com.bat.DTO.ProviderDTO;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -164,8 +168,9 @@ public class PDFExporter {
     }
     
     public void exportExportReceipt(String filePath, ExportReceiptDTO exportDTO,
-                                     ArrayList<ExportLotDTO> exportLots,
-                                     Map<Integer, String> productNames,
+                                    //  ArrayList<ExportLotDTO> exportLots,
+                                    //  Map<Integer, String> productNames,
+                                    ArrayList<ProductDTO> prInExportList,
                                      String userName,
                                      CustomerDTO customer) throws DocumentException, IOException {
         
@@ -232,19 +237,21 @@ public class PDFExporter {
         
         // Add table data
         BigDecimal total = BigDecimal.ZERO;
-        for (ExportLotDTO exportLot : exportLots) {
-            String productName = productNames.getOrDefault(exportLot.getProductId(), "N/A");
-            addTableCell(table, productName);
+        for (ProductDTO product : prInExportList) {
+            ProductBLL productBLL = new ProductBLL();
+            BigDecimal export_price = productBLL.getProductById(product.getProductId()).getPrice();
+            // String productName = productNames.getOrDefault(product.getProductId(), "N/A");
+            addTableCell(table, product.getProductName());
             
-            String priceStr = exportLot.getExportPrice() != null 
-                ? CURRENCY_FORMATTER.format(exportLot.getExportPrice()) 
+            String priceStr = export_price != null 
+                ? CURRENCY_FORMATTER.format(export_price) 
                 : "0 ₫";
             addTableCell(table, priceStr);
             
-            addTableCell(table, String.valueOf(exportLot.getQuantity()));
+            addTableCell(table, String.valueOf(product.getQuantity()));
             
-            BigDecimal itemTotal = exportLot.getExportPrice() != null 
-                ? exportLot.getExportPrice().multiply(new BigDecimal(exportLot.getQuantity()))
+            BigDecimal itemTotal = product.getPrice() != null 
+                ? product.getPrice()
                 : BigDecimal.ZERO;
             total = total.add(itemTotal);
             

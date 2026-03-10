@@ -62,12 +62,14 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
     JComboBox<String> customerCbx, userCbx;
     JDateChooser fromDateChooser, toDateChooser;
     Main main;
+    UserDTO currentUser;
     
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
 
-    public Export(Main main) {
+    public Export(Main main, UserDTO user) {
         this.main = main;
+        this.currentUser = user;
         initComponent();
         exportList = exportBLL.getExportList();
         loadDataTable(exportList);
@@ -286,7 +288,7 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
         String command = e.getActionCommand();
         switch (command) {
             case "create":
-                AddExportDialog dialog = new AddExportDialog(main);
+                AddExportDialog dialog = new AddExportDialog(main, currentUser.getUserId());
                 dialog.setVisible(true);
                 exportList = exportBLL.getExportList();
                 loadDataTable(exportList);

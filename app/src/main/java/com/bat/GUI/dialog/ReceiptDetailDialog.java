@@ -401,21 +401,22 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
                     String userName = userBLL.getUserNameById(exportDTO.getUser_id());
                     
                     // Get all export lots for this export
-                    ArrayList<ExportLotDTO> exportLots = exportBLL.getExportLotsByExportId(exportDTO.getExport_id());
+                    // ArrayList<ExportLotDTO> exportLots = exportBLL.getExportLotsByExportId(exportDTO.getExport_id());
+                    ArrayList<ProductDTO> prInExportList = productBLL.getPrdInExport(exportDTO.getExport_id());
                     
                     // Create product name map
-                    Map<Integer, String> productNames = new HashMap<>();
-                    for (ExportLotDTO exportLot : exportLots) {
-                        if (!productNames.containsKey(exportLot.getProductId())) {
-                            String productName = productBLL.getProductById(exportLot.getProductId()).getProductName();
-                            productNames.put(exportLot.getProductId(), productName);
-                        }
-                    }
+                    // Map<Integer, String> productNames = new HashMap<>();
+                    // for (ExportLotDTO exportLot : exportLots) {
+                    //     if (!productNames.containsKey(exportLot.getProductId())) {
+                    //         String productName = productBLL.getProductById(exportLot.getProductId()).getProductName();
+                    //         productNames.put(exportLot.getProductId(), productName);
+                    //     }
+                    // }
                     
                     // Get customer details - may be null
                     var customer = customerBLL.getCustomerById(exportDTO.getCustomer_id());
                     
-                    pdfExporter.exportExportReceipt(filePath, exportDTO, exportLots, productNames, userName, customer);
+                    pdfExporter.exportExportReceipt(filePath, exportDTO, prInExportList, userName, customer);
                 }
                 
                 // Show success message

@@ -64,12 +64,14 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
     JComboBox<String> providerCbx, userCbx;
     JDateChooser fromDateChooser, toDateChooser;
     Main main;
+    UserDTO currentUser;
     
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
 
-    public Import(Main main) {
+    public Import(Main main, UserDTO user) {
         this.main = main;
+        this.currentUser = user;
         initComponent();
         importList = importBLL.getImportList();
         loadDataTable(importList);
@@ -331,7 +333,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         String command = e.getActionCommand();
         switch (command) {
             case "create":
-                AddImportDialog dialog = new AddImportDialog(main);
+                AddImportDialog dialog = new AddImportDialog(main, currentUser.getUserId());
                 dialog.setVisible(true);
                 importList = importBLL.getImportList();
                 loadDataTable(importList);

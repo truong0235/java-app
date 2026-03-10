@@ -29,6 +29,7 @@ import com.bat.GUI.panel.Product;
 import com.bat.GUI.panel.Provider;
 import com.bat.GUI.panel.UserManagement; // ĐÃ THÊM IMPORT
 import com.bat.GUI.panel.statistic.Statistic;
+import com.bat.utils.PermissionManager;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 
@@ -121,7 +122,16 @@ public class MenuTaskbar extends JPanel{
 
         this.add(pnlBottom, BorderLayout.SOUTH);
 
+        // Lấy roleId của user hiện tại
+        UserDTO currentUser = mainFrame.getCurrentUser();
+
         for (int i = 0; i < menuItem.length; i++) {
+            // Kiểm tra quyền truy cập menu
+            if (!hasAccessToMenu(menuItem[i][0])) {
+                listitem[i] = null; // Bỏ qua menu không có quyền
+                continue;
+            }
+
             if (i + 1 == menuItem.length) {
                 listitem[i] = new ItemTaskbar(menuItem[i][1], menuItem[i][0]);
                 pnlBottom.add(listitem[i]);
@@ -131,22 +141,69 @@ public class MenuTaskbar extends JPanel{
             }
         }
         
-        listitem[0].setBackground(HowerBackgroundColor);
-        listitem[0].setForeground(HowerFontColor);
-        listitem[0].isSelected = true;
+        // Tìm menu item đầu tiên có quyền và set làm selected
+        for (int i = 0; i < listitem.length; i++) {
+            if (listitem[i] != null) {
+                listitem[i].setBackground(HowerBackgroundColor);
+                listitem[i].setForeground(HowerFontColor);
+                listitem[i].isSelected = true;
+                break;
+            }
+        }
 
         for (int i = 0; i < menuItem.length; i++) {
-            listitem[i].addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent evt) {
-                    pnlMenuTaskbarMousePress(evt);
-                }
-            });
+            if (listitem[i] != null) {
+                listitem[i].addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent evt) {
+                        pnlMenuTaskbarMousePress(evt);
+                    }
+                });
+            }
         }
+    }
+    
+    /**
+     * Kiểm tra quyền truy cập menu dựa trên role
+     * @param menuName Tên menu
+     * @return true nếu có quyền, false nếu không
+     */
+    private boolean hasAccessToMenu(String menuName) {
+        UserDTO user = mainFrame.getCurrentUser();
+        
+        // Admin (roleId = 1) có quyền truy cập tất cả
+        if (PermissionManager.isAdmin(user)) {
+            return true;
+        }
+        
+        // Trang chủ và Đăng xuất: tất cả đều truy cập được
+        if (menuName.equals("Trang chủ") || menuName.equals("Đăng xuất")) {
+            return true;
+        }
+        
+        // Kiểm tra quyền dựa trên PermissionManager
+        return switch (menuName) {
+            case "Sản phẩm" -> PermissionManager.canAccessProduct(user);
+            case "Danh mục" -> PermissionManager.canAccessCategory(user);
+            case "Khách hàng" -> PermissionManager.canAccessCustomer(user);
+            case "Người dùng" -> PermissionManager.canAccessUser(user);
+            case "Nhà cung cấp" -> PermissionManager.canAccessProvider(user);
+            case "Phiếu nhập" -> PermissionManager.canAccessImport(user);
+            case "Lô hàng" -> PermissionManager.canAccessLot(user);
+            case "Phiếu xuất" -> PermissionManager.canAccessExport(user);
+            case "Phiếu kiểm kê" -> PermissionManager.canAccessInventoryCheck(user);
+            case "Thống kê" -> PermissionManager.canAccessStatistic(user);
+            default -> false;
+        };
     }
 
     public void pnlMenuTaskbarMousePress(MouseEvent evt) {
         for (int i = 0; i < menuItem.length; i++) {
+            // Bỏ qua nếu menu item không tồn tại (không có quyền)
+            if (listitem[i] == null) {
+                continue;
+            }
+            
             if (evt.getSource() == listitem[i]) {
                 listitem[i].isSelected = true;
                 listitem[i].setBackground(HowerBackgroundColor);
@@ -166,28 +223,7 @@ public class MenuTaskbar extends JPanel{
         UserDTO user = mainFrame.getCurrentUser();
         
         String USERNAME = (user != null && user.getFullName() != null) ? user.getFullName() : "Khách";
-        String TENNHOMQUYEN = "Chưa phân quyền";
-        
-        if (user != null) {
-            switch(user.getRoleId()) {
-                case 1 -> TENNHOMQUYEN = "Quản trị viên";
-                case 2 -> TENNHOMQUYEN = "Giám đốc";
-                case 3 -> TENNHOMQUYEN = "Trưởng phòng kho";
-                case 4 -> TENNHOMQUYEN = "Quản lý kho";
-                case 5 -> TENNHOMQUYEN = "Thủ kho";
-                case 6 -> TENNHOMQUYEN = "Nhân viên nhập hàng";
-                case 7 -> TENNHOMQUYEN = "Nhân viên kiểm kê";
-                case 8 -> TENNHOMQUYEN = "Trưởng phòng kinh doanh";
-                case 9 -> TENNHOMQUYEN = "Nhân viên bán hàng";
-                case 10 -> TENNHOMQUYEN = "Nhân viên CSKH";
-                case 11 -> TENNHOMQUYEN = "Nhân viên Marketing";
-                case 12 -> TENNHOMQUYEN = "Trưởng phòng kế toán";
-                case 13 -> TENNHOMQUYEN = "Kế toán";
-                case 14 -> TENNHOMQUYEN = "Thủ quỹ";
-                case 15 -> TENNHOMQUYEN = "Nhân viên IT";
-                default -> TENNHOMQUYEN = "Chưa phân quyền";
-            }
-        }
+        String TENNHOMQUYEN = (user != null) ? PermissionManager.getRoleName(user.getRoleId()) : "Chưa phân quyền";
 
         JPanel pnlIcon = new JPanel(new FlowLayout());
         pnlIcon.setPreferredSize(new Dimension(60, 0));
@@ -241,10 +277,10 @@ public class MenuTaskbar extends JPanel{
             case "Người dùng" -> mainFrame.setPanel(new UserManagement(mainFrame.getCurrentUser())); 
             
             case "Nhà cung cấp" -> mainFrame.setPanel(new Provider(mainFrame));
-            case "Phiếu kiểm kê" -> mainFrame.setPanel(new InventoryCheck(mainFrame));
-            case "Phiếu nhập" -> mainFrame.setPanel(new Import(mainFrame));
+            case "Phiếu kiểm kê" -> mainFrame.setPanel(new InventoryCheck(mainFrame, mainFrame.getCurrentUser()));
+            case "Phiếu nhập" -> mainFrame.setPanel(new Import(mainFrame, mainFrame.getCurrentUser()));
             case "Lô hàng" -> mainFrame.setPanel(new Lot(mainFrame));
-            case "Phiếu xuất" -> mainFrame.setPanel(new Export(mainFrame));
+            case "Phiếu xuất" -> mainFrame.setPanel(new Export(mainFrame, mainFrame.getCurrentUser()));
             case "Thống kê" -> mainFrame.setPanel(new Statistic());
             
             // Bắt sự kiện thoát
