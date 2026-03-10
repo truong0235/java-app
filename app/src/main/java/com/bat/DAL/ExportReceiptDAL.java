@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.bat.DTO.ExportLotDTO;
 import com.bat.DTO.ExportReceiptDTO;
 import com.bat.utils.helper.DBConnectHelper;
 
@@ -74,26 +75,16 @@ public class ExportReceiptDAL {
         return -1;
     }
 
-    /**
-     * Cập nhật phiếu xuất
-     */
-    public boolean update(ExportReceiptDTO exportReceipt) {
-        String query = "UPDATE export_receipt SET export_date = ?, status = ?, user_id = ?, total_price = ?, customer_id = ? WHERE export_id = ?";
+    public boolean deleteExportDetails(int exportId) {
+        String query = "DELETE FROM export_detail WHERE export_id = ?";
+        
         try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(query);
         ) {
-            ps.setTimestamp(1, java.sql.Timestamp.valueOf(exportReceipt.getExport_date()));
-            ps.setInt(2, exportReceipt.getStatus());
-            ps.setInt(3, exportReceipt.getUser_id());
-            ps.setInt(4, exportReceipt.getTotal_price());
-            ps.setInt(5, exportReceipt.getCustomer_id());
-            ps.setInt(6, exportReceipt.getExport_id());
-
-            int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0;
-
+            ps.setInt(1, exportId);
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -102,10 +93,27 @@ public class ExportReceiptDAL {
         return false;
     }
 
+
     /**
      * Xóa phiếu xuất (soft delete)
      */
     public boolean delete(int exportId) {
+        LotTransactionDAL lotTransactionDAL = new LotTransactionDAL();
+        ExportLotDAL exportLotDAL = new ExportLotDAL();
+
+        ArrayList<ExportLotDTO> exportLots = exportLotDAL.getExportLotsByExportId(exportId);
+        for (ExportLotDTO exportLot : exportLots) {
+            ProductDAL productDAL = new ProductDAL();
+            LotDAL lotDAL = new LotDAL();
+
+            lotDAL.updateQuantity(exportLot.getLotId(), exportLot.getQuantity());
+            productDAL.updateQuantityByLotId(exportLot.getLotId(), exportLot.getQuantity());
+        }
+
+        exportLotDAL.deleteByExportId(exportId);
+        deleteExportDetails(exportId);
+        lotTransactionDAL.delete(exportId);
+
         String query = "UPDATE export_receipt SET status = 0 WHERE export_id = ?";
         try (
             DBConnectHelper db = new DBConnectHelper();

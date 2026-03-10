@@ -33,11 +33,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
-import com.bat.BLL.ExportBLL;
 import com.bat.BLL.CustomerBLL;
+import com.bat.BLL.ExportBLL;
 import com.bat.BLL.UserBLL;
-import com.bat.DTO.ExportReceiptDTO;
 import com.bat.DTO.CustomerDTO;
+import com.bat.DTO.ExportReceiptDTO;
 import com.bat.DTO.UserDTO;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
@@ -296,14 +296,19 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
                 int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu xuất đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
                 if (confirm == 0) {
                     ExportReceiptDTO selectedExport = exportList.get(selectedRow);
-                    JOptionPane.showMessageDialog(null, "Tính năng xóa phiếu xuất #" + selectedExport.getExport_id() + " đang được phát triển.");
+                    if (exportBLL.cancelExport(selectedExport.getExport_id())) {
+                        JOptionPane.showMessageDialog(this, "Xóa phiếu xuất thành công.");
+                        exportList = exportBLL.getExportList();
+                        loadDataTable(exportList);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Xóa phiếu xuất thất bại");
+                    }
                 }
                 break;
             case "detail":
                 int idx = getRowSelected();
                 if (idx != -1) {
-                    ReceiptDetailDialog detailDialog = new ReceiptDetailDialog(main, "Chi tiết phiếu xuất", exportList.get(idx));
-                    detailDialog.setVisible(true);
+                    new ReceiptDetailDialog(main, "Chi tiết phiếu xuất", exportList.get(idx));
                 }
                 break;
             case "export":

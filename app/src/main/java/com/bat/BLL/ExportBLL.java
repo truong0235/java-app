@@ -46,12 +46,6 @@ public class ExportBLL {
                 // Xử lý từng lô xuất
                 for (ExportLotDTO exportLot : exportLotList) {
                     exportLot.setExportId(exportId); 
-                
-                    
-                    // Thêm chi tiết lô xuất - DAL sẽ tự động:
-                    // 1. Cập nhật số lượng lô và sản phẩm
-                    // 2. Thêm lịch sử lot_transaction
-                    // 3. Cập nhật trạng thái lô nếu hết
                     boolean added = exportLotDAL.addExportLot(exportLot);
                     
                     if (!added) {
@@ -63,7 +57,6 @@ public class ExportBLL {
                 
             } catch (Exception e) {
                 e.printStackTrace();
-                // Có thể cần xóa phiếu xuất đã tạo
                 exportReceiptDAL.delete(exportId);
                 return false;
             }
@@ -71,10 +64,6 @@ public class ExportBLL {
         
         return false;
     }
-
-    // public ArrayList<ExportLotDTO> getExportLotsByExportId(int exportId) {
-    //     return exportLotDAL.getExportLotsByExportId(exportId);
-    // }
 
     public ArrayList<ExportLotDTO> getExportLotsByExportId(int exportId, int productId) {
         ArrayList<ExportLotDTO> allLots = exportLotDAL.getExportLotsByExportId(exportId);
@@ -86,4 +75,12 @@ public class ExportBLL {
         }
         return filteredLots;
     }
+
+    public boolean cancelExport(int exportId) {
+        if (exportReceiptDAL.delete(exportId)) {
+            return true;
+        }
+        return false;
+    }
+
 }

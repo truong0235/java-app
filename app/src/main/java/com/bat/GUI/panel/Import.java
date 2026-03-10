@@ -367,8 +367,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
             case "detail":
                 int idx = getRowSelected();
                 if (idx != -1) {
-                    ReceiptDetailDialog detailDialog = new ReceiptDetailDialog(main, "Chi tiết phiếu nhập", importList.get(idx));
-                    detailDialog.setVisible(true);
+                    new ReceiptDetailDialog(main, "Chi tiết phiếu nhập", importList.get(idx));
                 }
                 break;
             case "export":
