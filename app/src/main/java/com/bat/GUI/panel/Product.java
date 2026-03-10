@@ -20,6 +20,7 @@ import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -52,7 +53,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.bat.BLL.CategoryBLL;
 import com.bat.BLL.ProductBLL;
+import com.bat.DTO.CategoryDTO;
 import com.bat.DTO.ProductDTO;
 import com.bat.GUI.Main;
 import com.bat.GUI.component.ButtonToolbar;
@@ -62,6 +65,7 @@ import com.bat.GUI.component.MenuFunction;
 public class Product extends JPanel implements ActionListener {
     private Main main;
     private ProductBLL productBLL = new ProductBLL();
+    private CategoryBLL categoryBLL = new CategoryBLL();
     private DefaultTableModel tableModel;
     private JTable table;
 
@@ -176,7 +180,7 @@ public class Product extends JPanel implements ActionListener {
 
         JPanel brandPn = new JPanel(new GridLayout(2, 1));
         brandPn.setBackground(Color.WHITE);
-        JLabel lblBrand = new JLabel("Lọc theo thương hiệu:");
+        JLabel lblBrand = new JLabel("Lọc theo nhà xuất bản:");
         lblBrand.setFont(new Font("Segoe UI", Font.BOLD, 13));
 
         cbbBrandFilter = new JComboBox<>();
@@ -195,7 +199,7 @@ public class Product extends JPanel implements ActionListener {
         panel.setBackground(new Color(228, 238, 255));
         panel.setBorder(new EmptyBorder(0, 10, 0, 0));
 
-        String[] columns = {"ID", "Tên SP", "Thương hiệu", "Năm XB", "Tác giả", "Ngôn ngữ", "Mã loại", "Giá", "Số lượng", "Trạng thái"};
+        String[] columns = {"Mã SP", "Tên SP", "Nhà xuất bản", "Thể loại", "Giá", "Số lượng"};
         tableModel = new DefaultTableModel(null, columns) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -228,13 +232,13 @@ public class Product extends JPanel implements ActionListener {
         col.getColumn(0).setPreferredWidth(30); col.getColumn(0).setCellRenderer(centerRenderer);
         col.getColumn(1).setPreferredWidth(160);
         col.getColumn(2).setPreferredWidth(100);
-        col.getColumn(3).setPreferredWidth(60);  col.getColumn(3).setCellRenderer(centerRenderer);
-        col.getColumn(4).setPreferredWidth(120);
+        col.getColumn(3).setPreferredWidth(100);  col.getColumn(3).setCellRenderer(centerRenderer);
+        col.getColumn(4).setPreferredWidth(120); col.getColumn(4).setCellRenderer(centerRenderer);
         col.getColumn(5).setPreferredWidth(70);
-        col.getColumn(6).setPreferredWidth(50);  col.getColumn(6).setCellRenderer(centerRenderer);
-        col.getColumn(7).setPreferredWidth(80);  col.getColumn(7).setCellRenderer(rightRenderer);
-        col.getColumn(8).setPreferredWidth(60);  col.getColumn(8).setCellRenderer(centerRenderer);
-        col.getColumn(9).setPreferredWidth(80);  col.getColumn(9).setCellRenderer(centerRenderer);
+        // col.getColumn(6).setPreferredWidth(50);  col.getColumn(6).setCellRenderer(centerRenderer);
+        // col.getColumn(7).setPreferredWidth(80);  col.getColumn(7).setCellRenderer(rightRenderer);
+        // col.getColumn(8).setPreferredWidth(60);  col.getColumn(8).setCellRenderer(centerRenderer);
+        // col.getColumn(9).setPreferredWidth(80);  col.getColumn(9).setCellRenderer(centerRenderer);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(null);
@@ -367,10 +371,11 @@ public class Product extends JPanel implements ActionListener {
         if (list != null) {
             for (ProductDTO p : list) {
                 tableModel.addRow(new Object[]{
-                        p.getProductId(), p.getProductName(), p.getPublisher(), p.getPublishYear(),
-                        p.getAuthor(), p.getLanguage(), p.getCategoryId(),
+                        p.getProductId(),
+                        p.getProductName(), p.getPublisher(), 
+                        categoryBLL.getCategoryNameById(p.getCategoryId()),
                         p.getPrice() != null ? priceFormatter.format(p.getPrice()) : "0",
-                        p.getQuantity(), p.getStatus() == 1 ? "Đang bán" : "Ngừng bán"
+                        p.getQuantity()
                 });
             }
         }
@@ -388,7 +393,7 @@ public class Product extends JPanel implements ActionListener {
                 font.setBold(true);
                 style.setFont(font);
 
-                String[] columns = {"Mã SP", "Tên SP", "Thương hiệu", "Năm XB", "Tác giả", "Ngôn ngữ", "Giá", "Số lượng", "Mã loại", "Hình ảnh"};
+                String[] columns = {"Mã SP", "Tên SP", "Nhà xuất bản", "Năm XB", "Tác giả", "Ngôn ngữ", "Giá", "Số lượng", "Thể loại"};
                 for (int i = 0; i < columns.length; i++) {
                     Cell cell = header.createCell(i);
                     cell.setCellValue(columns[i]);
@@ -407,8 +412,8 @@ public class Product extends JPanel implements ActionListener {
                     row.createCell(5).setCellValue(p.getLanguage());
                     row.createCell(6).setCellValue(p.getPrice() != null ? p.getPrice().doubleValue() : 0);
                     row.createCell(7).setCellValue(p.getQuantity());
-                    row.createCell(8).setCellValue(p.getCategoryId());
-                    row.createCell(9).setCellValue(p.getPic() == null ? "" : p.getPic());
+                    row.createCell(8).setCellValue(categoryBLL.getCategoryNameById(p.getCategoryId()));
+                    // row.createCell(9).setCellValue(p.getPic() == null ? "" : p.getPic());
                 }
 
                 for (int i = 0; i < columns.length; i++) sheet.autoSizeColumn(i);
@@ -505,11 +510,11 @@ public class Product extends JPanel implements ActionListener {
             pnlInfo.setBackground(Color.WHITE);
 
             addReadOnlyField(pnlInfo, "Tên SP", data.getProductName());
-            addReadOnlyField(pnlInfo, "Thương hiệu", data.getPublisher());
+            addReadOnlyField(pnlInfo, "Nhà XB", data.getPublisher());
             addReadOnlyField(pnlInfo, "Năm XB", String.valueOf(data.getPublishYear()));
             addReadOnlyField(pnlInfo, "Tác giả", data.getAuthor());
             addReadOnlyField(pnlInfo, "Ngôn ngữ", data.getLanguage());
-            addReadOnlyField(pnlInfo, "Mã loại", String.valueOf(data.getCategoryId()));
+            addReadOnlyField(pnlInfo, "Thể loại", categoryBLL.getCategoryNameById(data.getCategoryId()));
             addReadOnlyField(pnlInfo, "Giá bán", (data.getPrice() != null ? priceFormatter.format(data.getPrice()) : "0") + " VNĐ");
             addReadOnlyField(pnlInfo, "Số lượng", String.valueOf(data.getQuantity()));
 
@@ -559,9 +564,11 @@ public class Product extends JPanel implements ActionListener {
     }
 
     class ProductDialog extends JDialog {
-        JTextField txtName, txtBrand, txtYear, txtAuthor, txtLang, txtPrice, txtQty, txtCat;
+        JTextField txtName, txtBrand, txtYear, txtAuthor, txtLang, txtPrice, txtQty, txtCate;
+        JComboBox<String> cbbCate;
         JLabel lblImagePreview;
         String selectedImagePath = "";
+        List<CategoryDTO> categoryList;
 
         public ProductDialog(JFrame parent, String title, ProductDTO data) {
             super(parent, title, true);
@@ -586,17 +593,30 @@ public class Product extends JPanel implements ActionListener {
 
             txtName = new JTextField(); txtBrand = new JTextField();
             txtYear = new JTextField(); txtAuthor = new JTextField();
-            txtLang = new JTextField(); txtCat = new JTextField();
+            txtLang = new JTextField(); cbbCate = new JComboBox<>();
             txtPrice = new JTextField(); txtQty = new JTextField();
 
             addInput(pnlForm, "Tên sản phẩm:", txtName);
-            addInput(pnlForm, "Thương hiệu:", txtBrand);
+            addInput(pnlForm, "Nhà XB:", txtBrand);
             addInput(pnlForm, "Năm xuất bản:", txtYear);
             addInput(pnlForm, "Tác giả:", txtAuthor);
             addInput(pnlForm, "Ngôn ngữ:", txtLang);
-            addInput(pnlForm, "Mã loại:", txtCat);
+
+            JPanel cateLbl = new JPanel(new BorderLayout(0, 5));
+            cateLbl.setBackground(Color.WHITE);
+            JLabel lbl = new JLabel("Thể loại");
+            lbl.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            cateLbl.add(lbl, BorderLayout.NORTH);
+            categoryList = categoryBLL.getCategoryList(); 
+            for (CategoryDTO category : categoryList) {
+                cbbCate.addItem(category.getCategoryName());
+            }
+            cbbCate.setPreferredSize(new Dimension(0, 30));
+            cateLbl.add(cbbCate, BorderLayout.CENTER);
+            pnlForm.add(cateLbl);
+
             addInput(pnlForm, "Giá bán:", txtPrice);
-            addInput(pnlForm, "Số lượng tồn:", txtQty);
+            // addInput(pnlForm, "Số lượng tồn:", txtQty);
 
             pnlBody.add(pnlForm, BorderLayout.CENTER);
 
@@ -638,7 +658,7 @@ public class Product extends JPanel implements ActionListener {
                 txtYear.setText(String.valueOf(data.getPublishYear()));
                 txtAuthor.setText(data.getAuthor());
                 txtLang.setText(data.getLanguage());
-                txtCat.setText(String.valueOf(data.getCategoryId()));
+                cbbCate.setSelectedItem(categoryBLL.getCategoryNameById(data.getCategoryId()));
                 txtPrice.setText(data.getPrice() != null ? data.getPrice().toString() : "0");
                 txtQty.setText(String.valueOf(data.getQuantity()));
 
@@ -658,15 +678,26 @@ public class Product extends JPanel implements ActionListener {
             add(pnlBottom, BorderLayout.SOUTH);
 
             btnSave.addActionListener(e -> {
+                // Validate dữ liệu nhập vào
+                String validationError = validateInput();
+                if (validationError != null) {
+                    JOptionPane.showMessageDialog(this, validationError, "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
                 try {
-                    String name = txtName.getText();
-                    String brand = txtBrand.getText();
-                    int year = Integer.parseInt(txtYear.getText().isEmpty() ? "0" : txtYear.getText());
-                    String author = txtAuthor.getText();
-                    String lang = txtLang.getText();
-                    int cat = Integer.parseInt(txtCat.getText().isEmpty() ? "0" : txtCat.getText());
-                    BigDecimal price = new BigDecimal(txtPrice.getText().isEmpty() ? "0" : txtPrice.getText());
-                    int qty = Integer.parseInt(txtQty.getText().isEmpty() ? "0" : txtQty.getText());
+                    String name = txtName.getText().trim();
+                    String brand = txtBrand.getText().trim();
+                    int year = Integer.parseInt(txtYear.getText().trim());
+                    String author = txtAuthor.getText().trim();
+                    String lang = txtLang.getText().trim();
+                    
+                    // Lấy category ID từ index được chọn trong combobox
+                    int selectedIndex = cbbCate.getSelectedIndex();
+                    int cat = categoryList.get(selectedIndex).getCategoryId();
+                    
+                    BigDecimal price = new BigDecimal(txtPrice.getText().trim());
+                    // int qty = Integer.parseInt(txtQty.getText().trim());
 
                     String picToSave = (data != null && data.getPic() != null) ? data.getPic() : "";
 
@@ -688,19 +719,45 @@ public class Product extends JPanel implements ActionListener {
                     }
 
                     if (data == null) {
-                        ProductDTO newProduct = new ProductDTO(0, name, picToSave, cat, brand, year, author, lang, price, qty, 1);
-                        JOptionPane.showMessageDialog(this, productBLL.add(newProduct));
+                        ProductDTO newProduct = new ProductDTO();
+                        newProduct.setProductName(name);
+                        newProduct.setPublisher(brand);
+                        newProduct.setPublishYear(year);
+                        newProduct.setAuthor(author);
+                        newProduct.setLanguage(lang);
+                        newProduct.setCategoryId(cat);
+                        newProduct.setPrice(price);
+                        newProduct.setQuantity(0); // Mặc định số lượng ban đầu là 0
+                        newProduct.setPic(picToSave);
+                        newProduct.setStatus(1); // Mặc định trạng thái là 1 (c
+                        String result = productBLL.add(newProduct);
+                        if (result.contains("thành công")) {
+                            JOptionPane.showMessageDialog(this, result, "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                            dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
                     } else {
-                        data.setProductName(name); data.setPublisher(brand);
-                        data.setPublishYear(year); data.setAuthor(author);
-                        data.setLanguage(lang); data.setCategoryId(cat);
-                        data.setPrice(price); data.setQuantity(qty);
+                        data.setProductName(name);
+                        data.setPublisher(brand);
+                        data.setPublishYear(year);
+                        data.setAuthor(author);
+                        data.setLanguage(lang);
+                        data.setCategoryId(cat);
+                        data.setPrice(price);
+                        // data.setQuantity(qty);
                         data.setPic(picToSave);
-                        JOptionPane.showMessageDialog(this, productBLL.update(data));
+                        String result = productBLL.update(data);
+                        if (result.contains("thành công")) {
+                            JOptionPane.showMessageDialog(this, result, "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                            dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
-                    dispose();
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số cho Năm XB, Mã loại, Giá và Số lượng!");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
                 }
             });
         }
@@ -714,6 +771,92 @@ public class Product extends JPanel implements ActionListener {
             field.setPreferredSize(new Dimension(0, 30));
             item.add(field, BorderLayout.CENTER);
             p.add(item);
+        }
+
+        // Phương thức validate dữ liệu nhập vào
+        private String validateInput() {
+            // Kiểm tra tên sản phẩm
+            if (txtName.getText().trim().isEmpty()) {
+                txtName.requestFocus();
+                return "Tên sản phẩm không được để trống!";
+            }
+
+            // Kiểm tra nhà xuất bản
+            if (txtBrand.getText().trim().isEmpty()) {
+                txtBrand.requestFocus();
+                return "Nhà xuất bản không được để trống!";
+            }
+
+            // Kiểm tra năm xuất bản
+            if (txtYear.getText().trim().isEmpty()) {
+                txtYear.requestFocus();
+                return "Năm xuất bản không được để trống!";
+            }
+            try {
+                int year = Integer.parseInt(txtYear.getText().trim());
+                if (year < 1000 || year > 2026) {
+                    txtYear.requestFocus();
+                    return "Năm xuất bản phải nằm trong khoảng 1000 - 2026!";
+                }
+            } catch (NumberFormatException e) {
+                txtYear.requestFocus();
+                return "Năm xuất bản phải là số nguyên hợp lệ!";
+            }
+
+            // Kiểm tra tác giả (không bắt buộc nhưng nếu có thì phải hợp lệ)
+            if (txtAuthor.getText().isEmpty()) {
+                txtAuthor.requestFocus();
+                return "Tên tác giả không được để trống!";
+            }
+
+            // Kiểm tra thể loại
+            if (cbbCate.getSelectedIndex() < 0) {
+                cbbCate.requestFocus();
+                return "Vui lòng chọn thể loại sản phẩm!";
+            }
+
+            // Kiểm tra giá bán
+            if (txtPrice.getText().trim().isEmpty()) {
+                txtPrice.requestFocus();
+                return "Giá bán không được để trống!";
+            }
+            try {
+                BigDecimal price = new BigDecimal(txtPrice.getText().trim());
+                if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                    txtPrice.requestFocus();
+                    return "Giá bán phải lớn hơn 0!";
+                }
+                if (price.compareTo(new BigDecimal("999999999")) > 0) {
+                    txtPrice.requestFocus();
+                    return "Giá bán không được vượt quá 999,999,999!";
+                }
+            } catch (NumberFormatException e) {
+                txtPrice.requestFocus();
+                return "Giá bán phải là số hợp lệ (ví dụ: 50000 hoặc 50000.50)!";
+            }
+
+            // Kiểm tra số lượng
+            // if (txtQty.getText().trim().isEmpty()) {
+            //     txtQty.requestFocus();
+            //     return "Số lượng không được để trống!";
+            // }
+            // try {
+            //     int qty = Integer.parseInt(txtQty.getText().trim());
+            //     if (qty < 0) {
+            //         txtQty.requestFocus();
+            //         return "Số lượng không được âm!";
+            //     }
+            //     if (qty > 999999) {
+            //         txtQty.requestFocus();
+            //         return "Số lượng không được vượt quá 999,999!";
+            //     }
+            // } catch (NumberFormatException e) {
+            //     txtQty.requestFocus();
+            //     return "Số lượng phải là số nguyên hợp lệ!";
+            // }
+
+            // Tất cả validation đều pass
+            return null;
         }
     }
 }

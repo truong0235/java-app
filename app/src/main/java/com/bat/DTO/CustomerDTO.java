@@ -1,9 +1,11 @@
 package com.bat.DTO;
 
+import java.util.Date;
+
 public class CustomerDTO {
     private int customerId;
     private String fullName;
-    private String birthday;
+    private Date birthday;
     private String phone;
     private String address;
     private String image;
@@ -11,7 +13,7 @@ public class CustomerDTO {
     public CustomerDTO() {
     }
 
-    public CustomerDTO(int customerId, String fullName, String birthday, String phone, String address, String image) {
+    public CustomerDTO(int customerId, String fullName, Date birthday, String phone, String address, String image) {
         this.customerId = customerId;
         this.fullName = fullName;
         this.birthday = birthday;
@@ -36,11 +38,11 @@ public class CustomerDTO {
         this.fullName = fullName;
     }
 
-    public String getBirthday() {
+    public Date getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(String birthday) {
+    public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
 

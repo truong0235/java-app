@@ -78,4 +78,22 @@ public class UserBLL {
         }
         return -1; // or throw an exception
     }
+
+    public boolean isUsernameExists(String username) {
+        for (UserDTO user : users) {
+            if (user.getUsername().equalsIgnoreCase(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isPhoneExists(String phone, int userId) {
+        for (UserDTO user : users) {
+            if (user.getPhone() != null && user.getPhone().equals(phone) && user.getUserId() != userId) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -546,23 +546,26 @@ public class Provider extends JPanel implements ActionListener {
                 String email = txtEmail.getText();
                 String address = txtAddress.getText();
 
-                if(name.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Tên nhà cung cấp không được để trống!");
-                    return;
-                }
-
+                String result;
                 if(data == null) {
                     ProviderDTO newProvider = new ProviderDTO(0, name, address, phone, email);
-                    JOptionPane.showMessageDialog(this, providerBLL.add(newProvider));
+                    result = providerBLL.add(newProvider);
                 } else {
                     data.setProviderName(name);
                     data.setPhone(phone);
                     data.setEmail(email);
                     data.setAddress(address);
-                    JOptionPane.showMessageDialog(this, providerBLL.update(data));
+                    result = providerBLL.update(data);
                 }
-                refreshData();
-                dispose();
+                
+                // Hiển thị thông báo
+                JOptionPane.showMessageDialog(this, result);
+                
+                // Chỉ đóng dialog và refresh data khi thành công
+                if(result.contains("thành công")) {
+                    refreshData();
+                    dispose();
+                }
             });
         }
 

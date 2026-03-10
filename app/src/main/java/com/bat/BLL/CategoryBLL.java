@@ -1,6 +1,7 @@
 package com.bat.BLL;
 
 import java.util.ArrayList;
+
 import com.bat.DAL.CategoryDAL;
 import com.bat.DTO.CategoryDTO;
 
@@ -18,6 +19,15 @@ public class CategoryBLL {
         return categories;
     }
 
+    public String getCategoryNameById(int id) {
+        if (categories == null) categories = categoryDAL.getCategories();
+        for (CategoryDTO c : categories) {
+            if (c.getCategoryId() == id) 
+                return c.getCategoryName();
+        }
+        return null;
+    }
+
     public CategoryDTO getCategoryById(int id) {
         if (categories == null) categories = categoryDAL.getCategories();
         for (CategoryDTO c : categories) {
@@ -27,8 +37,6 @@ public class CategoryBLL {
     }
 
     public String add(CategoryDTO c) {
-        if (c.getCategoryName().trim().isEmpty()) return "Tên danh mục không được để trống!";
-
         c.setCategoryId(categoryDAL.getAutoIncrement());
 
         if (categoryDAL.add(c)) {
@@ -38,7 +46,7 @@ public class CategoryBLL {
     }
 
     public String update(CategoryDTO c) {
-        if (c.getCategoryName().trim().isEmpty()) return "Tên danh mục không được để trống!";
+        // if (c.getCategoryName().trim().isEmpty()) return "Tên danh mục không được để trống!";
 
         if (categoryDAL.update(c)) {
             return "Cập nhật thành công!";

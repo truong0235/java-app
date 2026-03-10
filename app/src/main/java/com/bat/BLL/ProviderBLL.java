@@ -55,10 +55,33 @@ public class ProviderBLL {
     }
 
     public String add(ProviderDTO p) {
-        if (p.getProviderName().trim().isEmpty()) return "Tên nhà cung cấp không được để trống!";
-        if (p.getPhone().trim().isEmpty()) return "Số điện thoại không được để trống!";
-
-        if (!p.getPhone().matches("\\d{10,11}")) return "Số điện thoại phải là 10-11 chữ số!";
+        // Validate tên nhà cung cấp
+        if (p.getProviderName() == null || p.getProviderName().trim().isEmpty()) {
+            return "Tên nhà cung cấp không được để trống!";
+        }
+        
+        // Validate số điện thoại
+        if (p.getPhone() == null || p.getPhone().trim().isEmpty()) {
+            return "Số điện thoại không được để trống!";
+        }
+        if (!p.getPhone().matches("^(0[3|5|7|8|9]\\d{8}|02\\d{8})$")) {
+            return "Số điện thoại không hợp lệ!";
+        }
+        if (isPhoneExists(p.getPhone(), -1)) {
+            return "Số điện thoại này đã được sử dụng bởi nhà cung cấp khác!";
+        }
+        // Validate email
+        if (p.getEmail() == null || p.getEmail().trim().isEmpty()) {
+            return "Email không được để trống!";
+        }
+        if (!p.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            return "Email không hợp lệ!";
+        }
+        
+        // Validate địa chỉ
+        // if (p.getAddress() == null || p.getAddress().trim().isEmpty()) {
+        //     return "Địa chỉ không được để trống!";
+        // }
 
         int newId = providerDAL.getAutoIncrement();
         p.setProviderId(newId);
@@ -70,9 +93,34 @@ public class ProviderBLL {
     }
 
     public String update(ProviderDTO p) {
-        if (p.getProviderName().trim().isEmpty()) return "Tên nhà cung cấp không được để trống!";
-
-        if (!p.getPhone().matches("\\d{10,11}")) return "Số điện thoại phải là 10-11 chữ số!";
+        // Validate tên nhà cung cấp
+        if (p.getProviderName() == null || p.getProviderName().trim().isEmpty()) {
+            return "Tên nhà cung cấp không được để trống!";
+        }
+        
+        // Validate số điện thoại
+        if (p.getPhone() == null || p.getPhone().trim().isEmpty()) {
+            return "Số điện thoại không được để trống!";
+        }
+        if (!p.getPhone().matches("^(0[3|5|7|8|9]\\d{8}|02\\d{8})$")) {
+            return "Số điện thoại không hợp lệ!";
+        }
+        if (isPhoneExists(p.getPhone(), p.getProviderId())) {
+            return "Số điện thoại này đã được sử dụng bởi nhà cung cấp khác!";
+        }
+        
+        // Validate email
+        if (p.getEmail() == null || p.getEmail().trim().isEmpty()) {
+            return "Email không được để trống!";
+        }
+        if (!p.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            return "Email không hợp lệ!";
+        }
+        
+        // Validate địa chỉ
+        if (p.getAddress() == null || p.getAddress().trim().isEmpty()) {
+            return "Địa chỉ không được để trống!";
+        }
 
         if (providerDAL.update(p)) {
             return "Cập nhật thành công!";
@@ -85,5 +133,14 @@ public class ProviderBLL {
             return "Xóa thành công!";
         }
         return "Xóa thất bại!";
+    }
+
+    public boolean isPhoneExists(String phone, int id) {
+        for (ProviderDTO p : providers) {
+            if (p.getPhone() != null && p.getPhone().equals(phone) && p.getProviderId() != id) {
+                return true;
+            }
+        }
+        return false;
     }
 }
