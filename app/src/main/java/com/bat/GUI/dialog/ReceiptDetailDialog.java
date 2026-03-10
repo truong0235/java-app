@@ -342,11 +342,21 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
         try {
             // Create file chooser
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Lưu phiếu nhập PDF");
+            
+            // Determine if this is import or export
+            boolean isImport = (importDTO != null);
+            
+            fileChooser.setDialogTitle(isImport ? "Lưu phiếu nhập PDF" : "Lưu phiếu xuất PDF");
             
             // Set default file name
-            String defaultFileName = "PhieuNhap_" + importDTO.getReceiptId() + "_" + 
-                                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss")) + ".pdf";
+            String defaultFileName;
+            if (isImport) {
+                defaultFileName = "PhieuNhap_" + importDTO.getReceiptId() + "_" + 
+                                LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss")) + ".pdf";
+            } else {
+                defaultFileName = "PhieuXuat_" + exportDTO.getExport_id() + "_" + 
+                                LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss")) + ".pdf";
+            }
             fileChooser.setSelectedFile(new File(defaultFileName));
             
             // Set file filter
@@ -365,25 +375,48 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
                     filePath += ".pdf";
                 }
                 
-                // Get provider details
-                ProviderDTO provider = prdBLL.getProviderById(importDTO.getProviderId());
-                String userName = userBLL.getUserNameById(importDTO.getUserId());
-                
-                // Get all lots for this import
-                ArrayList<LotDTO> lots = lotBLL.getLotsByImportId(importDTO.getReceiptId());
-                
-                // Create product name map
-                Map<Integer, String> productNames = new HashMap<>();
-                for (LotDTO lot : lots) {
-                    if (!productNames.containsKey(lot.getProductId())) {
-                        String productName = productBLL.getProductById(lot.getProductId()).getProductName();
-                        productNames.put(lot.getProductId(), productName);
-                    }
-                }
-                
                 // Create PDF
                 PDFExporter pdfExporter = new PDFExporter();
-                pdfExporter.exportImportReceipt(filePath, importDTO, lots, productNames, userName, provider);
+                
+                if (isImport) {
+                    // Export import receipt
+                    ProviderDTO provider = prdBLL.getProviderById(importDTO.getProviderId());
+                    String userName = userBLL.getUserNameById(importDTO.getUserId());
+                    
+                    // Get all lots for this import
+                    ArrayList<LotDTO> lots = lotBLL.getLotsByImportId(importDTO.getReceiptId());
+                    
+                    // Create product name map
+                    Map<Integer, String> productNames = new HashMap<>();
+                    for (LotDTO lot : lots) {
+                        if (!productNames.containsKey(lot.getProductId())) {
+                            String productName = productBLL.getProductById(lot.getProductId()).getProductName();
+                            productNames.put(lot.getProductId(), productName);
+                        }
+                    }
+                    
+                    pdfExporter.exportImportReceipt(filePath, importDTO, lots, productNames, userName, provider);
+                } else {
+                    // Export export receipt
+                    String userName = userBLL.getUserNameById(exportDTO.getUser_id());
+                    
+                    // Get all export lots for this export
+                    ArrayList<ExportLotDTO> exportLots = exportBLL.getExportLotsByExportId(exportDTO.getExport_id());
+                    
+                    // Create product name map
+                    Map<Integer, String> productNames = new HashMap<>();
+                    for (ExportLotDTO exportLot : exportLots) {
+                        if (!productNames.containsKey(exportLot.getProductId())) {
+                            String productName = productBLL.getProductById(exportLot.getProductId()).getProductName();
+                            productNames.put(exportLot.getProductId(), productName);
+                        }
+                    }
+                    
+                    // Get customer details - may be null
+                    var customer = customerBLL.getCustomerById(exportDTO.getCustomer_id());
+                    
+                    pdfExporter.exportExportReceipt(filePath, exportDTO, exportLots, productNames, userName, customer);
+                }
                 
                 // Show success message
                 JOptionPane.showMessageDialog(this, 

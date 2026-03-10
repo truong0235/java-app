@@ -54,9 +54,9 @@ public class MenuTaskbar extends JPanel{
             { "Nhà cung cấp", "provider.svg", "nhacungcap" },
             { "Phiếu nhập", "import.svg", "nhaphang" },
             { "Lô hàng", "lot.svg", "lohang" },
-            { "Phiếu xuất", "lot.svg", "xuat" },
+            { "Phiếu xuất", "export.svg", "xuat" },
             { "Phiếu kiểm kê", "check.svg", "kiemke" },
-            { "Thống kê", "info.svg", "thongke" },
+            { "Thống kê", "statistic.svg", "thongke" },
             { "Đăng xuất", "log_out.svg", "dangxuat" },
     };
 

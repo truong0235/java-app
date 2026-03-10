@@ -84,6 +84,13 @@ public class ExportBLL {
         return filteredLots;
     }
 
+    /**
+     * Lấy tất cả lô xuất theo mã phiếu xuất
+     */
+    public ArrayList<ExportLotDTO> getExportLotsByExportId(int exportId) {
+        return exportLotDAL.getExportLotsByExportId(exportId);
+    }
+
     public boolean cancelExport(int exportId) {
         if (exportReceiptDAL.delete(exportId)) {
             return true;

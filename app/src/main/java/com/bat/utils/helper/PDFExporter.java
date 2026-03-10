@@ -11,6 +11,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.bat.DTO.CheckDetailDTO;
+import com.bat.DTO.CustomerDTO;
+import com.bat.DTO.ExportLotDTO;
+import com.bat.DTO.ExportReceiptDTO;
 import com.bat.DTO.ImportDTO;
 import com.bat.DTO.InventoryCheckDTO;
 import com.bat.DTO.LotDTO;
@@ -154,6 +157,119 @@ public class PDFExporter {
         addSignatureCell(signatureTable, "Người lập phiếu", "(Ký và ghi rõ họ tên)");
         addSignatureCell(signatureTable, "Nhân viên nhập", "(Ký và ghi rõ họ tên)");
         addSignatureCell(signatureTable, "Nhà cung cấp", "(Ký và ghi rõ họ tên)");
+        
+        document.add(signatureTable);
+        
+        document.close();
+    }
+    
+    public void exportExportReceipt(String filePath, ExportReceiptDTO exportDTO,
+                                     ArrayList<ExportLotDTO> exportLots,
+                                     Map<Integer, String> productNames,
+                                     String userName,
+                                     CustomerDTO customer) throws DocumentException, IOException {
+        
+        Document document = new Document(PageSize.A4);
+        PdfWriter.getInstance(document, new FileOutputStream(filePath));
+        document.open();
+        
+        // Add system title
+        Paragraph systemTitle = new Paragraph("Hệ thống quản lý cửa hàng sách BestBook", smallFont);
+        systemTitle.setAlignment(Element.ALIGN_LEFT);
+        systemTitle.setSpacingAfter(5);
+        document.add(systemTitle);
+        
+        // Add current date/time
+        String currentDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        Paragraph dateTime = new Paragraph("Thời gian in phiếu: " + currentDateTime, smallFont);
+        dateTime.setAlignment(Element.ALIGN_LEFT);
+        dateTime.setSpacingAfter(20);
+        document.add(dateTime);
+        
+        // Add main title
+        Paragraph title = new Paragraph("PHIẾU XUẤT KHO", titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingAfter(20);
+        document.add(title);
+        
+        // Add receipt info
+        Paragraph receiptInfo = new Paragraph();
+        receiptInfo.add(new Phrase("Mã phiếu: " + exportDTO.getExport_id() + "\n", normalFont));
+        
+        if (customer != null) {
+            receiptInfo.add(new Phrase("Khách hàng: " + customer.getFullName() + 
+                                       "   -   SĐT: " + customer.getPhone() + "\n", normalFont));
+            if (customer.getAddress() != null && !customer.getAddress().isEmpty()) {
+                receiptInfo.add(new Phrase("Địa chỉ: " + customer.getAddress() + "\n", normalFont));
+            }
+        }
+        
+        receiptInfo.add(new Phrase("Người thực hiện: " + userName + 
+                                   "   -   Mã nhân viên: " + exportDTO.getUser_id() + "\n", normalFont));
+        
+        String formattedDate = exportDTO.getExport_date() != null 
+            ? exportDTO.getExport_date().format(DATE_FORMATTER) 
+            : "";
+        receiptInfo.add(new Phrase("Thời gian xuất: " + formattedDate + "\n", normalFont));
+        receiptInfo.setSpacingAfter(20);
+        document.add(receiptInfo);
+        
+        // Create table with 4 columns (no lot code)
+        PdfPTable table = new PdfPTable(4);
+        table.setWidthPercentage(100);
+        table.setSpacingBefore(10);
+        table.setSpacingAfter(20);
+        
+        // Set column widths
+        float[] columnWidths = {4f, 1.5f, 1f, 1.5f};
+        table.setWidths(columnWidths);
+        
+        // Add table headers
+        addTableHeader(table, "Tên sản phẩm");
+        addTableHeader(table, "Giá");
+        addTableHeader(table, "Số lượng");
+        addTableHeader(table, "Tổng tiền");
+        
+        // Add table data
+        BigDecimal total = BigDecimal.ZERO;
+        for (ExportLotDTO exportLot : exportLots) {
+            String productName = productNames.getOrDefault(exportLot.getProductId(), "N/A");
+            addTableCell(table, productName);
+            
+            String priceStr = exportLot.getExportPrice() != null 
+                ? CURRENCY_FORMATTER.format(exportLot.getExportPrice()) 
+                : "0 ₫";
+            addTableCell(table, priceStr);
+            
+            addTableCell(table, String.valueOf(exportLot.getQuantity()));
+            
+            BigDecimal itemTotal = exportLot.getExportPrice() != null 
+                ? exportLot.getExportPrice().multiply(new BigDecimal(exportLot.getQuantity()))
+                : BigDecimal.ZERO;
+            total = total.add(itemTotal);
+            
+            addTableCell(table, CURRENCY_FORMATTER.format(itemTotal));
+        }
+        
+        document.add(table);
+        
+        // Add total
+        Paragraph totalParagraph = new Paragraph(
+            "Tổng thành tiền: " + CURRENCY_FORMATTER.format(total), 
+            headerFont
+        );
+        totalParagraph.setAlignment(Element.ALIGN_RIGHT);
+        totalParagraph.setSpacingAfter(30);
+        document.add(totalParagraph);
+        
+        // Add signature section
+        PdfPTable signatureTable = new PdfPTable(3);
+        signatureTable.setWidthPercentage(100);
+        signatureTable.setSpacingBefore(30);
+        
+        addSignatureCell(signatureTable, "Người lập phiếu", "(Ký và ghi rõ họ tên)");
+        addSignatureCell(signatureTable, "Nhân viên xuất", "(Ký và ghi rõ họ tên)");
+        addSignatureCell(signatureTable, "Khách hàng", "(Ký và ghi rõ họ tên)");
         
         document.add(signatureTable);
         

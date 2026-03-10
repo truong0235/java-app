@@ -29,6 +29,14 @@ public class CustomerBLL {
         return null;
     }
 
+    public CustomerDTO getCustomerById(int customerId) {
+        if (customers == null) customers = customerDAL.getCustomers();
+        for (CustomerDTO c : customers) {
+            if (c.getCustomerId() == customerId) return c;
+        }
+        return null;
+    }
+
     private String validateCustomer(CustomerDTO c, boolean isUpdate) {
         // 1. Validate tên khách hàng
         if (c.getFullName() == null || c.getFullName().trim().isEmpty()) {
@@ -111,4 +119,12 @@ public class CustomerBLL {
         }
         return "Xóa thất bại!";
     }     
+
+    public int getCustomerIdByIdx (int idx) {
+        if (customers == null) customers = customerDAL.getCustomers();
+        if (idx >= 0 && idx < customers.size()) {
+            return customers.get(idx).getCustomerId();
+        }
+        return -1; // Không tìm thấy
+    }
 }
