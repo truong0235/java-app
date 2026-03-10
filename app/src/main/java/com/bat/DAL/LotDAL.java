@@ -247,6 +247,8 @@ public class LotDAL {
         return false;
     }
 
+    
+
     public boolean updateStatus(int lotId, String status) {
         String query = "UPDATE lot SET status = ? WHERE lot_id = ?";
         try (

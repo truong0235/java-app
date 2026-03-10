@@ -112,4 +112,13 @@ public class LotBLL {
     public boolean updateLotStatus(int lotId, String status) {
         return lotDAL.updateStatus(lotId, status);
     }
+
+    public LotDTO getLotByCode(String lotCode) {
+        for (LotDTO lot : lotDAL.getLots()) {
+            if (lot.getLotCode().equals(lotCode)) {
+                return lot;
+            }
+        }
+        return null;
+    }
 }

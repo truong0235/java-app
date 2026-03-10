@@ -25,7 +25,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -33,25 +32,26 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import com.bat.BLL.ImportBLL;
+import com.bat.BLL.CustomerBLL;
+import com.bat.BLL.ExportBLL;
 import com.bat.BLL.LotBLL;
 import com.bat.BLL.ProductBLL;
-import com.bat.BLL.ProviderBLL;
-import com.bat.DTO.ImportDTO;
+import com.bat.DTO.CustomerDTO;
+import com.bat.DTO.ExportLotDTO;
+import com.bat.DTO.ExportReceiptDTO;
 import com.bat.DTO.LotDTO;
 import com.bat.DTO.ProductDTO;
-import com.bat.DTO.ProviderDTO;
 
-public class AddExportDialog extends JDialog implements ActionListener { // vde: lưu provider id trong db
+public class AddExportDialog extends JDialog implements ActionListener {
     private ProductBLL productBLL = new ProductBLL();
-    private ProviderBLL providerBLL = new ProviderBLL();
-    private ImportBLL importBLL = new ImportBLL();
+    private CustomerBLL customerBLL = new CustomerBLL();
+    private ExportBLL exportBLL = new ExportBLL();
     private LotBLL lotBLL = new LotBLL();
-    private ArrayList<LotDTO> listLostBaseOnProduct;
+    private ArrayList<LotDTO> listLotsBaseOnProduct;
 
     private ArrayList<ProductDTO> productList;
     private ArrayList<ProductDTO> filteredProducts;
-    private ArrayList<LotDTO> selectedLots = new ArrayList<>();
+    private ArrayList<ExportLotDTO> selectedExportLots = new ArrayList<>();
 
     // Left panel - Product search
     private JTextField txtSearch;
@@ -60,27 +60,27 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
 
     // Right panel - Lot details
     private JTextField txtProductName, txtProductId, txtPublisher, txtPrice;
-    private JComboBox<String> cbxProvider, cbxLot;
+    private JComboBox<String> cbxCustomer, cbxLot;
     private JButton btnAdd, btnEdit, btnDelete;
     private JSpinner spnQuantity;
+    
     // Bottom panel - Selected lots
     private JTable tblSelectedLots;
     private DefaultTableModel selectedLotsTableModel;
     private JLabel lblTotalPrice, labelQuantity;
-    private JButton btnImport, btnCancel;
+    private JButton btnExport, btnCancel;
 
-    private  static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
+    private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
     private int USERID = 1;
 
-    public AddExportDialog() {
-        this.setTitle("them phieu xuat");
-        // this.currentUserId = userId;
+    public AddExportDialog(JFrame parent) {
+        super(parent, "Thêm phiếu xuất hàng", true);
         productList = productBLL.getProductsList();
         filteredProducts = new ArrayList<>(productList);
         
         initComponents();
         setSize(1000, 700);
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(parent);
     }
 
     private void initComponents() {
@@ -132,9 +132,9 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
             }
         };
         tblProducts = new JTable(productTableModel);
-        tblProducts.getColumnModel().getColumn(0).setPreferredWidth(100);
-        tblProducts.getColumnModel().getColumn(1).setPreferredWidth(300);
-        tblProducts.getColumnModel().getColumn(2).setPreferredWidth(100);
+        tblProducts.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tblProducts.getColumnModel().getColumn(1).setPreferredWidth(250);
+        tblProducts.getColumnModel().getColumn(2).setPreferredWidth(70);
         tblProducts.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblProducts.getSelectedRow() != -1) {
                 tblSelectedLots.clearSelection();
@@ -159,16 +159,16 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         panel.setBorder(new EmptyBorder(5,5,5,5));
         panel.setBackground(Color.WHITE);
 
-        // Provider
-        JPanel providerPn = new JPanel(new GridLayout(2, 1, 5, 5));
-        providerPn.setBackground(Color.WHITE);
-        // providerPn.add(new JLabel("Nhà cung cấp"));
-        cbxProvider = new JComboBox<>();
-        ArrayList<ProviderDTO> providers = providerBLL.getProviderList();
-        for (ProviderDTO p : providers) {
-            cbxProvider.addItem(p.getProviderName());
+        // Customer
+        JPanel customerPn = new JPanel(new GridLayout(2, 1, 5, 5));
+        customerPn.setBackground(Color.WHITE);
+        customerPn.add(new JLabel("Khách hàng"));
+        cbxCustomer = new JComboBox<>();
+        ArrayList<CustomerDTO> customers = customerBLL.getCustomerList();
+        for (CustomerDTO c : customers) {
+            cbxCustomer.addItem(c.getFullName());
         }
-        // providerPn.add(cbxProvider);
+        customerPn.add(cbxCustomer);
 
         // Product name
         JPanel prdNamePn = new JPanel(new GridLayout(2, 1, 5, 5));
@@ -178,9 +178,9 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         txtProductName.setEditable(false);
         prdNamePn.add(txtProductName);
 
-        // Product ID & ISBN
-        JPanel idIsbnPn = new JPanel(new GridLayout(1, 2, 5, 5));
-        idIsbnPn.setBackground(Color.WHITE);
+        // Product ID & Lot Code
+        JPanel idLotPn = new JPanel(new GridLayout(1, 2, 5, 5));
+        idLotPn.setBackground(Color.WHITE);
         
         JPanel idPn = new JPanel(new GridLayout(2, 1, 5, 5));
         idPn.setBackground(Color.WHITE);
@@ -189,15 +189,15 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         txtProductId.setEditable(false);
         idPn.add(txtProductId);
         
-        JPanel isbnPn = new JPanel(new GridLayout(2, 1, 5, 5));
-        isbnPn.setBackground(Color.WHITE);
-        isbnPn.add(new JLabel("Mã lô"));
+        JPanel lotPn = new JPanel(new GridLayout(2, 1, 5, 5));
+        lotPn.setBackground(Color.WHITE);
+        lotPn.add(new JLabel("Mã lô"));
         cbxLot = new JComboBox<>();
         cbxLot.addActionListener(this);
-        isbnPn.add(cbxLot);
+        lotPn.add(cbxLot);
         
-        idIsbnPn.add(idPn);
-        idIsbnPn.add(isbnPn);
+        idLotPn.add(idPn);
+        idLotPn.add(lotPn);
 
         // Publisher
         JPanel publisherPn = new JPanel(new GridLayout(2, 1, 5, 5));
@@ -213,13 +213,14 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         
         JPanel pricePn = new JPanel(new GridLayout(2, 1, 5, 5));
         pricePn.setBackground(Color.WHITE);
-        pricePn.add(new JLabel("Giá xuat"));
+        pricePn.add(new JLabel("Giá xuất"));
         txtPrice = new JTextField();
+        txtPrice.setEditable(false);
         pricePn.add(txtPrice);
         
         JPanel qtyPn = new JPanel(new GridLayout(2, 1, 5, 5));
         qtyPn.setBackground(Color.WHITE);
-        labelQuantity = new JLabel("Số lượng");
+        labelQuantity = new JLabel("Số lượng xuất");
         qtyPn.add(labelQuantity);
         spnQuantity = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
         qtyPn.add(spnQuantity);
@@ -230,7 +231,6 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         JPanel btnPn = new JPanel();
         btnPn.setLayout(new FlowLayout());
         btnPn.setBackground(Color.WHITE);
-        // btnPn.setBorder(new EmptyBorder(5,0,5, 0));
 
         btnAdd = new JButton("Thêm sản phẩm");
         btnAdd.setBackground(new Color(112,119,183));        
@@ -244,7 +244,6 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         btnEdit.setFocusPainted(false);
         btnEdit.addActionListener(this);
         btnEdit.setEnabled(false);
-
         
         btnDelete = new JButton("Xóa sản phẩm");
         btnDelete.setBackground(new Color(112,119,183));        
@@ -257,9 +256,9 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         btnPn.add(btnEdit);
         btnPn.add(btnDelete);
 
-        panel.add(providerPn);
+        panel.add(customerPn);
         panel.add(prdNamePn);
-        panel.add(idIsbnPn);
+        panel.add(idLotPn);
         panel.add(publisherPn);
         panel.add(priceQtyPn);
         panel.add(btnPn);
@@ -273,7 +272,7 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         panel.setPreferredSize(new Dimension(0, 250));
 
         // Table
-        String[] columns = {"STT", "Mã SP", "Tên sản phẩm", "Đơn giá", "Số lượng"};
+        String[] columns = {"STT", "Mã SP", "Tên sản phẩm", "Mã lô", "Đơn giá", "Số lượng"};
         selectedLotsTableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -287,10 +286,8 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
                 btnDelete.setEnabled(true);
                 btnAdd.setEnabled(false);
                 tblProducts.clearSelection();
-                loadImportDetails();
-            } 
-
-            
+                loadExportDetails();
+            }
         });
         
         // Bottom panel with total and buttons
@@ -306,19 +303,15 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         lblTotalPrice.setForeground(new Color(220, 53, 69));
         totalPn.add(lblTotal);
         totalPn.add(lblTotalPrice);
-
-
-
-
         
         JPanel buttonPn = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPn.setBackground(Color.WHITE);
         
-        btnImport = new JButton("Xuat hàng");
-        btnImport.setBackground(new Color(40, 167, 69));
-        btnImport.setForeground(Color.WHITE);
-        btnImport.setFocusPainted(false);
-        btnImport.addActionListener(this);
+        btnExport = new JButton("Xuất hàng");
+        btnExport.setBackground(new Color(40, 167, 69));
+        btnExport.setForeground(Color.WHITE);
+        btnExport.setFocusPainted(false);
+        btnExport.addActionListener(this);
         
         btnCancel = new JButton("Hủy");
         btnCancel.setBackground(new Color(220, 53, 69));
@@ -326,7 +319,7 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         btnCancel.setFocusPainted(false);
         btnCancel.addActionListener(this);
         
-        buttonPn.add(btnImport);
+        buttonPn.add(btnExport);
         buttonPn.add(btnCancel);
         
         bottomPn.add(totalPn, BorderLayout.NORTH);
@@ -373,58 +366,57 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
             txtProductId.setText(String.valueOf(product.getProductId()));
             txtProductName.setText(product.getProductName());
             txtPublisher.setText(product.getPublisher());
-            txtPrice.setText("");
+            txtPrice.setText(product.getPrice().toString());
+            
+            // Load lô hàng của sản phẩm
             cbxLot.removeAllItems();
-            listLostBaseOnProduct = lotBLL.getLotsByProductId(product.getProductId());
-            for (LotDTO lot : listLostBaseOnProduct) {
-                cbxLot.addItem(lot.getLotCode()); 
+            listLotsBaseOnProduct = lotBLL.getLotsByProductId(product.getProductId());
+            for (LotDTO lot : listLotsBaseOnProduct) {
+                if (lot.getQuantity() > 0 && !lot.getStatus().equals("Hết")) {
+                    cbxLot.addItem(lot.getLotCode()); 
+                }
             }
         }
     }
 
-    private void loadImportDetails() {
+    private void loadExportDetails() {
         clearLotInputs();
         int selectedRow = tblSelectedLots.getSelectedRow();
         if (selectedRow >= 0) {
-            LotDTO lot = selectedLots.get(selectedRow);
-            txtProductId.setText(String.valueOf(lot.getProductId()));
-            ProductDTO product = productBLL.getProductById(lot.getProductId());
+            ExportLotDTO exportLot = selectedExportLots.get(selectedRow);
+            txtProductId.setText(String.valueOf(exportLot.getProductId()));
+            ProductDTO product = productBLL.getProductById(exportLot.getProductId());
             txtProductName.setText(product.getProductName());
             txtPublisher.setText(product.getPublisher());
-            txtPrice.setText(lot.getImportPrice().toString());
-            cbxLot.setSelectedItem(lot.getLotCode());
-            spnQuantity.setValue(lot.getQuantity());
+            txtPrice.setText(exportLot.getExportPrice().toString());
+            cbxLot.setSelectedItem(exportLot.getLotCode());
+            spnQuantity.setValue(exportLot.getQuantity());
         }
     }
 
-    public boolean validateInput(String lotText, String oldLotText,String qtyText, String priceText) {
+    private boolean validateInput(String lotText, String oldLotText, String qtyText, String priceText) {
         if (txtProductId.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
         }
                 
-        if (lotText.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập mã lô!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        if (lotText == null || lotText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn mã lô!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
         }
-        // else if (lotBLL.isLotCodeExist(lotText)) {
-        //     JOptionPane.showMessageDialog(this, "Mã lô đã tồn tại! Vui lòng nhập mã lô khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-        //     return false;
-        // }
-        else {
-            for (LotDTO lot : selectedLots) {
-                if (!oldLotText.isEmpty() && lot.getLotCode().equals(oldLotText)) 
-                    continue;
-                if (lot.getLotCode().equals(lotText)) {
-                    JOptionPane.showMessageDialog(this, "Mã lô đã được thêm trong danh sách! Vui lòng nhập mã lô khác.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
+        
+        // Kiểm tra trùng lô trong danh sách đã chọn
+        for (ExportLotDTO exportLot : selectedExportLots) {
+            if (!oldLotText.isEmpty() && exportLot.getLotCode().equals(oldLotText)) 
+                continue;
+            if (exportLot.getLotCode().equals(lotText)) {
+                JOptionPane.showMessageDialog(this, "Mã lô đã được thêm trong danh sách!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return false;
             }
         }
 
-
         if (qtyText.isEmpty() || priceText.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ số lượng và giá nhập!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ số lượng và giá xuất!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
         }    
         
@@ -432,12 +424,13 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         BigDecimal price = new BigDecimal(priceText);
        
         if (quantity <= 0 || price.compareTo(BigDecimal.ZERO) <= 0) {
-            JOptionPane.showMessageDialog(this, "Số lượng và giá nhập phải lớn hơn 0!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Số lượng và giá xuất phải lớn hơn 0!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
+        // Kiểm tra số lượng tồn kho
         if (spnQuantity.getValue() != null && (int) spnQuantity.getValue() > 0) {
-            for (LotDTO lot : listLostBaseOnProduct) {
+            for (LotDTO lot : listLotsBaseOnProduct) {
                 if (cbxLot.getSelectedIndex() != -1 && lot.getLotCode().equals(cbxLot.getSelectedItem())) {
                     if (lot.getQuantity() < (int) spnQuantity.getValue()) {
                         JOptionPane.showMessageDialog(this, "Số lượng không được vượt quá " + lot.getQuantity(), "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -454,7 +447,9 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         try {
             String qtyText = spnQuantity.getValue().toString();
             String priceText = txtPrice.getText().trim();
-            String lotText = (String) cbxLot.getSelectedItem();
+            // String lotText = (String) cbxLot.getSelectedItem();
+            String lotText = cbxLot.getSelectedIndex() != -1 ? (String) cbxLot.getSelectedItem() : "";
+
             // Validate inputs
             if (!validateInput(lotText, "", qtyText, priceText)) {
                 return;
@@ -464,25 +459,25 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
             int quantity = Integer.parseInt(qtyText);
             int productId = Integer.parseInt(txtProductId.getText());
             String productName = txtProductName.getText();
+            LotDTO lot = lotBLL.getLotByCode(lotText);
             
-            // Create lot
-            LotDTO lot = new LotDTO();
-            lot.setProductId(productId);
-            lot.setLotCode(lotText);
-            lot.setQuantity(quantity);
-            lot.setInitialQuantity(quantity);
-            lot.setImportPrice(price);
-            lot.setImportDate(LocalDateTime.now());
-            lot.setPrintYear(LocalDateTime.now().getYear());
-            lot.setStatus("Còn");
+            // Create export lot
+            ExportLotDTO exportLot = new ExportLotDTO();
+            exportLot.setProductId(productId);
+            exportLot.setProductName(productName);
+            exportLot.setLotId(lot.getLotId());
+            exportLot.setLotCode(lotText);
+            exportLot.setQuantity(quantity);
+            exportLot.setExportPrice(price);
             
-            selectedLots.add(lot);
+            selectedExportLots.add(exportLot);
             
             // Add to table
             selectedLotsTableModel.addRow(new Object[]{
                 selectedLotsTableModel.getRowCount() + 1,
                 productId,
                 productName,
+                lotText,
                 CURRENCY_FORMATTER.format(price),
                 quantity
             });
@@ -490,10 +485,9 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
             lblTotalPrice.setText(CURRENCY_FORMATTER.format(calTotalPrice()));
             clearLotInputs();
             tblProducts.clearSelection();
-            clearLotInputs();
             
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Số lượng và giá nhập phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Số lượng và giá xuất phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -504,62 +498,59 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         txtPublisher.setText("");
         txtProductId.setText("");
         txtProductName.setText("");
+        labelQuantity.setText("Số lượng xuất");
     }
     
     private BigDecimal calTotalPrice() {
         BigDecimal total = BigDecimal.ZERO;
-        for (LotDTO lot : selectedLots) {
-            total = total.add(lot.getImportPrice().multiply(new BigDecimal(lot.getQuantity())));
+        for (ExportLotDTO exportLot : selectedExportLots) {
+            total = total.add(exportLot.getExportPrice().multiply(new BigDecimal(exportLot.getQuantity())));
         }
         return total;
     }
 
-    private void importProducts() {
-        if (selectedLots.isEmpty()) {
+    private void exportProducts() {
+        if (selectedExportLots.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng thêm ít nhất một sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
-        if (cbxProvider.getSelectedIndex() == -1) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn nhà cung cấp!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        if (cbxCustomer.getSelectedIndex() == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn khách hàng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        if (cbxLot.getSelectedIndex() == -1) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn mã lô!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (spnQuantity.getValue() == null || spnQuantity.getValue().equals(0)) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập số lượng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-
-        
         try {
             BigDecimal totalPrice = calTotalPrice();     
-            int providerId = providerBLL.getPrdIdByIdx(cbxProvider.getSelectedIndex());
             
-            // Create import receipt
-            ImportDTO importDTO = new ImportDTO();
-            importDTO.setProviderId(providerId);
-            importDTO.setUserId(USERID);
-            importDTO.setTotalPrice(totalPrice);
-            importDTO.setStatus(1);
-            importDTO.setCreatedDate(LocalDateTime.now());
-            System.out.println(importDTO);
+            // Lấy customerId
+            ArrayList<CustomerDTO> customers = customerBLL.getCustomerList();
+            int customerId = -1;
+            if (cbxCustomer.getSelectedIndex() >= 0 && cbxCustomer.getSelectedIndex() < customers.size()) {
+                customerId = customers.get(cbxCustomer.getSelectedIndex()).getCustomerId();
+            }
             
-            // Save to database
-            boolean success = importBLL.addImport(importDTO, selectedLots);
-            // boolean success = false;
+            if (customerId == -1) {
+                JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin khách hàng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // Create export receipt
+            ExportReceiptDTO exportDTO = new ExportReceiptDTO();
+            exportDTO.setExport_date(LocalDateTime.now());
+            exportDTO.setStatus(1);
+            exportDTO.setUser_id(USERID);
+            exportDTO.setTotal_price(totalPrice.intValue());
+            exportDTO.setCustomer_id(customerId);
+            
+    
+            boolean success = exportBLL.addExport(exportDTO, selectedExportLots);
             
             if (success) {
-                JOptionPane.showMessageDialog(this, "Nhập hàng thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                
+                JOptionPane.showMessageDialog(this, "Xuất hàng thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "Nhập hàng thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Xuất hàng thất bại! Vui lòng kiểm tra lại số lượng tồn kho.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
             
         } catch (Exception e) {
@@ -573,18 +564,19 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
         if (e.getSource() == btnAdd) {
             addLot();
         } 
-        else if (e.getSource() == btnImport) {
-            importProducts();
+        else if (e.getSource() == btnExport) {
+            exportProducts();
         }
         else if (e.getSource() == cbxLot) {
-            for (LotDTO lot : listLostBaseOnProduct) {
-                if (cbxLot.getSelectedIndex() != -1 && lot.getLotCode().equals(cbxLot.getSelectedItem())) {
-                    labelQuantity.setText("Số lượng (Tối đa: " + lot.getQuantity() + ")");
-                    break;
+            if (cbxLot.getSelectedIndex() != -1) {
+                for (LotDTO lot : listLotsBaseOnProduct) {
+                    if (lot.getLotCode().equals(cbxLot.getSelectedItem())) {
+                        labelQuantity.setText("Số lượng xuất (Tối đa: " + lot.getQuantity() + ")");
+                        break;
+                    }
                 }
             }
         }
-       
         else if (e.getSource() == btnCancel) {
             dispose();
         } 
@@ -595,19 +587,21 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
                     String qtyText = spnQuantity.getValue().toString();
                     String priceText = txtPrice.getText().trim();
                     String lotText = (String) cbxLot.getSelectedItem();
-                    LotDTO lot = selectedLots.get(selectedRow);
-                    if (!validateInput(lotText, lot.getLotCode(), qtyText, priceText)) {
+                    ExportLotDTO exportLot = selectedExportLots.get(selectedRow);
+                    
+                    if (!validateInput(lotText, exportLot.getLotCode(), qtyText, priceText)) {
                         return;
                     }
                     
-                    int quantity = Integer.parseInt(spnQuantity.getValue().toString());
-                    BigDecimal price = new BigDecimal(txtPrice.getText().trim());
-                    lot.setQuantity(quantity);
-                    lot.setImportPrice(price);
-                    lot.setLotCode(lotText);
+                    int quantity = Integer.parseInt(qtyText);
+                    BigDecimal price = new BigDecimal(priceText);
+                    exportLot.setQuantity(quantity);
+                    exportLot.setExportPrice(price);
+                    exportLot.setLotCode(lotText);
 
-                    selectedLotsTableModel.setValueAt(price + "đ", selectedRow, 3);
-                    selectedLotsTableModel.setValueAt(quantity, selectedRow, 4);
+                    selectedLotsTableModel.setValueAt(lotText, selectedRow, 3);
+                    selectedLotsTableModel.setValueAt(CURRENCY_FORMATTER.format(price), selectedRow, 4);
+                    selectedLotsTableModel.setValueAt(quantity, selectedRow, 5);
 
                     lblTotalPrice.setText(CURRENCY_FORMATTER.format(calTotalPrice()));
                     clearLotInputs();
@@ -618,19 +612,21 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
                     tblSelectedLots.clearSelection();
 
                 } catch (NumberFormatException err) {
-                    JOptionPane.showMessageDialog(this, "Số lượng và giá nhập phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Số lượng và giá xuất phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
         else if (e.getSource() == btnDelete) {
             int selectedRow = tblSelectedLots.getSelectedRow();
             if (selectedRow >= 0) {
-                selectedLots.remove(selectedRow);
+                selectedExportLots.remove(selectedRow);
                 selectedLotsTableModel.removeRow(selectedRow);
 
+                // Cập nhật lại số thứ tự
                 for (int i = 0; i < selectedLotsTableModel.getRowCount(); i++) {
                     selectedLotsTableModel.setValueAt(i + 1, i, 0);
                 }
+                
                 lblTotalPrice.setText(CURRENCY_FORMATTER.format(calTotalPrice()));
                 btnEdit.setEnabled(false);
                 btnDelete.setEnabled(false);
@@ -639,6 +635,5 @@ public class AddExportDialog extends JDialog implements ActionListener { // vde:
                 clearLotInputs();
             }
         }
-        
     }
 }

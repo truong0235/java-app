@@ -50,11 +50,11 @@ public class MenuTaskbar extends JPanel{
             { "Sản phẩm", "product.svg", "sanpham" },
             { "Danh mục", "category.svg", "danhmuc" },
             { "Khách hàng", "customer.svg", "khachhang" },
-            { "Quản lý người dùng", "users.svg", "nguoidung" },
+            { "Người dùng", "users.svg", "nguoidung" },
             { "Nhà cung cấp", "provider.svg", "nhacungcap" },
             { "Phiếu nhập", "import.svg", "nhaphang" },
             { "Lô hàng", "lot.svg", "lohang" },
-            { "xuat", "lot.svg", "xuat" },
+            { "Phiếu xuất", "lot.svg", "xuat" },
             { "Phiếu kiểm kê", "check.svg", "kiemke" },
             { "Thống kê", "info.svg", "thongke" },
             { "Đăng xuất", "log_out.svg", "dangxuat" },
@@ -238,13 +238,13 @@ public class MenuTaskbar extends JPanel{
             case "Khách hàng" -> mainFrame.setPanel(new Customer(mainFrame));
             
             // ĐÃ SỬA: Chuyền biến currentUser sang form UserManagement
-            case "Quản lý người dùng" -> mainFrame.setPanel(new UserManagement(mainFrame.getCurrentUser())); 
+            case "Người dùng" -> mainFrame.setPanel(new UserManagement(mainFrame.getCurrentUser())); 
             
             case "Nhà cung cấp" -> mainFrame.setPanel(new Provider(mainFrame));
             case "Phiếu kiểm kê" -> mainFrame.setPanel(new InventoryCheck(mainFrame));
             case "Phiếu nhập" -> mainFrame.setPanel(new Import(mainFrame));
             case "Lô hàng" -> mainFrame.setPanel(new Lot(mainFrame));
-            case "xuat" -> mainFrame.setPanel(new Export(mainFrame));
+            case "Phiếu xuất" -> mainFrame.setPanel(new Export(mainFrame));
             case "Thống kê" -> mainFrame.setPanel(new Statistic());
             
             // Bắt sự kiện thoát
