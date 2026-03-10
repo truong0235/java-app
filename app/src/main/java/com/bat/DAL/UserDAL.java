@@ -10,11 +10,11 @@ import com.bat.utils.helper.DBConnectHelper;
 
 public class UserDAL {
     
-    // Lấy danh sách user đang hoạt động
+    // Lấy danh sách user (BỎ QUA NHỮNG NGƯỜI ĐÃ BỊ XÓA ẨN - STATUS = 2)
     public ArrayList<UserDTO> getUsers() {
         ArrayList<UserDTO> users = new ArrayList<>();
-        // Chỉ lấy user có status = 1 (Hoạt động)
-        String query = "SELECT * FROM users WHERE status = 1"; 
+        // ĐÃ KHÔI PHỤC: Lấy status = 1 (Hoạt động) và status = 0 (Bị khoá). Bỏ qua status = 2 (Đã xóa)
+        String query = "SELECT * FROM users WHERE status != 2"; 
         try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -108,8 +108,8 @@ public class UserDAL {
 
     public int deleteUser(int userId) {
         int result = 0;
-        // Xóa mềm: Chuyển status về 0 chứ không xóa hẳn database
-        String query = "UPDATE users SET status = 0 WHERE user_id = ?"; 
+        // ĐÃ KHÔI PHỤC: Xóa mềm theo ý giáo viên - Chuyển status = 2 để ẩn khỏi bảng
+        String query = "UPDATE users SET status = 2 WHERE user_id = ?"; 
         try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
