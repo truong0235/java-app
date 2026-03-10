@@ -50,6 +50,10 @@ public class ProductBLL {
         return productDAL.getPrInImport(importId);
     }
     
+    public ArrayList<ProductDTO> getPrdInExport(int exportId) {
+        return productDAL.getPrInExport(exportId);
+    }
+
     // --- LOGIC CHO GIAO DIỆN QUẢN LÝ ---
     public String add(ProductDTO p) {
         if (p.getProductName().trim().isEmpty()) return "Tên sản phẩm không được để trống!";

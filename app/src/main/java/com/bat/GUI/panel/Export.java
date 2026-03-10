@@ -43,6 +43,7 @@ import com.bat.GUI.Main;
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
 import com.bat.GUI.dialog.AddExportDialog;
+import com.bat.GUI.dialog.ReceiptDetailDialog;
 import com.toedter.calendar.JDateChooser;
 
 public class Export extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {
@@ -301,7 +302,8 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
             case "detail":
                 int idx = getRowSelected();
                 if (idx != -1) {
-                    JOptionPane.showMessageDialog(this, "Chi tiết phiếu xuất đang được phát triển");
+                    ReceiptDetailDialog detailDialog = new ReceiptDetailDialog(main, "Chi tiết phiếu xuất", exportList.get(idx));
+                    detailDialog.setVisible(true);
                 }
                 break;
             case "export":

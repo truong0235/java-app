@@ -72,16 +72,18 @@ public class ExportBLL {
         return false;
     }
 
-    /**
-     * Lấy lot_id từ lot_code và product_id
-     */
-    private int getLotIdByCode(String lotCode, int productId) {
-        ArrayList<LotDTO> lots = lotDAL.getLotsByProductId(productId);
-        for (LotDTO lot : lots) {
-            if (lot.getLotCode().equals(lotCode)) {
-                return lot.getLotId();
+    // public ArrayList<ExportLotDTO> getExportLotsByExportId(int exportId) {
+    //     return exportLotDAL.getExportLotsByExportId(exportId);
+    // }
+
+    public ArrayList<ExportLotDTO> getExportLotsByExportId(int exportId, int productId) {
+        ArrayList<ExportLotDTO> allLots = exportLotDAL.getExportLotsByExportId(exportId);
+        ArrayList<ExportLotDTO> filteredLots = new ArrayList<>();
+        for (ExportLotDTO lot : allLots) {
+            if (lot.getProductId() == productId) {
+                filteredLots.add(lot);
             }
         }
-        return -1;
+        return filteredLots;
     }
 }

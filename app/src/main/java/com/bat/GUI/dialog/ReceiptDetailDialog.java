@@ -31,10 +31,14 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
+import com.bat.BLL.CustomerBLL;
+import com.bat.BLL.ExportBLL;   
 import com.bat.BLL.LotBLL;
 import com.bat.BLL.ProductBLL;
 import com.bat.BLL.ProviderBLL;
 import com.bat.BLL.UserBLL;
+import com.bat.DTO.ExportLotDTO;
+import com.bat.DTO.ExportReceiptDTO;
 import com.bat.DTO.ImportDTO;
 import com.bat.DTO.LotDTO;
 import com.bat.DTO.ProductDTO;
@@ -43,12 +47,17 @@ import com.bat.utils.helper.PDFExporter;
 
 public class ReceiptDetailDialog extends JDialog implements ActionListener {
     private ImportDTO importDTO;
+    private ExportReceiptDTO exportDTO;
     private ArrayList<ProductDTO> prInImportList;
+    private ArrayList<ProductDTO> prInExportList;
+
 
     private LotBLL lotBLL = new LotBLL();
     private UserBLL userBLL = new UserBLL();
     private ProviderBLL prdBLL = new ProviderBLL();
     private ProductBLL productBLL = new ProductBLL();
+    private ExportBLL exportBLL = new ExportBLL();
+    private CustomerBLL customerBLL = new CustomerBLL();
 
 
     private JPanel mainPn, main_topPn, main_blPn, main_brPn, main_btnPn, main_bPn;
@@ -68,6 +77,14 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
         this.prInImportList = productBLL.getPrdInImport(importDTO.getReceiptId());
         initComponent(title, "import");
         initImport();
+        this.setVisible(true); 
+    }
+    public ReceiptDetailDialog(JFrame main, String title, ExportReceiptDTO exportDTO) { // chp cột STT bên phải nhỏ lại (để có chỗ cho mã lô)
+        super(main, title, true);
+        this.exportDTO = exportDTO;
+        this.prInExportList = productBLL.getPrdInExport(exportDTO.getExport_id());
+        initComponent(title, "export");
+        initExport();
         this.setVisible(true); 
     }
 
@@ -165,7 +182,12 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
         table.getSelectionModel().addListSelectionListener(e -> {
             int idx = table.getSelectedRow();
             if (idx != -1) {
-                LoadLotsData(lotBLL.getLotsByProductIdInImport(importDTO.getReceiptId(), prInImportList.get(idx).getProductId()));
+                if (type.equals("import")) {
+                    LoadLotsData(lotBLL.getLotsByProductIdInImport(importDTO.getReceiptId(), prInImportList.get(idx).getProductId()));
+                } else {
+                    // LoadLotsData(lotBLL.getLotsByProductIdInExport(exportDTO.getExport_id(), prInExportList.get(idx).getProductId()));
+                    LoadExportLotsData(exportBLL.getExportLotsByExportId(exportDTO.getExport_id(), prInExportList.get(idx).getProductId()));
+                }
             } 
         });
         main_blPn.add(scrollTbl);
@@ -257,6 +279,50 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
                 lot.getLotId(),
                 lot.getLotCode(),
                 lot.getInitialQuantity(),
+                formattedPrice
+            };
+            tblLotsModel.addRow(rowData);
+        }
+    }
+
+    public void initExport() {
+        txtImportId.setText(String.valueOf(exportDTO.getExport_id()));
+        txtUser.setText(userBLL.getUserNameById(exportDTO.getUser_id()));
+        txtProvider.setText(customerBLL.getCustomerNameById(exportDTO.getCustomer_id()));
+        
+        // Format date
+        String formattedDate = exportDTO.getExport_date() != null ? exportDTO.getExport_date().format(DATE_FORMATTER) : "";
+        txtCreatedDate.setText(formattedDate);
+        
+        LoadExportDetailData();
+
+    }
+
+    public void LoadExportDetailData() {
+        tblMode.setRowCount(0);
+        for (ProductDTO prd : prInExportList) {
+            String formattedPrice = prd.getPrice() != null ? CURRENCY_FORMATTER.format(prd.getPrice()) : "0 ₫";
+            
+            Object[] rowData = new Object[] {
+                prd.getProductId(),
+                prd.getProductName(),
+                prd.getQuantity(),
+                formattedPrice
+            };
+            tblMode.addRow(rowData);
+        }
+    }
+
+    public void LoadExportLotsData(ArrayList<ExportLotDTO> lotList) {
+        tblLotsModel.setRowCount(0);
+        LotBLL lotBLL = new LotBLL();
+        for (ExportLotDTO lot : lotList) {
+            String formattedPrice = lot.getExportPrice() != null ? CURRENCY_FORMATTER.format(lot.getExportPrice()) : "0 ₫";
+            
+            Object[] rowData = new Object[] {
+                lot.getLotId(),
+                lotBLL.getLotById(lot.getLotId()).getLotCode(),
+                lot.getQuantity(),
                 formattedPrice
             };
             tblLotsModel.addRow(rowData);

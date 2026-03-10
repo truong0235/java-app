@@ -119,6 +119,53 @@ public class ProductDAL {
         return prInImport;
     }
 
+    public ArrayList<ProductDTO> getPrInExport(int exportId) {
+        ArrayList<ProductDTO> prInExport = new ArrayList<>();
+        String query = "SELECT DISTINCT p.product_id, p.product_name, sum(el.quantity) as qty, sum(el.quantity * el.export_price) as price " +
+                        "FROM Product p " +
+                        "JOIN Export_Lot el ON p.product_id = el.product_id " +
+                        "WHERE el.export_id = ? AND p.status != 0 " +
+                        "GROUP BY p.product_id, p.product_name";
+        try (
+            DBConnectHelper db = new DBConnectHelper();
+            Connection conn = db.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query);
+        ) {
+            
+            ps.setInt(1, exportId);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                ProductDTO prd = new ProductDTO();
+                prd.setProductId(rs.getInt("product_id"));
+                prd.setProductName(rs.getString("product_name"));
+                prd.setQuantity(rs.getInt("qty"));
+                prd.setPrice(rs.getBigDecimal("price"));
+                prInExport.add(prd);
+             }
+         } catch (Exception e) {
+             e.printStackTrace();
+         }
+         return prInExport;
+     }
+
+     public int getProductIdByIdx(int idx) {
+        String query = "SELECT product_id FROM product WHERE status != 0 ORDER BY product_id LIMIT ?, 1";
+        try (
+            DBConnectHelper db = new DBConnectHelper();
+            Connection conn = db.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query);
+        ) {
+            ps.setInt(1, idx);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("product_id");
+            }
+         } catch (Exception e) {
+             e.printStackTrace();
+         }
+         return -1;
+     }
+
     public boolean update(ProductDTO product) {
         String query = "UPDATE product SET product_name = ?, pic = ?, category_id = ?, publisher = ?, publish_year = ?, author = ?, language = ?, price = ?, quantity = ?, status = ? WHERE product_id = ?";
         try (

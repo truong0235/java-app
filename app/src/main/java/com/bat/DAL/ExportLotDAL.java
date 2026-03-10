@@ -12,23 +12,8 @@ import com.bat.utils.helper.DBConnectHelper;
 
 
 public class ExportLotDAL {
-    
-    /**
-     * Thêm chi tiết lô xuất vào bảng export_lot
-     * Đồng thời cập nhật:
-     * 1. Số lượng lô (giảm)
-     * 2. Số lượng sản phẩm (giảm)
-     * 3. Thêm lịch sử lot_transaction (type: export)
-     * 4. Cập nhật trạng thái lô thành "Hết" nếu xuất hết
-     */
     public boolean addExportLot(ExportLotDTO exportLot) {
         String query = "INSERT INTO export_lot (export_id, product_id, lot_id, quantity, export_price) VALUES (?, ?, ?, ?, ?)";
-        // String updateLotQuantityQuery = "UPDATE lot SET quantity = quantity - ? WHERE lot_id = ?";
-        // String updateLotStatusQuery = "UPDATE lot SET status = 'Hết' WHERE lot_id = ? AND quantity = 0";
-        // String updateProductQuantityQuery = "UPDATE product SET quantity = quantity - ? WHERE product_id = ?";
-        // String insertTransactionQuery = "INSERT INTO lot_transaction (lot_id, ref_id, quantity_change, quantity, date, type) VALUES (?, ?, ?, ?, ?, ?)";
-        // String getLotQuantityQuery = "SELECT quantity FROM lot WHERE lot_id = ?";
-        
         try (
             DBConnectHelper db = new DBConnectHelper();
             Connection conn = db.getConnection();
@@ -66,52 +51,6 @@ public class ExportLotDAL {
                     lotTransactionDAL.add(trans);
                     return true;
                 }
-            
-            // 2. Cập nhật số lượng lô (giảm)
-            // try (PreparedStatement ps = conn.prepareStatement(updateLotQuantityQuery)) {
-            //     ps.setInt(1, exportLot.getQuantity());
-            //     ps.setInt(2, lotId);
-            //     ps.executeUpdate();
-            // }
-            
-            // 3. Lấy số lượng còn lại của lô sau khi cập nhật
-            // int remainingQuantity = 0;
-            // try (PreparedStatement ps = conn.prepareStatement(getLotQuantityQuery)) {
-            //     ps.setInt(1, lotId);
-            //     ResultSet rs = ps.executeQuery();
-            //     if (rs.next()) {
-            //         remainingQuantity = rs.getInt("quantity");
-            //     }
-            // }
-            
-            // 4. Cập nhật trạng thái lô nếu hết hàng
-            // if (remainingQuantity == 0) {
-            //     try (PreparedStatement ps = conn.prepareStatement(updateLotStatusQuery)) {
-            //         ps.setInt(1, lotId);
-            //         ps.executeUpdate();
-            //     }
-            // }
-            
-            // 5. Cập nhật số lượng sản phẩm (giảm)
-            // try (PreparedStatement ps = conn.prepareStatement(updateProductQuantityQuery)) {
-            //     ps.setInt(1, exportLot.getQuantity());
-            //     ps.setInt(2, exportLot.getProductId());
-            //     ps.executeUpdate();
-            // }
-            
-            // 6. Thêm lịch sử lot_transaction
-            // try (PreparedStatement ps = conn.prepareStatement(insertTransactionQuery)) {
-            //     ps.setInt(1, lotId);
-            //     ps.setInt(2, exportId);
-            //     ps.setInt(3, -exportLot.getQuantity()); // Số lượng thay đổi (âm vì xuất)
-            //     ps.setInt(4, remainingQuantity); // Số lượng còn lại
-            //     ps.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
-            //     ps.setString(6, "export");
-            //     ps.executeUpdate();
-            // }
-            
-            // conn.commit(); // Commit transaction
-            // return true;
             
         } catch (Exception e) {
             e.printStackTrace();
