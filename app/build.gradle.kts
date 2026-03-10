@@ -31,12 +31,9 @@ dependencies {
     implementation ("com.toedter:jcalendar:1.4")
     implementation ("org.apache.poi:poi:5.2.5")
     implementation ("org.apache.poi:poi-ooxml:5.2.5")
+    implementation("com.itextpdf:itextpdf:5.5.13.3")
+    implementation("net.java.dev.timingframework:timingframework:1.0")
 }
-
-
-    //export pdf bill
-    // Source: https://mvnrepository.com/artifact/com.itextpdf/itextpdf
-    //implementation("com.itextpdf:itextpdf:5.5.13.5")
 
 
 
@@ -55,7 +52,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 application {
-    mainClass = "com.bat.GUI.Main"
+    mainClass = "com.bat.GUI.LoginJFrame"
 
     if (hasProperty("launch")) {
         mainClass.set("${property("launch")}")

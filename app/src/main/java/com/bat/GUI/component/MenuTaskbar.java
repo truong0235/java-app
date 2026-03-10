@@ -15,16 +15,20 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
+import com.bat.DTO.UserDTO; // ĐÃ THÊM IMPORT
+import com.bat.GUI.LoginJFrame;
 import com.bat.GUI.Main;
+import com.bat.GUI.panel.Category;
+import com.bat.GUI.panel.Customer;
 import com.bat.GUI.panel.Export;
 import com.bat.GUI.panel.Home;
-import com.bat.GUI.panel.Customer;
-import com.bat.GUI.panel.Provider;
 import com.bat.GUI.panel.Import;
 import com.bat.GUI.panel.InventoryCheck;
 import com.bat.GUI.panel.Lot;
 import com.bat.GUI.panel.Product;
-import com.bat.GUI.panel.Category; // Đã thêm Import Category
+import com.bat.GUI.panel.Provider;
+import com.bat.GUI.panel.UserManagement; // ĐÃ THÊM IMPORT
+import com.bat.GUI.panel.statistic.Statistic;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 
@@ -33,28 +37,26 @@ public class MenuTaskbar extends JPanel{
     public ItemTaskbar[] listitem;
     Main mainFrame;
 
-    //tasbarMenu chia thành 3 phần chính là pnlCenter, pnlTop, pnlBottom
     JPanel pnlCenter, pnlTop, pnlBottom, bar1, bar2, bar3, bar4;
     JLabel lblUsername, lblTenNhomQuyen;
-
 
     Color FontColor = new Color(96, 125, 139);
     Color DefaultColor = new Color(255, 255, 255);
     Color HowerFontColor = new Color(1, 87, 155);
     Color HowerBackgroundColor = new Color(187, 222, 251);
 
-    // Đã thêm mục Danh mục vào đây
     private final String[][] menuItem = {
             { "Trang chủ", "home.svg", "trangchu" },
             { "Sản phẩm", "product.svg", "sanpham" },
             { "Danh mục", "category.svg", "danhmuc" },
             { "Khách hàng", "customer.svg", "khachhang" },
+            { "Quản lý người dùng", "users.svg", "nguoidung" },
             { "Nhà cung cấp", "provider.svg", "nhacungcap" },
             { "Phiếu nhập", "import.svg", "nhaphang" },
             { "Lô hàng", "lot.svg", "lohang" },
-            // {"Mẫu", "import.svg", "nhaphang"},
             { "xuat", "lot.svg", "xuat" },
             { "Phiếu kiểm kê", "check.svg", "kiemke" },
+            { "Thống kê", "info.svg", "thongke" },
             { "Đăng xuất", "log_out.svg", "dangxuat" },
     };
 
@@ -62,7 +64,6 @@ public class MenuTaskbar extends JPanel{
     public MenuTaskbar(Main main) {
         this.mainFrame = main;
         initComponent();
-
     }
 
     public void initComponent() {
@@ -84,7 +85,6 @@ public class MenuTaskbar extends JPanel{
 
         addUserInfo(info);
 
-        // bar1, bar là các đường kẻ mỏng giữa taskbarMenu và MainContent
         bar1 = new JPanel();
         bar1.setBackground(new Color(204, 214, 219));
         bar1.setPreferredSize(new Dimension(1, 0));
@@ -121,7 +121,6 @@ public class MenuTaskbar extends JPanel{
 
         this.add(pnlBottom, BorderLayout.SOUTH);
 
-        // thêm các item vào menu taskbar
         for (int i = 0; i < menuItem.length; i++) {
             if (i + 1 == menuItem.length) {
                 listitem[i] = new ItemTaskbar(menuItem[i][1], menuItem[i][0]);
@@ -129,22 +128,13 @@ public class MenuTaskbar extends JPanel{
             } else {
                 listitem[i] = new ItemTaskbar(menuItem[i][1], menuItem[i][0]);
                 pnlCenter.add(listitem[i]);
-                // if (i != 0) {
-                //     if (!checkRole(menuItem[i][2])) {
-                //         listitem[i].setVisible(false);
-                //     }
-                // }
             }
         }
-        // Thiết lập hiệu ứng chọn mặc định cho mục 0
+        
         listitem[0].setBackground(HowerBackgroundColor);
         listitem[0].setForeground(HowerFontColor);
         listitem[0].isSelected = true;
 
-        /**
-         * Xử lý khi click 1 item: đánh dấu isSelected cho item được click và reset item khác.
-         * Container chịu trách nhiệm gán hành động (chuyển panel) theo index.
-         */
         for (int i = 0; i < menuItem.length; i++) {
             listitem[i].addMouseListener(new MouseAdapter() {
                 @Override
@@ -172,8 +162,32 @@ public class MenuTaskbar extends JPanel{
     }
 
     public void addUserInfo(JPanel info) {
-        String USERNAME = "Hihihihihihihi";
-        String TENNHOMQUYEN = "Admin";
+        // ĐÃ SỬA: Lấy dữ liệu tài khoản thực tế từ Main
+        UserDTO user = mainFrame.getCurrentUser();
+        
+        String USERNAME = (user != null && user.getFullName() != null) ? user.getFullName() : "Khách";
+        String TENNHOMQUYEN = "Chưa phân quyền";
+        
+        if (user != null) {
+            switch(user.getRoleId()) {
+                case 1 -> TENNHOMQUYEN = "Quản trị viên";
+                case 2 -> TENNHOMQUYEN = "Giám đốc";
+                case 3 -> TENNHOMQUYEN = "Trưởng phòng kho";
+                case 4 -> TENNHOMQUYEN = "Quản lý kho";
+                case 5 -> TENNHOMQUYEN = "Thủ kho";
+                case 6 -> TENNHOMQUYEN = "Nhân viên nhập hàng";
+                case 7 -> TENNHOMQUYEN = "Nhân viên kiểm kê";
+                case 8 -> TENNHOMQUYEN = "Trưởng phòng kinh doanh";
+                case 9 -> TENNHOMQUYEN = "Nhân viên bán hàng";
+                case 10 -> TENNHOMQUYEN = "Nhân viên CSKH";
+                case 11 -> TENNHOMQUYEN = "Nhân viên Marketing";
+                case 12 -> TENNHOMQUYEN = "Trưởng phòng kế toán";
+                case 13 -> TENNHOMQUYEN = "Kế toán";
+                case 14 -> TENNHOMQUYEN = "Thủ quỹ";
+                case 15 -> TENNHOMQUYEN = "Nhân viên IT";
+                default -> TENNHOMQUYEN = "Chưa phân quyền";
+            }
+        }
 
         JPanel pnlIcon = new JPanel(new FlowLayout());
         pnlIcon.setPreferredSize(new Dimension(60, 0));
@@ -181,12 +195,14 @@ public class MenuTaskbar extends JPanel{
         info.add(pnlIcon, BorderLayout.WEST);
         JLabel lblIcon = new JLabel();
         lblIcon.setPreferredSize(new Dimension(50, 70));
-        // lblIcon.setBorder(new EmptyBorder(0, 10, 0, 0));
+        
+        // Đoạn code icon nam nữ của bạn tôi giữ nguyên comment
         // if (nhanVienDTO.getGioitinh() == 1) {
         //     lblIcon.setIcon(new FlatSVGIcon("./src/icon/man_50px.svg"));
         // } else {
         //     lblIcon.setIcon(new FlatSVGIcon("./src/icon/women_50px.svg"));
         // }
+        
         java.net.URL url = getClass().getResource("/icon/account.svg");
         if (url != null) {
             lblIcon.setIcon(new FlatSVGIcon(url));
@@ -197,7 +213,6 @@ public class MenuTaskbar extends JPanel{
 
         JPanel pnlInfo = new JPanel();
         pnlInfo.setOpaque(false);
-        // Use vertical layout so role (Admin) appears on next line under the username
         pnlInfo.setLayout(new BoxLayout(pnlInfo, BoxLayout.Y_AXIS));
         pnlInfo.setBorder(new EmptyBorder(15, 0, 0, 0));
         info.add(pnlInfo, BorderLayout.CENTER);
@@ -219,14 +234,24 @@ public class MenuTaskbar extends JPanel{
         switch (menuName) {
             case "Trang chủ" -> mainFrame.setPanel(new Home());
             case "Sản phẩm" -> mainFrame.setPanel(new Product(mainFrame));
-            case "Danh mục" -> mainFrame.setPanel(new Category(mainFrame)); // Đã thêm logic click vào đây
+            case "Danh mục" -> mainFrame.setPanel(new Category(mainFrame)); 
             case "Khách hàng" -> mainFrame.setPanel(new Customer(mainFrame));
+            
+            // ĐÃ SỬA: Chuyền biến currentUser sang form UserManagement
+            case "Quản lý người dùng" -> mainFrame.setPanel(new UserManagement(mainFrame.getCurrentUser())); 
+            
             case "Nhà cung cấp" -> mainFrame.setPanel(new Provider(mainFrame));
             case "Phiếu kiểm kê" -> mainFrame.setPanel(new InventoryCheck(mainFrame));
             case "Phiếu nhập" -> mainFrame.setPanel(new Import(mainFrame));
             case "Lô hàng" -> mainFrame.setPanel(new Lot(mainFrame));
-            // case "Mẫu" -> mainFrame.setPanel(new ImportManagement(mainFrame));
             case "xuat" -> mainFrame.setPanel(new Export(mainFrame));
+            case "Thống kê" -> mainFrame.setPanel(new Statistic());
+            
+            // Bắt sự kiện thoát
+            case "Đăng xuất" -> {
+                mainFrame.dispose();
+                new LoginJFrame().setVisible(true);
+            }
             default -> JOptionPane.showMessageDialog(mainFrame, "Chức năng đang phát triển!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         }
     }

@@ -2,6 +2,7 @@ package com.bat.BLL;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+
 import com.bat.DAL.ProductDAL;
 import com.bat.DTO.ProductDTO;
 
@@ -45,6 +46,10 @@ public class ProductBLL {
         return -1;
     }
 
+    public ArrayList<ProductDTO> getPrdInImport(int importId) {
+        return productDAL.getPrInImport(importId);
+    }
+    
     // --- LOGIC CHO GIAO DIỆN QUẢN LÝ ---
     public String add(ProductDTO p) {
         if (p.getProductName().trim().isEmpty()) return "Tên sản phẩm không được để trống!";

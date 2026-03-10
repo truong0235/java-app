@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+
 import com.bat.DTO.CustomerDTO;
 import com.bat.utils.helper.DBConnectHelper;
 
@@ -18,17 +19,16 @@ public class CustomerDAL {
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 CustomerDTO customer = new CustomerDTO(
-                        rs.getInt("customer_id"), 
+                        rs.getInt("customer_id"),
                         rs.getString("fullname"),
                         rs.getString("birthday"),
                         rs.getString("phone"),
-                        rs.getString("address")
+                        rs.getString("address"),
+                        rs.getString("image")
                 );
                 customers.add(customer);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
         return customers;
     }
 
@@ -45,15 +45,16 @@ public class CustomerDAL {
     }
 
     public boolean add(CustomerDTO c) {
-        String query = "INSERT INTO customer (customer_id, fullname, birthday, phone, address) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO customer (customer_id, fullname, birthday, phone, address, image) VALUES (?, ?, ?, ?, ?, ?)";
         try (DBConnectHelper db = new DBConnectHelper();
              Connection conn = db.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setInt(1, c.getCustomerId()); 
+            ps.setInt(1, c.getCustomerId());
             ps.setString(2, c.getFullName());
             ps.setString(3, c.getBirthday());
             ps.setString(4, c.getPhone());
             ps.setString(5, c.getAddress());
+            ps.setString(6, c.getImage());
             int result = ps.executeUpdate();
             return result > 0;
         } catch (Exception e) { e.printStackTrace(); }
@@ -61,15 +62,12 @@ public class CustomerDAL {
     }
 
     public boolean update(CustomerDTO c) {
-        String query = "UPDATE customer SET fullname=?, birthday=?, phone=?, address=? WHERE customer_id=?";
+        String query = "UPDATE customer SET fullname=?, birthday=?, phone=?, address=?, image=? WHERE customer_id=?";
         try (DBConnectHelper db = new DBConnectHelper();
              Connection conn = db.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setString(1, c.getFullName());
             ps.setString(2, c.getBirthday());
-            ps.setString(3, c.getPhone());
-            ps.setString(4, c.getAddress());
-            ps.setInt(5, c.getCustomerId()); 
+            ps.setInt(6, c.getCustomerId());
             int result = ps.executeUpdate();
             return result > 0;
         } catch (Exception e) { e.printStackTrace(); }
@@ -84,10 +82,7 @@ public class CustomerDAL {
             ps.setInt(1, id);
             int result = ps.executeUpdate();
             return result > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
         return false;
     }
 }
-
