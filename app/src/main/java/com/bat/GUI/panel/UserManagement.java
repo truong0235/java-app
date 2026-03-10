@@ -525,12 +525,36 @@ public class UserManagement extends JPanel implements ActionListener {
                 String address = txtAddress.getText().trim();
                 String avatar = txtAvatar.getText().trim();
 
-                // Kiểm tra các trường bắt buộc không được rỗng
-                if (name.isEmpty() || uname.isEmpty() || pass.isEmpty() || email.isEmpty() || phone.isEmpty()) {
-                    JOptionPane.showMessageDialog(dialog, "Vui lòng điền đầy đủ các thông tin bắt buộc!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                if (name.isEmpty()) {
+                    JOptionPane.showMessageDialog(dialog, "Họ và tên không được để trống!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                    txtName.requestFocus();
                     return;
                 }
 
+                if (!isEdit && userBLL.isUsernameExists(uname)) {
+                    JOptionPane.showMessageDialog(dialog, "Tên đăng nhập đã tồn tại! Vui lòng chọn tên khác.", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
+                    txtUser.requestFocus();
+                    return;
+                }
+
+                if (uname.isEmpty()) {
+                    JOptionPane.showMessageDialog(dialog, "Username không được để trống!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                    txtUser.requestFocus();
+                    return;
+                }
+
+                if (pass.isEmpty()) {
+                    JOptionPane.showMessageDialog(dialog, "Mật khẩu không được để trống!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                    txtPass.requestFocus();
+                    return;
+                }
+
+                if (email.isEmpty()) {
+                    JOptionPane.showMessageDialog(dialog, "Email không được để trống!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                    txtEmail.requestFocus();
+                    return;
+                }
+                
                 // Kiểm tra định dạng Email
                 String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
                 if (!email.matches(emailRegex)) {
@@ -539,14 +563,26 @@ public class UserManagement extends JPanel implements ActionListener {
                     return;
                 }
 
+                if (phone.isEmpty()) {
+                    JOptionPane.showMessageDialog(dialog, "Số điện thoại không được để trống!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                    txtPhone.requestFocus();
+                    return;
+                }
+             
                 // Kiểm tra định dạng Số điện thoại (10 số, bắt đầu bằng số 0)
-                String phoneRegex = "^0\\d{9}$";
+                String phoneRegex = "^(0[3|5|7|8|9]\\d{8}|02\\d{8})$";
                 if (!phone.matches(phoneRegex)) {
                     JOptionPane.showMessageDialog(dialog, "Số điện thoại không hợp lệ!\nVui lòng nhập đúng 10 chữ số và bắt đầu bằng số 0.", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
                     txtPhone.requestFocus();
                     return;
                 }
-
+                
+                int id = isEdit ? user.getUserId() : -1;
+                if (userBLL.isPhoneExists(phone, id)) {
+                    JOptionPane.showMessageDialog(dialog, "Số điện thoại đã tồn tại! Vui lòng nhập số khác.", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
+                    txtPhone.requestFocus();
+                    return;
+                }
                 // Cập nhật thông tin vào đối tượng UserDTO
                 UserDTO u = new UserDTO();
                 if (isEdit) u.setUserId(user.getUserId());
