@@ -566,6 +566,25 @@ public class UserManagement extends JPanel implements ActionListener {
                 if (msg.contains("thành công")) {
                     performSearch();
                     dialog.dispose();
+
+                    // 🚨 BỔ SUNG LOGIC: KIỂM TRA NẾU TỰ KHÓA CHÍNH MÌNH THÌ ĐĂNG XUẤT
+                    if (isEdit && currentUser != null && u.getUserId() == currentUser.getUserId() && u.getStatus() == 0) {
+                        JOptionPane.showMessageDialog(UserManagement.this, 
+                            "Bạn đã tự khóa tài khoản đang sử dụng. Hệ thống sẽ tự động đăng xuất!", 
+                            "Cảnh báo bảo mật", 
+                            JOptionPane.WARNING_MESSAGE);
+                        
+                        // Lấy Frame Main hiện tại và đóng nó lại
+                        JFrame mainFrame = (JFrame) SwingUtilities.getWindowAncestor(UserManagement.this);
+                        if (mainFrame != null) {
+                            mainFrame.dispose();
+                        }
+                        
+                        // Gọi lại màn hình Đăng nhập
+                        java.awt.EventQueue.invokeLater(() -> {
+                            new com.bat.GUI.LoginJFrame().setVisible(true);
+                        });
+                    }
                 }
             });
             pnlBottom.add(btnSave);
