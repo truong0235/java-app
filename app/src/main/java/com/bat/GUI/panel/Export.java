@@ -236,14 +236,14 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
         table.getColumnModel().getColumn(2).setPreferredWidth(100);
         table.getColumnModel().getColumn(3).setPreferredWidth(100);
         table.getColumnModel().getColumn(4).setPreferredWidth(100);
-        // table.getColumnModel().getColumn(5).setPreferredWidth(100);
+
         
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
         table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-        // table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
+
         
         DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
         rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -335,7 +335,7 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
     }
 
     public boolean validateFilterInputs(){
-        // System.out.println();
+
         Date fromDate = fromDateChooser.getDate();
         Date toDate = toDateChooser.getDate();
         Date currentDate = new Date();
@@ -383,7 +383,7 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
         if (e.getSource() == customerCbx || e.getSource() == userCbx) {
             filter();
         }
-        // Xử lý khi thay đổi filter
+
     }
 
     @Override
