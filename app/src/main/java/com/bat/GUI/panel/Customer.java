@@ -572,7 +572,6 @@ public class Customer extends JPanel implements ActionListener {
 
             if (data != null) {
                 txtName.setText(data.getFullName());
-                // Set ngày sinh vào JDateChooser
                 birthDateChooser.setDate(data.getBirthday());
                 txtPhone.setText(data.getPhone());
                 txtAddress.setText(data.getAddress());
@@ -631,12 +630,10 @@ public class Customer extends JPanel implements ActionListener {
                     result = customerBLL.update(data);
                 }
                 
-                // Chỉ đóng dialog nếu thành công
                 if (result.contains("thành công")) {
                     JOptionPane.showMessageDialog(this, result);
                     dispose();
                 } else {
-                    // Chỉ hiện thông báo lỗi, không đóng dialog
                     JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             });
@@ -658,3 +655,4 @@ public class Customer extends JPanel implements ActionListener {
         }
     }
 }
+
