@@ -12,7 +12,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
-import com.bat.DTO.UserDTO; // ĐÃ THÊM IMPORT NÀY
+import com.bat.DTO.UserDTO; 
 import com.bat.GUI.component.MenuTaskbar;
 import com.bat.GUI.panel.Home;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -25,27 +25,24 @@ public class Main extends JFrame {
     private MenuTaskbar menuTaskbar;
     private Home home;
 
-    // ĐÃ THÊM: Biến lưu trữ người dùng hiện tại
     private UserDTO currentUser;
 
-    // ĐÃ SỬA: Constructor nhận UserDTO
+    
     public Main(UserDTO user) {
         this.currentUser = user;
     }
 
-    // ĐÃ THÊM: Hàm Getter để các Panel khác lấy thông tin User
+   
     public UserDTO getCurrentUser() {
         return currentUser;
     }
 
     public static void main(String[] args) {
-        // Cài đặt font Roboto trước
         FlatRobotoFont.install();
         FlatLaf.setPreferredFontFamily(FlatRobotoFont.FAMILY);
         FlatLaf.setPreferredLightFontFamily(FlatRobotoFont.FAMILY_LIGHT);
         FlatLaf.setPreferredSemiboldFontFamily(FlatRobotoFont.FAMILY_SEMIBOLD);
         
-        // Thiết lập Look and Feel
         try {
             UIManager.setLookAndFeel(new FlatIntelliJLaf());
         } catch (UnsupportedLookAndFeelException e) {
@@ -72,9 +69,7 @@ public class Main extends JFrame {
         UIManager.put("TableHeader.separatorColor", new Color(242, 242, 242));
         UIManager.put("TableHeader.bottomSeparatorColor", new Color(242, 242, 242));
         
-        // Khởi tạo application trên EDT
         SwingUtilities.invokeLater(() -> {
-            // ĐÃ SỬA: Truyền null hoặc tạo mới một UserDTO rỗng khi test độc lập file Main
             new Main(new UserDTO()).init();
         });
     }
@@ -86,7 +81,6 @@ public class Main extends JFrame {
         this.setSize(new Dimension(1400, 800));
         this.setLocationRelativeTo(null);
 
-        // Khởi tạo các component trước khi hiển thị
         menuTaskbar = new MenuTaskbar(this);
         menuTaskbar.setPreferredSize(new Dimension(250, 1400));
         this.add(menuTaskbar, BorderLayout.WEST);
@@ -99,11 +93,10 @@ public class Main extends JFrame {
         home = new Home();
         MainContent.add(home, BorderLayout.CENTER);
         
-        // Refresh UI
         this.revalidate();
         this.repaint();
         
-        // Hiển thị cuối cùng
+
         this.setVisible(true);
     }
 
