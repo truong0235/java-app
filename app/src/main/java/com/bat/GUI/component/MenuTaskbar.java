@@ -21,7 +21,7 @@ import com.bat.GUI.Main;
 import com.bat.GUI.panel.Category;
 import com.bat.GUI.panel.Customer;
 import com.bat.GUI.panel.Export;
-import com.bat.GUI.panel.Home;
+// import com.bat.GUI.panel.Home;
 import com.bat.GUI.panel.Import;
 import com.bat.GUI.panel.InventoryCheck;
 import com.bat.GUI.panel.Lot;
@@ -47,7 +47,7 @@ public class MenuTaskbar extends JPanel{
     Color HowerBackgroundColor = new Color(187, 222, 251);
 
     private final String[][] menuItem = {
-            { "Trang chủ", "home.svg", "trangchu" },
+            // { "Trang chủ", "home.svg", "trangchu" },
             { "Sản phẩm", "product.svg", "sanpham" },
             { "Danh mục", "category.svg", "danhmuc" },
             { "Khách hàng", "customer.svg", "khachhang" },
@@ -138,15 +138,6 @@ public class MenuTaskbar extends JPanel{
             }
         }
         
-        for (int i = 0; i < listitem.length; i++) {
-            if (listitem[i] != null) {
-                listitem[i].setBackground(HowerBackgroundColor);
-                listitem[i].setForeground(HowerFontColor);
-                listitem[i].isSelected = true;
-                break;
-            }
-        }
-
         for (int i = 0; i < menuItem.length; i++) {
             if (listitem[i] != null) {
                 listitem[i].addMouseListener(new MouseAdapter() {
@@ -159,6 +150,18 @@ public class MenuTaskbar extends JPanel{
         }
     }
     
+    public void selectFirstAvailableMenu() {
+        for (int i = 0; i < listitem.length; i++) {
+            if (listitem[i] != null) {
+                listitem[i].setBackground(HowerBackgroundColor);
+                listitem[i].setForeground(HowerFontColor);
+                listitem[i].isSelected = true;
+                handleMenuClick(menuItem[i][0]);
+                break;
+            }
+        }
+    }
+    
     private boolean hasAccessToMenu(String menuName) {
         UserDTO user = mainFrame.getCurrentUser();
         
@@ -166,9 +169,9 @@ public class MenuTaskbar extends JPanel{
             return true;
         }
         
-        if (menuName.equals("Trang chủ") || menuName.equals("Đăng xuất")) {
-            return true;
-        }
+        // if (menuName.equals("Trang chủ") || menuName.equals("Đăng xuất")) {
+        //     return true;
+        // }
         
         return switch (menuName) {
             case "Sản phẩm" -> PermissionManager.canAccessProduct(user);
@@ -247,7 +250,7 @@ public class MenuTaskbar extends JPanel{
 
     private void handleMenuClick(String menuName) {
         switch (menuName) {
-            case "Trang chủ" -> mainFrame.setPanel(new Home());
+            // case "Trang chủ" -> mainFrame.setPanel(new Home());
             case "Sản phẩm" -> mainFrame.setPanel(new Product(mainFrame));
             case "Danh mục" -> mainFrame.setPanel(new Category(mainFrame)); 
             case "Khách hàng" -> mainFrame.setPanel(new Customer(mainFrame));            

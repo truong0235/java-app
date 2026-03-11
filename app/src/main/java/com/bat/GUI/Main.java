@@ -14,7 +14,6 @@ import javax.swing.border.EmptyBorder;
 
 import com.bat.DTO.UserDTO;
 import com.bat.GUI.component.MenuTaskbar;
-import com.bat.GUI.panel.Home;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
@@ -23,7 +22,6 @@ public class Main extends JFrame {
     Color MainColor = new Color(250, 250, 250);
     private JPanel MainContent;
     private MenuTaskbar menuTaskbar;
-    private Home home;
 
     private UserDTO currentUser;
 
@@ -88,8 +86,7 @@ public class Main extends JFrame {
         MainContent.setLayout(new BorderLayout(0, 0));
         this.add(MainContent, BorderLayout.CENTER);
         
-        home = new Home();
-        MainContent.add(home, BorderLayout.CENTER);
+        menuTaskbar.selectFirstAvailableMenu();
         
         this.revalidate();
         this.repaint();

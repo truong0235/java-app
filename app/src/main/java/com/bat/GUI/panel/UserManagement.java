@@ -62,11 +62,7 @@ public class UserManagement extends JPanel implements ActionListener {
     private UserDTO currentUser;
 
     private final String[] ROLES_ARRAY = {
-        "Quản trị viên", "Giám đốc", "Trưởng phòng kho", "Quản lý kho", 
-        "Thủ kho", "Nhân viên nhập hàng", "Nhân viên kiểm kê", 
-        "Trưởng phòng kinh doanh", "Nhân viên bán hàng", "Nhân viên CSKH", 
-        "Nhân viên Marketing", "Trưởng phòng kế toán", "Kế toán", 
-        "Thủ quỹ", "Nhân viên IT"
+        "Quản trị viên", "Nhân viên bán hàng", "Nhân viên kho", "Nhân viên kiểm kê"
     };
 
     public UserManagement(UserDTO user) {
