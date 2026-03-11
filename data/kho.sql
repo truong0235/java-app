@@ -155,6 +155,20 @@ CREATE TABLE export_lot (
     FOREIGN KEY (lot_id) REFERENCES lot(lot_id)
 );
 
+
+-- 15. Bảng Permission (Quyền hạn kiểu bitmask - Linux style)
+-- perm_value bits: 4=read(r), 2=write(w), 1=execute/delete(x)
+-- Ví dụ: 7=rwx(111), 6=rw-(110), 5=r-x(101), 4=r--(100), 0=---(000)
+CREATE TABLE permission (
+    perm_id    INT AUTO_INCREMENT PRIMARY KEY,
+    role_id    INT NOT NULL,
+    resource   VARCHAR(100) NOT NULL COMMENT 'Tên tài nguyên: category, product, user, import, export, ...',
+    perm_value TINYINT NOT NULL DEFAULT 0 COMMENT '4=read,2=write,1=execute; tổ hợp như chmod',
+    status     TINYINT DEFAULT 1,
+    FOREIGN KEY (role_id) REFERENCES roles(role_id),
+    UNIQUE KEY uq_role_resource (role_id, resource)
+);
+
 -- ===================================================================
 -- THÊM DỮ LIỆU MẪU CHO DATABASE KHOSACH
 -- ===================================================================
@@ -164,6 +178,7 @@ USE KhoSach;
 -- ===================================================================
 -- 1. THÊM DỮ LIỆU CHO BẢNG CATEGORY
 -- ===================================================================
+
 INSERT INTO category (category_name, description, status) VALUES
 ('Văn học Việt Nam', 'Các tác phẩm văn học của tác giả Việt Nam', 1),
 ('Văn học nước ngoài', 'Các tác phẩm văn học dịch từ nước ngoài', 1),
@@ -260,6 +275,76 @@ INSERT INTO roles (name, status) VALUES
 ('Tạp vụ', 1),
 ('Thực tập sinh', 1),
 ('Cộng tác viên', 1);
+
+-- ===================================================================
+-- 4b. THÊM DỮ LIỆU CHO BẢNG PERMISSION (bitmask: 4=r, 2=w, 1=x)
+-- perm_value: 7=rwx, 6=rw-, 5=r-x, 4=r--, 3=-wx, 2=-w-, 1=--x, 0=---
+-- ===================================================================
+INSERT INTO permission (role_id, resource, perm_value, status) VALUES
+-- role 1: Admin → toàn quyền mọi tài nguyên (7 = rwx)
+(1, 'category',        7, 1),
+(1, 'product',         7, 1),
+(1, 'provider',        7, 1),
+(1, 'customer',        7, 1),
+(1, 'import',          7, 1),
+(1, 'export',          7, 1),
+(1, 'lot',             7, 1),
+(1, 'inventory_check', 7, 1),
+(1, 'user',            7, 1),
+(1, 'permission',      7, 1),
+(1, 'statistic',       7, 1),
+
+-- role 2: Quản lý kho → đọc+ghi hầu hết, không quản lý user/permission
+(2, 'category',        6, 1),  -- rw-
+(2, 'product',         7, 1),  -- rwx
+(2, 'provider',        6, 1),  -- rw-
+(2, 'import',          7, 1),  -- rwx
+(2, 'export',          6, 1),  -- rw-
+(2, 'lot',             7, 1),  -- rwx
+(2, 'inventory_check', 7, 1),  -- rwx
+(2, 'statistic',       4, 1),  -- r--
+
+-- role 3: Nhân viên nhập hàng → chỉ nhập hàng
+(3, 'product',         4, 1),  -- r--
+(3, 'provider',        4, 1),  -- r--
+(3, 'import',          6, 1),  -- rw-
+(3, 'lot',             4, 1),  -- r--
+
+-- role 4: Nhân viên bán hàng → chỉ bán hàng
+(4, 'product',         4, 1),  -- r--
+(4, 'customer',        6, 1),  -- rw-
+(4, 'export',          6, 1),  -- rw-
+(4, 'lot',             4, 1),  -- r--
+
+-- role 5: Kế toán → đọc báo cáo, không sửa hàng hóa
+(5, 'import',          4, 1),  -- r--
+(5, 'export',          4, 1),  -- r--
+(5, 'statistic',       5, 1),  -- r-x (xem + xuất báo cáo)
+(5, 'customer',        4, 1),  -- r--
+
+-- role 6: Thủ kho → quản lý lô hàng, kiểm kê
+(6, 'product',         4, 1),  -- r--
+(6, 'lot',             6, 1),  -- rw-
+(6, 'inventory_check', 7, 1),  -- rwx
+
+-- role 7: Giám đốc → đọc tất cả, xuất báo cáo
+(7, 'category',        4, 1),
+(7, 'product',         4, 1),
+(7, 'provider',        4, 1),
+(7, 'customer',        4, 1),
+(7, 'import',          4, 1),
+(7, 'export',          4, 1),
+(7, 'lot',             4, 1),
+(7, 'statistic',       5, 1),  -- r-x
+
+-- role 8: Nhân viên kiểm kê → chỉ kiểm kê
+(8, 'product',         4, 1),  -- r--
+(8, 'lot',             4, 1),  -- r--
+(8, 'inventory_check', 6, 1),  -- rw-
+
+-- role 10: Nhân viên CSKH → chỉ xem/sửa khách hàng
+(10, 'customer',       6, 1),  -- rw-
+(10, 'export',         4, 1);  -- r--
 
 -- ===================================================================
 -- 5. THÊM DỮ LIỆU CHO BẢNG USERS

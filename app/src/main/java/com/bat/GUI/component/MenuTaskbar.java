@@ -25,6 +25,7 @@ import com.bat.GUI.panel.Home;
 import com.bat.GUI.panel.Import;
 import com.bat.GUI.panel.InventoryCheck;
 import com.bat.GUI.panel.Lot;
+import com.bat.GUI.panel.Perm;
 import com.bat.GUI.panel.Product;
 import com.bat.GUI.panel.Provider;
 import com.bat.GUI.panel.UserManagement; // ĐÃ THÊM IMPORT
@@ -57,6 +58,7 @@ public class MenuTaskbar extends JPanel{
             { "Phiếu xuất", "lot.svg", "xuat" },
             { "Phiếu kiểm kê", "check.svg", "kiemke" },
             { "Thống kê", "info.svg", "thongke" },
+            {"test", "test.svg", "test"},
             { "Đăng xuất", "log_out.svg", "dangxuat" },
     };
 
@@ -246,6 +248,7 @@ public class MenuTaskbar extends JPanel{
             case "Lô hàng" -> mainFrame.setPanel(new Lot(mainFrame));
             case "Phiếu xuất" -> mainFrame.setPanel(new Export(mainFrame));
             case "Thống kê" -> mainFrame.setPanel(new Statistic());
+            case "test" -> mainFrame.setPanel(new Perm()); // ĐÃ THÊM: Panel test tạm thời
             
             // Bắt sự kiện thoát
             case "Đăng xuất" -> {
