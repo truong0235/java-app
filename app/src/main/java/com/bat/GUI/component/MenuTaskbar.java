@@ -169,9 +169,9 @@ public class MenuTaskbar extends JPanel{
             return true;
         }
         
-        // if (menuName.equals("Trang chủ") || menuName.equals("Đăng xuất")) {
-        //     return true;
-        // }
+        if (menuName.equals("Đăng xuất")) {
+            return true;
+        }
         
         return switch (menuName) {
             case "Sản phẩm" -> PermissionManager.canAccessProduct(user);
