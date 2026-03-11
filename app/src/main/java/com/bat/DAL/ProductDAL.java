@@ -65,7 +65,6 @@ public class ProductDAL {
         return product;
     }
 
-    // --- CÁC HÀM CŨ ĐƯỢC GIỮ LẠI ĐỂ KHÔNG BỊ LỖI MODULE KHÁC ---
     public ProductDTO getProductByLotId(int lotId){
         ProductDTO product = null;
         String query = "SELECT p.* FROM product p JOIN lot l ON p.product_id = l.product_id WHERE l.lot_id = ? AND p.status != 0";
@@ -207,7 +206,6 @@ public class ProductDAL {
         return false;
     }
 
-    // --- CÁC HÀM MỚI CHO GIAO DIỆN QUẢN LÝ ---
     public int getAutoIncrement() {
         int nextId = 1;
         String query = "SELECT MAX(product_id) FROM product";
@@ -244,29 +242,6 @@ public class ProductDAL {
         return false;
     }
 
-    // public boolean update(ProductDTO p) {
-    //     String query = "UPDATE product SET product_name=?, pic=?, category_id=?, publisher=?, publish_year=?, author=?, language=?, price=?, quantity=?, status=? WHERE product_id=?";
-    //     try {
-    //         DBConnectHelper db = new DBConnectHelper();
-    //         Connection conn = db.getConnection();
-    //         PreparedStatement ps = conn.prepareStatement(query);
-    //         ps.setString(1, p.getProductName());
-    //         ps.setString(2, p.getPic());
-    //         ps.setInt(3, p.getCategoryId());
-    //         ps.setString(4, p.getPublisher());
-    //         ps.setInt(5, p.getPublishYear());
-    //         ps.setString(6, p.getAuthor());
-    //         ps.setString(7, p.getLanguage());
-    //         ps.setBigDecimal(8, p.getPrice());
-    //         ps.setInt(9, p.getQuantity());
-    //         ps.setInt(10, p.getStatus());
-    //         ps.setInt(11, p.getProductId());
-    //         int result = ps.executeUpdate();
-    //         db.closeConnection();
-    //         return result > 0;
-    //     } catch (Exception e) { e.printStackTrace(); }
-    //     return false;
-    // }
 
     public boolean delete(int id) {
         String query = "UPDATE product SET status = 0 WHERE product_id = ?";
