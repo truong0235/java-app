@@ -80,7 +80,6 @@ public class CategoryDAL {
     }
 
     public boolean delete(int id) {
-        // Xóa mềm
         String query = "UPDATE category SET status = 0 WHERE category_id = ?";
         try (
             DBConnectHelper db = new DBConnectHelper();
@@ -95,4 +94,5 @@ public class CategoryDAL {
     }
 
     
+
 }
