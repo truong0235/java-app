@@ -61,7 +61,7 @@ public class UserManagement extends JPanel implements ActionListener {
     private JComboBox<String> cbbStatusFilter;
     private UserDTO currentUser;
 
-    // Danh sách 15 Role chuẩn theo Database
+
     private final String[] ROLES_ARRAY = {
         "Quản trị viên", "Nhân viên bán hàng", "Nhân viên kho", "Nhân viên kiểm kê"
     };
@@ -77,9 +77,7 @@ public class UserManagement extends JPanel implements ActionListener {
         this.setBackground(new Color(228, 238, 255)); 
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // ==========================================
-        // 1. HEADER & MENU BAR
-        // ==========================================
+
         JPanel menuBar = new JPanel(new BorderLayout());
         menuBar.setBackground(new Color(228, 238, 255));
         menuBar.setBorder(new EmptyBorder(0, 0, 10, 0));
@@ -126,9 +124,7 @@ public class UserManagement extends JPanel implements ActionListener {
         headerPanel.add(menuFunction, BorderLayout.EAST);
         menuBar.add(headerPanel, BorderLayout.NORTH);
 
-        // ==========================================
-        // 2. THANH TÌM KIẾM
-        // ==========================================
+ 
         String[] searchOptions = {"Tất cả", "Họ và tên", "Tên đăng nhập", "Số điện thoại"};
         searchPanel = new IntegratedSearch(searchOptions);
         searchPanel.txtSearchForm.putClientProperty("JTextField.placeholderText", "Nhập từ khóa tìm kiếm...");
@@ -144,9 +140,7 @@ public class UserManagement extends JPanel implements ActionListener {
         menuBar.add(searchPanel, BorderLayout.SOUTH);
         this.add(menuBar, BorderLayout.NORTH);
 
-        // ==========================================
-        // 3. BẢNG VÀ BỘ LỌC
-        // ==========================================
+        
         JPanel tablePanel = createTablePanel();
         this.add(tablePanel, BorderLayout.CENTER);
 
@@ -281,9 +275,7 @@ public class UserManagement extends JPanel implements ActionListener {
         performSearch();
     }
 
-    // ==========================================
-    // FORM POPUP ĐÃ TÍCH HỢP HIỂN THỊ ẢNH AVATAR VÀ VALIDATION
-    // ==========================================
+
     private void showUserDialog(UserDTO user, boolean isViewOnly) {
         boolean isEdit = (user != null);
         String title = isViewOnly ? "Chi tiết tài khoản" : (isEdit ? "Cập nhật tài khoản" : "Thêm tài khoản mới");
@@ -293,7 +285,7 @@ public class UserManagement extends JPanel implements ActionListener {
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
-        // Header
+
         JPanel pnlHeader = new JPanel();
         pnlHeader.setBackground(new Color(13, 110, 253));
         JLabel lblTitle = new JLabel(title);
