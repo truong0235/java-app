@@ -24,9 +24,9 @@ public class NiceScale {
     }
 
     private double niceNum(final double RANGE, final boolean ROUND) {
-        double exponent;     // exponent of RANGE
-        double fraction;     // fractional part of RANGE
-        double niceFraction; // nice, rounded fraction
+        double exponent;     
+        double fraction;     
+        double niceFraction; 
 
         exponent = Math.floor(Math.log10(RANGE));
         fraction = RANGE / Math.pow(10, exponent);

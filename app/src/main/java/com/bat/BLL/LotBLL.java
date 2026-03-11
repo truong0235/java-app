@@ -62,7 +62,6 @@ public class LotBLL {
         for (LotDTO lot : lotList) {
             boolean matches = true;
             ImportDTO imp = importBLL.getImportById(lot.getImportId());
-            // ProviderDTO provider = providerBLL.getProviderById(imp.getProviderId());
             if (!searchTxt.isEmpty()) {
                 String searchLower = searchTxt.toLowerCase();
                 String lotCode = lot.getLotCode().toLowerCase();

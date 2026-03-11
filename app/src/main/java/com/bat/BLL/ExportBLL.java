@@ -23,35 +23,23 @@ public class ExportBLL {
     
     ArrayList<ExportReceiptDTO> exportList;
     public ExportBLL() {
-        // Constructor
         exportList = exportReceiptDAL.getExports();
     }
 
-    /**
-     * Lấy danh sách phiếu xuất
-     */
+    
     public ArrayList<ExportReceiptDTO> getExportList() {
         return exportReceiptDAL.getExports();
     }
 
-    /**
-     * Lấy danh sách lô theo sản phẩm
-     */
     public ArrayList<LotDTO> getLotsByProductId(int productId) {
         return lotDAL.getLotsByProductId(productId);
     }
 
-    /**
-     * Thêm phiếu xuất mới
-     * Logic cập nhật số lượng, lịch sử, trạng thái đã được xử lý trong DAL
-     */
     public boolean addExport(ExportReceiptDTO exportReceipt, ArrayList<ExportLotDTO> exportLotList) {
-        // Thêm phiếu xuất và lấy ID
         int exportId = exportReceiptDAL.add(exportReceipt);
         
         if (exportId != -1) {
             try {
-                // Xử lý từng lô xuất
                 for (ExportLotDTO exportLot : exportLotList) {
                     exportLot.setExportId(exportId); 
                     boolean added = exportLotDAL.addExportLot(exportLot);
@@ -84,15 +72,12 @@ public class ExportBLL {
         return filteredLots;
     }
 
-    /**
-     * Lấy tất cả lô xuất theo mã phiếu xuất
-     */
     public ArrayList<ExportLotDTO> getExportLotsByExportId(int exportId) {
         return exportLotDAL.getExportLotsByExportId(exportId);
     }
 
     public boolean cancelExport(int exportId) {
-        if (exportReceiptDAL.delete(exportId)) {
+        if(exportReceiptDAL.delete(exportId)) {
             return true;
         }
         return false;
@@ -112,16 +97,16 @@ public class ExportBLL {
                 String searchLower = searchTxt.toLowerCase();
 
                 switch (searchOpt) {
-                    case 0: // All
+                    case 0: 
                         matches &= exportIdStr.contains(searchTxt) || customerName.toLowerCase().contains(searchLower) || userName.toLowerCase().contains(searchLower);
                         break;
-                    case 1: // Export ID
+                    case 1: 
                         matches &= exportIdStr.contains(searchTxt);
                         break;
-                    case 2: // Customer Name
+                    case 2: 
                         matches &= customerName.toLowerCase().contains(searchLower);
                         break;
-                    case 3: // User Name
+                    case 3: 
                         matches &= userName.toLowerCase().contains(searchLower);
                         break;
                 }

@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
-import com.bat.DTO.UserDTO; // ĐÃ THÊM IMPORT
+import com.bat.DTO.UserDTO; 
 import com.bat.GUI.LoginJFrame;
 import com.bat.GUI.Main;
 import com.bat.GUI.panel.Category;
@@ -27,7 +27,7 @@ import com.bat.GUI.panel.InventoryCheck;
 import com.bat.GUI.panel.Lot;
 import com.bat.GUI.panel.Product;
 import com.bat.GUI.panel.Provider;
-import com.bat.GUI.panel.UserManagement; // ĐÃ THÊM IMPORT
+import com.bat.GUI.panel.UserManagement; 
 import com.bat.GUI.panel.statistic.Statistic;
 import com.bat.utils.PermissionManager;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
@@ -122,13 +122,10 @@ public class MenuTaskbar extends JPanel{
 
         this.add(pnlBottom, BorderLayout.SOUTH);
 
-        // Lấy roleId của user hiện tại
-        UserDTO currentUser = mainFrame.getCurrentUser();
 
         for (int i = 0; i < menuItem.length; i++) {
-            // Kiểm tra quyền truy cập menu
             if (!hasAccessToMenu(menuItem[i][0])) {
-                listitem[i] = null; // Bỏ qua menu không có quyền
+                listitem[i] = null;
                 continue;
             }
 
@@ -141,7 +138,6 @@ public class MenuTaskbar extends JPanel{
             }
         }
         
-        // Tìm menu item đầu tiên có quyền và set làm selected
         for (int i = 0; i < listitem.length; i++) {
             if (listitem[i] != null) {
                 listitem[i].setBackground(HowerBackgroundColor);
@@ -163,25 +159,17 @@ public class MenuTaskbar extends JPanel{
         }
     }
     
-    /**
-     * Kiểm tra quyền truy cập menu dựa trên role
-     * @param menuName Tên menu
-     * @return true nếu có quyền, false nếu không
-     */
     private boolean hasAccessToMenu(String menuName) {
         UserDTO user = mainFrame.getCurrentUser();
         
-        // Admin (roleId = 1) có quyền truy cập tất cả
         if (PermissionManager.isAdmin(user)) {
             return true;
         }
         
-        // Trang chủ và Đăng xuất: tất cả đều truy cập được
         if (menuName.equals("Trang chủ") || menuName.equals("Đăng xuất")) {
             return true;
         }
         
-        // Kiểm tra quyền dựa trên PermissionManager
         return switch (menuName) {
             case "Sản phẩm" -> PermissionManager.canAccessProduct(user);
             case "Danh mục" -> PermissionManager.canAccessCategory(user);
@@ -199,7 +187,6 @@ public class MenuTaskbar extends JPanel{
 
     public void pnlMenuTaskbarMousePress(MouseEvent evt) {
         for (int i = 0; i < menuItem.length; i++) {
-            // Bỏ qua nếu menu item không tồn tại (không có quyền)
             if (listitem[i] == null) {
                 continue;
             }
@@ -219,7 +206,6 @@ public class MenuTaskbar extends JPanel{
     }
 
     public void addUserInfo(JPanel info) {
-        // ĐÃ SỬA: Lấy dữ liệu tài khoản thực tế từ Main
         UserDTO user = mainFrame.getCurrentUser();
         
         String USERNAME = (user != null && user.getFullName() != null) ? user.getFullName() : "Khách";
@@ -231,13 +217,6 @@ public class MenuTaskbar extends JPanel{
         info.add(pnlIcon, BorderLayout.WEST);
         JLabel lblIcon = new JLabel();
         lblIcon.setPreferredSize(new Dimension(50, 70));
-        
-        // Đoạn code icon nam nữ của bạn tôi giữ nguyên comment
-        // if (nhanVienDTO.getGioitinh() == 1) {
-        //     lblIcon.setIcon(new FlatSVGIcon("./src/icon/man_50px.svg"));
-        // } else {
-        //     lblIcon.setIcon(new FlatSVGIcon("./src/icon/women_50px.svg"));
-        // }
         
         java.net.URL url = getClass().getResource("/icon/account.svg");
         if (url != null) {
@@ -271,19 +250,14 @@ public class MenuTaskbar extends JPanel{
             case "Trang chủ" -> mainFrame.setPanel(new Home());
             case "Sản phẩm" -> mainFrame.setPanel(new Product(mainFrame));
             case "Danh mục" -> mainFrame.setPanel(new Category(mainFrame)); 
-            case "Khách hàng" -> mainFrame.setPanel(new Customer(mainFrame));
-            
-            // ĐÃ SỬA: Chuyền biến currentUser sang form UserManagement
+            case "Khách hàng" -> mainFrame.setPanel(new Customer(mainFrame));            
             case "Người dùng" -> mainFrame.setPanel(new UserManagement(mainFrame.getCurrentUser())); 
-            
             case "Nhà cung cấp" -> mainFrame.setPanel(new Provider(mainFrame));
             case "Phiếu kiểm kê" -> mainFrame.setPanel(new InventoryCheck(mainFrame, mainFrame.getCurrentUser()));
             case "Phiếu nhập" -> mainFrame.setPanel(new Import(mainFrame, mainFrame.getCurrentUser()));
             case "Lô hàng" -> mainFrame.setPanel(new Lot(mainFrame));
             case "Phiếu xuất" -> mainFrame.setPanel(new Export(mainFrame, mainFrame.getCurrentUser()));
             case "Thống kê" -> mainFrame.setPanel(new Statistic());
-            
-            // Bắt sự kiện thoát
             case "Đăng xuất" -> {
                 mainFrame.dispose();
                 new LoginJFrame().setVisible(true);

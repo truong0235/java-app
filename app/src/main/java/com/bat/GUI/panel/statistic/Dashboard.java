@@ -70,11 +70,9 @@ public class Dashboard extends JPanel {
         }
         add(topPanel, BorderLayout.NORTH);
         
-        // Panel chính chứa biểu đồ và bảng
         JPanel centerPanel = new JPanel(new BorderLayout(15, 15));
         centerPanel.setOpaque(false);
         
-        // Panel bên trái - Biểu đồ tròn với chú thích
         JPanel leftPanel = createPanelWithTitle("Top 5 sản phẩm bán chạy");
         leftPanel.setPreferredSize(new Dimension(400, 400));
         
@@ -82,7 +80,6 @@ public class Dashboard extends JPanel {
         categoryPieChart.setPreferredSize(new Dimension(350, 200));
         leftPanel.add(categoryPieChart, BorderLayout.CENTER);
         
-        // Thêm panel chú thích màu phía dưới biểu đồ
         legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         legendPanel.setPreferredSize(new Dimension(350, 80));
         legendPanel.setOpaque(false);
@@ -90,7 +87,6 @@ public class Dashboard extends JPanel {
         
         centerPanel.add(leftPanel, BorderLayout.WEST);
         
-        // Panel bên phải - Bảng top
         JPanel rightPanel = new JPanel(new GridLayout(2, 1, 15, 15));
         rightPanel.setOpaque(false);
         
@@ -123,20 +119,17 @@ public class Dashboard extends JPanel {
     }
     
     public void loadData() {
-        // Load dữ liệu biểu đồ tròn (Top 5)
         categoryPieChart.clear();
         Map<String, Double> categoryStats = statisticBLL.getProductStatistics();
         
-        // Màu sắc cho biểu đồ - 5 màu rõ ràng
         Color[] colors = {
-            new Color(52, 152, 219),  // Xanh dương
-            new Color(46, 204, 113),  // Xanh lá
-            new Color(241, 196, 15),  // Vàng
-            new Color(231, 76, 60),   // Đỏ
-            new Color(155, 89, 182)   // Tím
+            new Color(52, 152, 219), 
+            new Color(46, 204, 113), 
+            new Color(241, 196, 15), 
+            new Color(231, 76, 60),  
+            new Color(155, 89, 182)  
         };
         
-        // Xóa legend cũ và thêm mới
         legendPanel.removeAll();
         
         int colorIndex = 0;
@@ -148,7 +141,6 @@ public class Dashboard extends JPanel {
                 color
             ));
             
-            // Thêm chú thích màu
             addLegendItem(legendPanel, entry.getKey(), color);
             colorIndex++;
         }
@@ -157,11 +149,9 @@ public class Dashboard extends JPanel {
         legendPanel.revalidate();
         legendPanel.repaint();
         
-        // Load top khách hàng
         List<Object[]> topCustomers = statisticBLL.getTopCustomers(5);
         topCustomerPanel.setData(topCustomers);
         
-        // Load top nhà cung cấp
         List<Object[]> topProviders = statisticBLL.getTopProviders(5);
         topProviderPanel.setData(topProviders);    }
     
@@ -173,13 +163,11 @@ public class Dashboard extends JPanel {
         JPanel itemPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         itemPanel.setOpaque(false);
         
-        // Ô vuông màu
         JPanel colorBox = new JPanel();
         colorBox.setBackground(color);
         colorBox.setPreferredSize(new Dimension(15, 15));
         colorBox.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         
-        // Tên danh mục
         JLabel nameLabel = new JLabel(categoryName);
         nameLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         nameLabel.setForeground(new Color(80, 80, 80));

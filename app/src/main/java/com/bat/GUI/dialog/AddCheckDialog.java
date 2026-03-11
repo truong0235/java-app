@@ -35,7 +35,7 @@ import com.bat.DTO.InventoryCheckDTO;
 import com.bat.DTO.LotDTO;
 import com.bat.DTO.ProductDTO;
 
-public class AddCheckDialog extends JDialog implements ActionListener { // thêm một ô só lượng ban đầu 
+public class AddCheckDialog extends JDialog implements ActionListener { 
     private ProductBLL productBLL = new ProductBLL();
     private ProviderBLL providerBLL = new ProviderBLL();
     private ImportBLL importBLL = new ImportBLL();
@@ -48,7 +48,6 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
     private ArrayList<LotDTO> lotList;
     private ArrayList<LotDTO> filteredLots = new ArrayList<>();
 
-    // Left panel - Product search
     private JTextField txtPrSearch;
     private JTable tblProducts;
     private DefaultTableModel productTableModel;
@@ -57,14 +56,11 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
     private JTable tblLots;
     private DefaultTableModel lotTableModel;
 
-    // Right panel - Lot details
     private JTextField txtProductName, txtProductId, txtLot, txtQuantity, txtSysQty;
     private JButton btnAdd, btnEdit, btnDelete;
 
-    // Bottom panel - Selected lots
     private JTable tblSelectedDetails;
     private DefaultTableModel selectedDetailsTableModel;
-    // private JLabel lblTotalPrice;
     private JButton btnImport, btnCancel;
 
     private int currentUserId;
@@ -73,8 +69,6 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
         super(parent, "Thêm phiếu nhập", true);
         this.currentUserId = userId;
         productList = productBLL.getProductsList();
-        // lotList = lotBLL.getLots();
-        // filteredLots = new ArrayList<>(lotList);
         filteredLots = new ArrayList<>();
         filteredProducts = new ArrayList<>(productList);
         
@@ -87,12 +81,10 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
         setLayout(new BorderLayout(10, 10));
         ((JPanel) getContentPane()).setBorder(new EmptyBorder(0, 0, 0, 0));
 
-        // Create main split panel
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBackground(new Color(228, 238, 255));
         mainPanel.setBorder(new EmptyBorder(5,5,5,5));
         
-        // Left-Right split
         JPanel topPanel = new JPanel(new GridLayout(1, 3, 10, 0));
         topPanel.setBackground(Color.WHITE);
         topPanel.add(createProductSearchPanel());
@@ -124,7 +116,6 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
         });
         searchPanel.add(txtPrSearch, BorderLayout.CENTER);
 
-        // Product table
         String[] columns = {"Mã SP", "Tên sản phẩm"};
         productTableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -207,7 +198,6 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
         panel.setBackground(Color.WHITE);
 
 
-        // Product name
         JPanel prdNamePn = new JPanel(new GridLayout(2, 1, 5, 5));
         prdNamePn.setBackground(Color.WHITE);
         prdNamePn.add(new JLabel("Tên sản phẩm"));
@@ -215,7 +205,6 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
         txtProductName.setEditable(false);
         prdNamePn.add(txtProductName);
 
-        // Product ID & ISBN
         JPanel idIsbnPn = new JPanel(new GridLayout(1, 2, 5, 5));
         idIsbnPn.setBackground(Color.WHITE);
         
@@ -236,7 +225,6 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
         idIsbnPn.add(PrdIdPn);
         idIsbnPn.add(isbnPn);
 
-        // Price & Quantity
         JPanel qtyPanel = new JPanel(new GridLayout(1, 2, 5, 5));
         qtyPanel.setBackground(Color.WHITE);
         
@@ -298,7 +286,6 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
         panel.setBackground(Color.WHITE);
         panel.setPreferredSize(new Dimension(0, 250));
 
-        // Table
         String[] columns = {"STT", "Mã SP", "Tên sản phẩm", "Mã lô","Số lượng HT", "Số lượng TT"};
         selectedDetailsTableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -318,7 +305,6 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
             }          
         });
         
-        // Bottom panel with total and buttons
         JPanel bottomPn = new JPanel(new BorderLayout());
         bottomPn.setBackground(Color.WHITE);
         
@@ -450,7 +436,7 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
             return false;
         }
         else if (quantity > initQty) {
-            JOptionPane.showMessageDialog(this, "Số lượng thực tế không được lớn hơn số lượng lúc mới nhập!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Số lượng thực tế không được lớn hơn số lượng lúc mới nhập (" + initQty + ")!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
@@ -465,7 +451,6 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
             String lotText = txtLot.getText().trim();
             int initQty = selectedLot.getQuantity();
             
-            // Validate inputs
             if (!validateInput(lotText, qtyText, sysQtyText, initQty)) {
                 return;
             }
@@ -482,7 +467,6 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
             
             selectedDetails.add(detail);
             
-            // Add to table
             selectedDetailsTableModel.addRow(new Object[]{
                 selectedDetailsTableModel.getRowCount() + 1,
                 productId,
@@ -516,14 +500,12 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
         
         try {
             
-            // Create import receipt
             InventoryCheckDTO checkDTO = new InventoryCheckDTO();
             checkDTO.setUserId(currentUserId);
             checkDTO.setStatus(1);
             checkDTO.setCheckDate(LocalDateTime.now());
             System.out.println(checkDTO);
             
-            // Save to database
             boolean success = checkBLL.addCheck(checkDTO, selectedDetails);
             
             if (success) {
@@ -554,7 +536,6 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
             int selectedRow = tblSelectedDetails.getSelectedRow();
             if (selectedRow >= 0) {
                 try {
-                    // LotDTO selectedLot = filteredLots.get(tblSelectedDetails.getSelectedRow());
                     CheckDetailDTO selectedDetail = selectedDetails.get(selectedRow);
                     LotDTO selectedLot = lotBLL.getLotById(selectedDetail.getLotId());
                     String qtyText = txtQuantity.getText().trim();
@@ -562,7 +543,6 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
                     String lotText = txtLot.getText().trim();
                     int initQty = selectedLot.getInitialQuantity();
                     
-                    // Validate inputs
                     if (!validateInput(lotText, qtyText, sysQtyText, initQty)) {
                         return;
                     }
@@ -579,7 +559,7 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
                     tblSelectedDetails.clearSelection();
 
                 } catch (NumberFormatException err) {
-                    JOptionPane.showMessageDialog(this, "Số lượng và giá nhập phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Số lượng phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }

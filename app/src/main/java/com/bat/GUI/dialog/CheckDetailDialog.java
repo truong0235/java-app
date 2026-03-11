@@ -179,7 +179,6 @@ public class CheckDetailDialog extends JDialog implements ActionListener {
         txtImportId.setText(String.valueOf(checkDTO.getCheckId()));
         txtUser.setText(userBLL.getUserNameById(checkDTO.getUserId()));
         
-        // Format date
         String formattedDate = checkDTO.getCheckDate() != null ? checkDTO.getCheckDate().format(DATE_FORMATTER) : "";
         txtCreatedDate.setText(formattedDate);
         
@@ -228,7 +227,6 @@ public class CheckDetailDialog extends JDialog implements ActionListener {
             }
             
             try {
-                // Create maps for product names and lot codes
                 java.util.Map<Integer, String> productNames = new java.util.HashMap<>();
                 java.util.Map<Integer, String> lotCodes = new java.util.HashMap<>();
                 

@@ -20,7 +20,6 @@ public class ExportLotDAL {
             PreparedStatement ps = conn.prepareStatement(query);
         ) {
                 int lotId = exportLot.getLotId();
-            // 1. Thêm vào export_lot
                 ps.setInt(1, exportLot.getExportId());
                 ps.setInt(2, exportLot.getProductId());
                 ps.setInt(3, exportLot.getLotId());
@@ -58,9 +57,6 @@ public class ExportLotDAL {
         return false;
     }
 
-    /**
-     * Lấy danh sách lô xuất theo export_id
-     */
     public ArrayList<ExportLotDTO> getExportLotsByExportId(int exportId) {
         ArrayList<ExportLotDTO> list = new ArrayList<>();
         String query = "SELECT el.*, p.product_name, l.lot_code " +
@@ -97,9 +93,6 @@ public class ExportLotDAL {
         return list;
     }
 
-    /**
-     * Xóa tất cả lô xuất của một phiếu xuất
-     */
     public boolean deleteByExportId(int exportId) {
         String query = "DELETE FROM export_lot WHERE export_id = ?";
         

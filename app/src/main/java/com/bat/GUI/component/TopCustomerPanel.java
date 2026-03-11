@@ -23,14 +23,12 @@ public class TopCustomerPanel extends JPanel {
         setBackground(Color.WHITE);
         setBorder(new EmptyBorder(15, 15, 15, 15));
         
-        // Title
         JLabel titleLabel = new JLabel("Top Khách Hàng");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
         titleLabel.setForeground(new Color(51, 51, 51));
         titleLabel.setHorizontalAlignment(SwingConstants.LEFT);
         add(titleLabel, BorderLayout.NORTH);
         
-        // Table
         String[] columnNames = {"#", "Tên Khách Hàng", "Số Điện Thoại", "Số Đơn", "Tổng Tiền"};
         customerTblModel = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -48,14 +46,12 @@ public class TopCustomerPanel extends JPanel {
         customerTable.setSelectionBackground(new Color(230, 247, 255));
         customerTable.setGridColor(new Color(230, 230, 230));
         
-        // Center align for columns
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         customerTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         customerTable.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
         customerTable.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
         
-        // Set column widths
         customerTable.getColumnModel().getColumn(0).setPreferredWidth(40);
         customerTable.getColumnModel().getColumn(1).setPreferredWidth(200);
         customerTable.getColumnModel().getColumn(2).setPreferredWidth(120);
@@ -73,10 +69,10 @@ public class TopCustomerPanel extends JPanel {
         for (Object[] row : data) {
             Object[] rowData = new Object[5];
             rowData[0] = rank++;
-            rowData[1] = row[0]; // Tên
-            rowData[2] = row[1]; // SĐT
-            rowData[3] = row[2]; // Số đơn
-            rowData[4] = String.format("%,.0f₫", row[3]); // Tổng tiền
+            rowData[1] = row[0]; 
+            rowData[2] = row[1]; 
+            rowData[3] = row[2]; 
+            rowData[4] = String.format("%,.0f₫", row[3]); 
             customerTblModel.addRow(rowData);
         }
     }

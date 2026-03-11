@@ -12,9 +12,6 @@ import com.bat.utils.helper.DBConnectHelper;
 
 public class ExportReceiptDAL {
     
-    /**
-     * Lấy tất cả phiếu xuất
-     */
     public ArrayList<ExportReceiptDTO> getExports() {
         ArrayList<ExportReceiptDTO> list = new ArrayList<>();
         String query = "SELECT export_id, export_date, status, user_id, total_price, customer_id FROM export_receipt WHERE status = 1";
@@ -33,7 +30,7 @@ public class ExportReceiptDAL {
                     rs.getInt("user_id"),
                     rs.getInt("total_price"),
                     rs.getInt("customer_id"),
-                    0 // order_id
+                    0
                 );
                 list.add(exportReceipt);
             }
@@ -94,9 +91,6 @@ public class ExportReceiptDAL {
     }
 
 
-    /**
-     * Xóa phiếu xuất (soft delete)
-     */
     public boolean delete(int exportId) {
         LotTransactionDAL lotTransactionDAL = new LotTransactionDAL();
         ExportLotDAL exportLotDAL = new ExportLotDAL();

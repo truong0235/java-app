@@ -39,7 +39,7 @@ import com.bat.DTO.LotDTO;
 import com.bat.DTO.ProductDTO;
 import com.bat.DTO.ProviderDTO;
 
-public class AddImportDialog extends JDialog implements ActionListener { // vde: lưu provider id trong db
+public class AddImportDialog extends JDialog implements ActionListener {
     private ProductBLL productBLL = new ProductBLL();
     private ProviderBLL providerBLL = new ProviderBLL();
     private ImportBLL importBLL = new ImportBLL();
@@ -49,28 +49,25 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
     private ArrayList<ProductDTO> filteredProducts;
     private ArrayList<LotDTO> selectedLots = new ArrayList<>();
 
-    // Left panel - Product search
     private JTextField txtSearch;
     private JTable tblProducts;
     private DefaultTableModel productTableModel;
 
-    // Right panel - Lot details
     private JTextField txtProductName, txtProductId, txtLot, txtPublisher, txtQuantity, txtPrice;
     private JComboBox<String> cbxProvider;
     private JButton btnAdd, btnEdit, btnDelete;
 
-    // Bottom panel - Selected lots
     private JTable tblSelectedLots;
     private DefaultTableModel selectedLotsTableModel;
     private JLabel lblTotalPrice;
     private JButton btnImport, btnCancel;
 
     private  static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
-    private int USERID = 1;
+    private int currentUserId;
 
     public AddImportDialog(JFrame parent, int userId) {
         super(parent, "Thêm phiếu nhập", true);
-        // this.currentUserId = userId;
+        this.currentUserId = userId;
         productList = productBLL.getProductsList();
         filteredProducts = new ArrayList<>(productList);
         
@@ -83,12 +80,10 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         setLayout(new BorderLayout(10, 10));
         ((JPanel) getContentPane()).setBorder(new EmptyBorder(0, 0, 0, 0));
 
-        // Create main split panel
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBackground(new Color(228, 238, 255));
         mainPanel.setBorder(new EmptyBorder(5,5,5,5));
         
-        // Left-Right split
         JPanel topPanel = new JPanel(new GridLayout(1, 2, 10, 0));
         topPanel.setBackground(Color.WHITE);
         topPanel.add(createProductSearchPanel());
@@ -105,7 +100,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         panel.setBorder(new EmptyBorder(5,5,5,5));
         panel.setBackground(Color.WHITE);
 
-        // Search box
         JPanel searchPanel = new JPanel(new BorderLayout(5, 5));
         searchPanel.setBackground(Color.WHITE);
         txtSearch = new JTextField();
@@ -119,7 +113,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         });
         searchPanel.add(txtSearch, BorderLayout.CENTER);
 
-        // Product table
         String[] columns = {"Mã SP", "Tên sản phẩm", "SL"};
         productTableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -155,7 +148,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         panel.setBorder(new EmptyBorder(5,5,5,5));
         panel.setBackground(Color.WHITE);
 
-        // Provider
         JPanel providerPn = new JPanel(new GridLayout(2, 1, 5, 5));
         providerPn.setBackground(Color.WHITE);
         providerPn.add(new JLabel("Nhà cung cấp"));
@@ -166,7 +158,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         }
         providerPn.add(cbxProvider);
 
-        // Product name
         JPanel prdNamePn = new JPanel(new GridLayout(2, 1, 5, 5));
         prdNamePn.setBackground(Color.WHITE);
         prdNamePn.add(new JLabel("Tên sản phẩm"));
@@ -174,7 +165,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         txtProductName.setEditable(false);
         prdNamePn.add(txtProductName);
 
-        // Product ID & ISBN
         JPanel idIsbnPn = new JPanel(new GridLayout(1, 2, 5, 5));
         idIsbnPn.setBackground(Color.WHITE);
         
@@ -194,7 +184,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         idIsbnPn.add(idPn);
         idIsbnPn.add(isbnPn);
 
-        // Publisher
         JPanel publisherPn = new JPanel(new GridLayout(2, 1, 5, 5));
         publisherPn.setBackground(Color.WHITE);
         publisherPn.add(new JLabel("Nhà xuất bản"));
@@ -202,7 +191,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         txtPublisher.setEditable(false);
         publisherPn.add(txtPublisher);
 
-        // Price & Quantity
         JPanel priceQtyPn = new JPanel(new GridLayout(1, 2, 5, 5));
         priceQtyPn.setBackground(Color.WHITE);
         
@@ -224,7 +212,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         JPanel btnPn = new JPanel();
         btnPn.setLayout(new FlowLayout());
         btnPn.setBackground(Color.WHITE);
-        // btnPn.setBorder(new EmptyBorder(5,0,5, 0));
 
         btnAdd = new JButton("Thêm sản phẩm");
         btnAdd.setBackground(new Color(112,119,183));        
@@ -265,7 +252,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
         panel.setBackground(Color.WHITE);
         panel.setPreferredSize(new Dimension(0, 250));
 
-        // Table
         String[] columns = {"STT", "Mã SP", "Tên sản phẩm", "Đơn giá", "Số lượng"};
         selectedLotsTableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -286,7 +272,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             
         });
         
-        // Bottom panel with total and buttons
         JPanel bottomPn = new JPanel(new BorderLayout());
         bottomPn.setBackground(Color.WHITE);
         
@@ -428,7 +413,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             String qtyText = txtQuantity.getText().trim();
             String priceText = txtPrice.getText().trim();
             String lotText = txtLot.getText().trim();
-            // Validate inputs
             if (!validateInput(lotText, "", qtyText, priceText)) {
                 return;
             }
@@ -438,7 +422,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             int productId = Integer.parseInt(txtProductId.getText());
             String productName = txtProductName.getText();
             
-            // Create lot
             LotDTO lot = new LotDTO();
             lot.setProductId(productId);
             lot.setLotCode(lotText);
@@ -451,7 +434,6 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             
             selectedLots.add(lot);
             
-            // Add to table
             selectedLotsTableModel.addRow(new Object[]{
                 selectedLotsTableModel.getRowCount() + 1,
                 productId,
@@ -501,18 +483,15 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
             BigDecimal totalPrice = calTotalPrice();     
             int providerId = providerBLL.getPrdIdByIdx(cbxProvider.getSelectedIndex());
             
-            // Create import receipt
             ImportDTO importDTO = new ImportDTO();
             importDTO.setProviderId(providerId);
-            importDTO.setUserId(USERID);
+            importDTO.setUserId(currentUserId);
             importDTO.setTotalPrice(totalPrice);
             importDTO.setStatus(1);
             importDTO.setCreatedDate(LocalDateTime.now());
             System.out.println(importDTO);
             
-            // Save to database
             boolean success = importBLL.addImport(importDTO, selectedLots);
-            // boolean success = false;
             
             if (success) {
                 JOptionPane.showMessageDialog(this, "Nhập hàng thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);

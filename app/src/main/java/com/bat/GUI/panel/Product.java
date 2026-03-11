@@ -75,13 +75,11 @@ public class Product extends JPanel implements ActionListener {
     private JComboBox<String> cbbBrandFilter;
     private final DecimalFormat priceFormatter = new DecimalFormat("###,###,###");
 
-    // Đã cấu hình chính xác đường dẫn theo cấu trúc: app/src/main/resources/image_product/
     private final String IMAGE_DIR;
 
     public Product(Main main) {
         this.main = main;
 
-        // Thiết lập đường dẫn động để tương thích với cấu trúc "java-app-main\app\..."
         String userDir = System.getProperty("user.dir");
         if (userDir.endsWith("app")) {
             IMAGE_DIR = userDir + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "image_product" + File.separator;
@@ -89,7 +87,6 @@ public class Product extends JPanel implements ActionListener {
             IMAGE_DIR = userDir + File.separator + "app" + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "image_product" + File.separator;
         }
 
-        // Tự động tạo thư mục nếu chưa tồn tại
         File directory = new File(IMAGE_DIR);
         if (!directory.exists()) {
             directory.mkdirs();

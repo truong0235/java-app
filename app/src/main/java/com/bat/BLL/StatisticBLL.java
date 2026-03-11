@@ -10,18 +10,15 @@ import com.bat.DTO.Statistic.ThongKeTheoThangDTO;
 import com.bat.DTO.Statistic.ThongKeTungNgayTrongThangDTO;
 
 public class StatisticBLL {
-    // Lấy thống kê theo danh mục (cho biểu đồ tròn) - Top 5 danh mục
     private final StatisticDAL statisticDAL = new StatisticDAL();
     public Map<String, Double> getProductStatistics() {
         return statisticDAL.getProductStatistics();
     }
     
-    // Top khách hàng (theo tổng tiền xuất)
     public List<Object[]> getTopCustomers(int limit) {
         return statisticDAL.getTopCustomers(limit);
     }
 
-    // Top nhà cung cấp (theo tổng tiền nhập)
     public List<Object[]> getTopProviders(int limit) {
         return statisticDAL.getTopProviders(limit);
     }

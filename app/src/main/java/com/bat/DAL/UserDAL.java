@@ -10,10 +10,8 @@ import com.bat.utils.helper.DBConnectHelper;
 
 public class UserDAL {
     
-    // Lấy danh sách user (BỎ QUA NHỮNG NGƯỜI ĐÃ BỊ XÓA ẨN - STATUS = 2)
     public ArrayList<UserDTO> getUsers() {
         ArrayList<UserDTO> users = new ArrayList<>();
-        // ĐÃ KHÔI PHỤC: Lấy status = 1 (Hoạt động) và status = 0 (Bị khoá). Bỏ qua status = 2 (Đã xóa)
         String query = "SELECT * FROM users WHERE status != 2"; 
         try (
             DBConnectHelper db = new DBConnectHelper();
@@ -52,7 +50,6 @@ public class UserDAL {
 
     public int addUser(UserDTO u) {
         int result = 0;
-        // Nếu trùng username thì cập nhật lại toàn bộ thông tin mới và set status = 1
         String query = "INSERT INTO users (username, password, fullname, role_id, email, phone, address, status, avatar) " +
                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
                        "ON DUPLICATE KEY UPDATE " +
@@ -72,7 +69,7 @@ public class UserDAL {
             ps.setString(5, u.getEmail());
             ps.setString(6, u.getPhone());
             ps.setString(7, u.getAddress());
-            ps.setInt(8, 1); // Trạng thái mặc định khi thêm mới / khôi phục là 1
+            ps.setInt(8, 1);
             ps.setString(9, u.getAvatar());
             
             result = ps.executeUpdate();
@@ -84,7 +81,6 @@ public class UserDAL {
 
     public int updateUser(UserDTO u) {
         int result = 0;
-        // Không update password và username ở đây để bảo mật, chỉ update thông tin
         String query = "UPDATE users SET fullname=?, role_id=?, email=?, phone=?, address=?, status=?, avatar=? WHERE user_id=?";
         try (
             DBConnectHelper db = new DBConnectHelper();
@@ -108,7 +104,6 @@ public class UserDAL {
 
     public int deleteUser(int userId) {
         int result = 0;
-        // ĐÃ KHÔI PHỤC: Xóa mềm theo ý giáo viên - Chuyển status = 2 để ẩn khỏi bảng
         String query = "UPDATE users SET status = 2 WHERE user_id = ?"; 
         try (
             DBConnectHelper db = new DBConnectHelper();
@@ -123,12 +118,8 @@ public class UserDAL {
         return result;
     }
     
-    // ==========================================
-    // 🔐 HÀM KHÔI PHỤC MẬT KHẨU (XÁC MINH 3 LỚP)
-    // ==========================================
     public int resetPassword(String username, String phone, String email, String newPassword) {
         int result = 0;
-        // Cập nhật mật khẩu nếu khớp cả username, phone VÀ email (chỉ cho user đang hoạt động)
         String query = "UPDATE users SET password = ? WHERE username = ? AND phone = ? AND email = ? AND status = 1"; 
         try (
             DBConnectHelper db = new DBConnectHelper();
@@ -147,7 +138,6 @@ public class UserDAL {
         return result;
     }
     
-    // Hàm phụ trợ map dữ liệu
     private UserDTO mapResultSetToUser(ResultSet rs) throws Exception {
         return new UserDTO(
             rs.getInt("user_id"),

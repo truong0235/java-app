@@ -36,7 +36,6 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
     private final StatisticBLL statisticBLL;
     private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
     
-    // UI Components
     private JTextField txtFromYear;
     private JTextField txtToYear;
     private JButton btnStatistic;
@@ -61,26 +60,22 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
         setBackground(new Color(228, 238, 255));
         setBorder(new EmptyBorder(15, 15, 15, 15));
         
-        // Top panel - Filter controls
         add(createFilterPanel(), BorderLayout.NORTH);
         
-        // Center panel - Chart
         chartPanel = createChartPanel();
         add(chartPanel, BorderLayout.CENTER);
         
-        // Bottom panel - Table
         add(createTablePanel(), BorderLayout.SOUTH);
     }
     
     private JPanel createFilterPanel() { 
-        // return panel;
         JPanel pnl_top = new JPanel(new FlowLayout());
         JLabel lblChonNamBatDau, lblChonNamKetThuc;
         lblChonNamBatDau = new JLabel("Từ năm");
         lblChonNamKetThuc = new JLabel("Đến năm");
 
-        txtFromYear = new JTextField("");
-        txtToYear = new JTextField("");
+        txtFromYear = new JTextField(Year.now().getValue() - 5 + "");
+        txtToYear = new JTextField(Year.now().getValue() + "");
 
         btnStatistic = new JButton("Thống kê");
         btnRefresh = new JButton("Làm mới");
@@ -99,19 +94,7 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
 
         return pnl_top;
     }
-    
-    // private JButton createButton(String text, Color bgColor) {
-    //     JButton button = new JButton(text);
-    //     button.setPreferredSize(new Dimension(120, 35));
-    //     button.setFont(new Font("Segoe UI", Font.BOLD, 13));
-    //     button.setBackground(bgColor);
-    //     button.setForeground(Color.WHITE);
-    //     button.setFocusPainted(false);
-    //     button.setBorderPainted(false);
-    //     button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-    //     return button;
-    // }
-    
+
     private JPanel createChartPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.WHITE);
@@ -155,14 +138,12 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
         table.setSelectionForeground(Color.BLACK);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         
-        // Center align all columns
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
         
-        // Set column widths
         table.getColumnModel().getColumn(0).setPreferredWidth(150);
         table.getColumnModel().getColumn(1).setPreferredWidth(200);
         table.getColumnModel().getColumn(2).setPreferredWidth(200);
@@ -183,15 +164,11 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
     
     private void loadData(int fromYear, int toYear) {
         try {
-            // Get data from BLL
             currentData = statisticBLL.getDoanhThuTheoTungNam(fromYear, toYear);
             
-            // Clear table
             tableModel.setRowCount(0);
             
-            // Update chart and table
             for (ThongKeDoanhThuDTO dto : currentData) {
-                // Add to chart
                 String label = "Năm " + dto.getThoigian();
                 double[] values = {
                     dto.getVon().doubleValue(),
@@ -200,7 +177,6 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
                 };
                 chart.addData(new ModelChart(label, values));
                 
-                // Add to table
                 Object[] row = {
                     dto.getThoigian(),
                     CURRENCY_FORMATTER.format(dto.getVon()),
@@ -210,7 +186,6 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
                 tableModel.addRow(row);
             }
             
-            // Refresh chart
             chart.repaint();
             chart.revalidate();
             
@@ -236,7 +211,6 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
     
     private void handleStatistic() {
         try {
-            // Check empty fields
             if (txtFromYear.getText().trim().isEmpty() || txtToYear.getText().trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this,
                     "Vui lòng nhập đầy đủ năm bắt đầu và năm kết thúc!",
@@ -256,7 +230,6 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
                 return;
             }
 
-            // Validation: Year range
             if (fromYear < 1900 || toYear > 2100) {
                 JOptionPane.showMessageDialog(this,
                     "Năm phải nằm trong khoảng từ 1900 đến 2100!",
@@ -265,7 +238,6 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
                 return;
             }
             
-            // Validation: From year must be less than or equal to year
             if (fromYear > toYear) {
                 JOptionPane.showMessageDialog(this,
                     "Năm bắt đầu không được lớn hơn năm kết thúc!",
@@ -274,7 +246,6 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
                 return;
             }
             
-            // Validation: Maximum range check
             if (toYear - fromYear > 50) {
                 JOptionPane.showMessageDialog(this,
                     "Khoảng thời gian thống kê không được vượt quá 50 năm!",
@@ -283,7 +254,6 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
                 return;
             }
             
-            // Create new chart
             chartPanel.removeAll();
             chart = new Chart();
             chart.addLegend("Vốn", new Color(255, 193, 7));
@@ -291,10 +261,8 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
             chart.addLegend("Lợi nhuận", new Color(168, 85, 247));
             chartPanel.add(chart, BorderLayout.CENTER);
             
-            // Load new data
             loadData(fromYear, toYear);
             
-            // Refresh UI
             chartPanel.revalidate();
             chartPanel.repaint();
             
@@ -310,7 +278,6 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
         txtFromYear.setText("2021");
         txtToYear.setText("2026");
         
-        // Create new chart
         chartPanel.removeAll();
         chart = new Chart();
         chart.addLegend("Vốn", new Color(255, 193, 7));
@@ -320,7 +287,6 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
         
         loadDefaultData();
         
-        // Refresh UI
         chartPanel.revalidate();
         chartPanel.repaint();
     }
@@ -335,8 +301,6 @@ public class RevenueStatisticByYear extends JPanel implements ActionListener {
         }
         try {
             ExcelExporter.exportJTableToExcel(table);
-            // JOptionPane.showMessageDialog(this, "Xuất file Excel thành công!", 
-                                        // "Thành công", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Lỗi khi xuất file: " + ex.getMessage(), 
                                         "Lỗi", JOptionPane.ERROR_MESSAGE);

@@ -52,7 +52,6 @@ public class LoginJFrame extends BaseJFrame {
         Color colorTextRight = new Color(55, 65, 81); 
         Color colorBorder = new Color(209, 213, 219); 
 
-        // --- PANEL TRÁI (LOGO) ---
         JPanel pnlLeft = new JPanel(new GridBagLayout());
         pnlLeft.setBackground(colorLeft);
         JLabel lblTitle = new JLabel("HỆ THỐNG");
@@ -70,7 +69,6 @@ public class LoginJFrame extends BaseJFrame {
         pnlLeft.add(lblSubTitle, gbc);
         add(pnlLeft);
 
-        // --- PANEL PHẢI (FORM) ---
         JPanel pnlRight = new JPanel(null);
         pnlRight.setBackground(colorRight);
 
@@ -190,7 +188,6 @@ public class LoginJFrame extends BaseJFrame {
         if (user != null) {
             this.dispose(); 
             SwingUtilities.invokeLater(() -> {
-                // ĐÃ SỬA: Chuyền UserDTO vừa đăng nhập sang Main
                 new Main(user).init(); 
             });
         } else {

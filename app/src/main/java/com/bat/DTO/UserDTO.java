@@ -4,7 +4,7 @@ public class UserDTO {
     private int userId;
     private String username;
     private String password;
-    private String fullName; // Lưu ý: Chữ N viết hoa (CamelCase)
+    private String fullName;
     private int roleId;
     private String email;
     private String phone;
@@ -107,7 +107,6 @@ public int getUserId() {
         this.avatar = avatar;
     }
     
-    // Hàm toString để debug cho dễ nếu cần
     @Override
     public String toString() {
         return this.fullName;

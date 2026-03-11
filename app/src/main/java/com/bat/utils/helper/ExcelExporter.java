@@ -35,14 +35,12 @@ public class ExcelExporter {
             try (Workbook workbook = new XSSFWorkbook()) {
                 Sheet sheet = workbook.createSheet("Sheet1");
 
-                // Create header row
                 Row headerRow = sheet.createRow(0);
                 for (int i = 0; i < model.getColumnCount(); i++) {
                     Cell headerCell = headerRow.createCell(i);
                     headerCell.setCellValue(model.getColumnName(i));
                 }
 
-                // Create data rows
                 for (int i = 0; i < model.getRowCount(); i++) {
                     Row dataRow = sheet.createRow(i + 1);
                     for (int j = 0; j < model.getColumnCount(); j++) {
@@ -54,12 +52,10 @@ public class ExcelExporter {
                     }
                 }
 
-                // Resize all columns to fit the content size
                 for (int i = 0; i < model.getColumnCount(); i++) {
                     sheet.autoSizeColumn(i);
                 }
 
-                // Write the output to a file
                 try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
                     workbook.write(fileOut);
                 }

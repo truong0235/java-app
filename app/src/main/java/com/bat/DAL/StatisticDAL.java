@@ -40,7 +40,6 @@ public class StatisticDAL {
         return categoryStats;
     }
 
-    // Top khách hàng (theo tổng tiền xuất)
     public List<Object[]> getTopCustomers(int limit) {
         List<Object[]> topCustomers = new ArrayList<>();
         String query = "SELECT c.fullname, c.phone, COUNT(DISTINCT e.export_id) as order_count, " +
@@ -72,7 +71,6 @@ public class StatisticDAL {
         return topCustomers;
     }
     
-    // Top nhà cung cấp (theo tổng tiền nhập)
     public List<Object[]> getTopProviders(int limit) {
         List<Object[]> topProviders = new ArrayList<>();
         String query = "SELECT p.provider_name, p.phone, COUNT(DISTINCT i.import_id) as order_count, " +
@@ -190,8 +188,6 @@ public class StatisticDAL {
             PreparedStatement pstEndMonth = con.prepareStatement(sqlSetEndMonth);
 
             pstYear.setInt(1, year);
-            // pstStartMonth.setInt(1, month_start);
-            // pstEndMonth.setInt(1, month_end);
 
             pstYear.execute();
             pstStartMonth.execute();

@@ -38,15 +38,12 @@ public class CustomerBLL {
     }
 
     private String validateCustomer(CustomerDTO c, boolean isUpdate) {
-        // 1. Validate tên khách hàng
         if (c.getFullName() == null || c.getFullName().trim().isEmpty()) {
             return "Tên khách hàng không được để trống!";
         }
 
-        // 2. Validate ngày sinh
         if (c.getBirthday() != null) {
             try {
-                // Chuyển Date sang LocalDate để so sánh
                 LocalDate dob = c.getBirthday().toInstant()
                     .atZone(ZoneId.systemDefault())
                     .toLocalDate();
@@ -61,7 +58,6 @@ public class CustomerBLL {
             }
         }
 
-        // 3. Validate số điện thoại
         if (c.getPhone() == null || c.getPhone().trim().isEmpty()) {
             return "Số điện thoại không được để trống!";
         }
@@ -70,22 +66,19 @@ public class CustomerBLL {
             return "Số điện thoại không đúng định dạng! (VD: 0901234567)";
         }
         
-        // 4. Validate số điện thoại không được trùng
         int excludeId = isUpdate ? c.getCustomerId() : 0;
         if (customerDAL.isPhoneExists(phone, excludeId)) {
             return "Số điện thoại này đã được sử dụng bởi khách hàng khác!";
         }
 
-        // 5. Validate địa chỉ (optional)
         if (c.getAddress() != null && c.getAddress().trim().length() > 200) {
             return "Địa chỉ không được vượt quá 200 ký tự!";
         }
 
-        return null; // Tất cả đều hợp lệ
+        return null; 
     }
 
     public String add(CustomerDTO c) {
-        // Validate toàn bộ thông tin
         String validationError = validateCustomer(c, false);
         if (validationError != null) {
             return validationError;
@@ -101,7 +94,6 @@ public class CustomerBLL {
     }
 
     public String update(CustomerDTO c) {
-        // Validate toàn bộ thông tin
         String validationError = validateCustomer(c, true);
         if (validationError != null) {
             return validationError;
@@ -125,6 +117,6 @@ public class CustomerBLL {
         if (idx >= 0 && idx < customers.size()) {
             return customers.get(idx).getCustomerId();
         }
-        return -1; // Không tìm thấy
+        return -1; 
     }
 }

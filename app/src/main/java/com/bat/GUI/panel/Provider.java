@@ -558,10 +558,8 @@ public class Provider extends JPanel implements ActionListener {
                     result = providerBLL.update(data);
                 }
                 
-                // Hiển thị thông báo
                 JOptionPane.showMessageDialog(this, result);
                 
-                // Chỉ đóng dialog và refresh data khi thành công
                 if(result.contains("thành công")) {
                     refreshData();
                     dispose();
