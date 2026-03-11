@@ -375,7 +375,6 @@ public class Product extends JPanel implements ActionListener {
         }
     }
 
-    // Đã cập nhật để xuất ID thể loại và Hình ảnh
     public void exportExcel() {
         JFileChooser jf = new JFileChooser();
         jf.setDialogTitle("Lưu file Excel");
@@ -407,8 +406,8 @@ public class Product extends JPanel implements ActionListener {
                     row.createCell(5).setCellValue(p.getLanguage());
                     row.createCell(6).setCellValue(p.getPrice() != null ? p.getPrice().doubleValue() : 0);
                     row.createCell(7).setCellValue(p.getQuantity());
-                    row.createCell(8).setCellValue(p.getCategoryId()); // Xuất ID thay vì Tên Thể loại
-                    row.createCell(9).setCellValue(p.getPic() == null ? "" : p.getPic()); // Xuất hình ảnh
+                    row.createCell(8).setCellValue(p.getCategoryId()); 
+                    row.createCell(9).setCellValue(p.getPic() == null ? "" : p.getPic()); 
                 }
 
                 for (int i = 0; i < columns.length; i++) sheet.autoSizeColumn(i);
@@ -423,7 +422,6 @@ public class Product extends JPanel implements ActionListener {
         }
     }
 
-    // Đã cập nhật sử dụng DataFormatter để chống lỗi "Cannot get a NUMERIC value from a STRING cell"
     public void importExcel() {
         JFileChooser jf = new JFileChooser();
         jf.setDialogTitle("Chọn file Excel");
@@ -689,7 +687,6 @@ public class Product extends JPanel implements ActionListener {
                 txtLang.setText(data.getLanguage());
                 cbbCate.setSelectedItem(categoryBLL.getCategoryNameById(data.getCategoryId()));
 
-                // ĐÃ XỬ LÝ ẨN SỐ .00 Ở ĐÂY
                 txtPrice.setText(data.getPrice() != null ? data.getPrice().stripTrailingZeros().toPlainString() : "0");
 
                 txtQty.setText(String.valueOf(data.getQuantity()));

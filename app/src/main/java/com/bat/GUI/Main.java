@@ -27,12 +27,12 @@ public class Main extends JFrame {
 
     private UserDTO currentUser;
 
-    public Main(UserDTO user) {
-        this.currentUser = user;
-    }
-
     public UserDTO getCurrentUser() {
         return currentUser;
+    }
+
+    public Main(UserDTO user) {
+        this.currentUser = user;
     }
 
     public static void main(String[] args) {

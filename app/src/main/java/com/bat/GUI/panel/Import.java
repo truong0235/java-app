@@ -221,10 +221,6 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         };
         
         table = new JTable(tableModel);
-        table.setRowHeight(45);
-        table.setShowVerticalLines(false);
-        table.setShowHorizontalLines(true);
-        table.setGridColor(new Color(229, 231, 235));
         table.setSelectionBackground(new Color(239, 246, 255));
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         table.setIntercellSpacing(new java.awt.Dimension(0, 1));

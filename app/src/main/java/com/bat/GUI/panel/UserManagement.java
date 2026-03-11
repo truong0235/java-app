@@ -62,7 +62,11 @@ public class UserManagement extends JPanel implements ActionListener {
     private UserDTO currentUser;
 
     private final String[] ROLES_ARRAY = {
-        "Quản trị viên", "Nhân viên bán hàng", "Nhân viên kho", "Nhân viên kiểm kê"
+        "Quản trị viên", "Giám đốc", "Trưởng phòng kho", "Quản lý kho", 
+        "Thủ kho", "Nhân viên nhập hàng", "Nhân viên kiểm kê", 
+        "Trưởng phòng kinh doanh", "Nhân viên bán hàng", "Nhân viên CSKH", 
+        "Nhân viên Marketing", "Trưởng phòng kế toán", "Kế toán", 
+        "Thủ quỹ", "Nhân viên IT"
     };
 
     public UserManagement(UserDTO user) {
@@ -354,7 +358,7 @@ public class UserManagement extends JPanel implements ActionListener {
         JComboBox<String> cbStatus = new JComboBox<>(new String[]{"Bị khoá", "Hoạt động"});
 
         if (isEdit) {
-            txtUser.setEnabled(false);
+            txtUser.setEnabled(false); 
             if (user.getRoleId() > 0 && user.getRoleId() <= ROLES_ARRAY.length) {
                 cbRole.setSelectedIndex(user.getRoleId() - 1);
             }
@@ -543,6 +547,7 @@ public class UserManagement extends JPanel implements ActionListener {
                     txtPhone.requestFocus();
                     return;
                 }
+                // Cập nhật thông tin vào đối tượng UserDTO
                 UserDTO u = new UserDTO();
                 if (isEdit) u.setUserId(user.getUserId());
                 u.setFullName(name);
@@ -561,22 +566,6 @@ public class UserManagement extends JPanel implements ActionListener {
                 if (msg.contains("thành công")) {
                     performSearch();
                     dialog.dispose();
-
-                    if (isEdit && currentUser != null && u.getUserId() == currentUser.getUserId() && u.getStatus() == 0) {
-                        JOptionPane.showMessageDialog(UserManagement.this, 
-                            "Bạn đã tự khóa tài khoản đang sử dụng. Hệ thống sẽ tự động đăng xuất!", 
-                            "Cảnh báo bảo mật", 
-                            JOptionPane.WARNING_MESSAGE);
-                        
-                        JFrame mainFrame = (JFrame) SwingUtilities.getWindowAncestor(UserManagement.this);
-                        if (mainFrame != null) {
-                            mainFrame.dispose();
-                        }
-                        
-                        java.awt.EventQueue.invokeLater(() -> {
-                            new com.bat.GUI.LoginJFrame().setVisible(true);
-                        });
-                    }
                 }
             });
             pnlBottom.add(btnSave);
