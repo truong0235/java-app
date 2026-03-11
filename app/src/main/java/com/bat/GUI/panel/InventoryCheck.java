@@ -58,11 +58,13 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
     JComboBox<String> userCbx;
     JDateChooser fromDateChooser, toDateChooser;
     Main main;
+    UserDTO currentUser;
     
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    public InventoryCheck(Main main) {
+    public InventoryCheck(Main main, UserDTO user) {
         this.main = main;
+        this.currentUser = user;
         initComponent();
         checkList = checkBLL.getCheckList();
         loadDataTable(checkList);
@@ -261,7 +263,7 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
         String command = e.getActionCommand();
         switch (command) {
             case "create":
-                AddCheckDialog dialog = new AddCheckDialog(main);
+                AddCheckDialog dialog = new AddCheckDialog(main, currentUser.getUserId());
                 dialog.setVisible(true);
                 checkList = checkBLL.getCheckList();
                 loadDataTable(checkList);

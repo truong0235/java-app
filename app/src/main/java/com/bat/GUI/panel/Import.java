@@ -64,12 +64,14 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
     JComboBox<String> providerCbx, userCbx;
     JDateChooser fromDateChooser, toDateChooser;
     Main main;
+    UserDTO currentUser;
     
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
 
-    public Import(Main main) {
+    public Import(Main main, UserDTO user) {
         this.main = main;
+        this.currentUser = user;
         initComponent();
         importList = importBLL.getImportList();
         loadDataTable(importList);
@@ -217,7 +219,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         panel.setBorder(new EmptyBorder(0, 10, 0, 0));
         
         // Tạo table với dữ liệu mẫu phiếu nhập
-        String[] columns = {"Mã phiếu", "Nhà cung cấp", "Ngày nhập", "Nhân viên nhập" ,"Tổng tiền", "Trạng thái"};
+        String[] columns = {"Mã phiếu", "Nhà cung cấp", "Ngày nhập", "Nhân viên nhập" ,"Tổng tiền"};
         tableModel = new DefaultTableModel(null, columns) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -248,7 +250,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         table.getColumnModel().getColumn(2).setPreferredWidth(100);
         table.getColumnModel().getColumn(3).setPreferredWidth(100);
         table.getColumnModel().getColumn(4).setPreferredWidth(100);
-        table.getColumnModel().getColumn(5).setPreferredWidth(100);
+        // table.getColumnModel().getColumn(5).setPreferredWidth(100);
         
         // Cell renderer for status column
         // table.getColumnModel().getColumn(4).setCellRenderer(new ImportStatusCellRenderer());
@@ -259,7 +261,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
         table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-        table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
+        // table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
         
         // Right align for money column
         DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
@@ -311,8 +313,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
                 providerBLL.getProviderNameById(imp.getProviderId()),
                 formattedDate,
                 userBLL.getUserNameById(imp.getUserId()),
-                formattedPrice,
-                imp.getStatus()
+                formattedPrice
             };
             tableModel.addRow(rowData);
         }
@@ -332,7 +333,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         String command = e.getActionCommand();
         switch (command) {
             case "create":
-                AddImportDialog dialog = new AddImportDialog(main);
+                AddImportDialog dialog = new AddImportDialog(main, currentUser.getUserId());
                 dialog.setVisible(true);
                 importList = importBLL.getImportList();
                 loadDataTable(importList);

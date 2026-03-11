@@ -67,11 +67,11 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
     // private JLabel lblTotalPrice;
     private JButton btnImport, btnCancel;
 
-    private int USERID = 1;
+    private int currentUserId;
 
-    public AddCheckDialog(JFrame parent) {
+    public AddCheckDialog(JFrame parent, int userId) {
         super(parent, "Thêm phiếu nhập", true);
-        // this.currentUserId = userId;
+        this.currentUserId = userId;
         productList = productBLL.getProductsList();
         // lotList = lotBLL.getLots();
         // filteredLots = new ArrayList<>(lotList);
@@ -518,7 +518,7 @@ public class AddCheckDialog extends JDialog implements ActionListener { // thêm
             
             // Create import receipt
             InventoryCheckDTO checkDTO = new InventoryCheckDTO();
-            checkDTO.setUserId(USERID);
+            checkDTO.setUserId(currentUserId);
             checkDTO.setStatus(1);
             checkDTO.setCheckDate(LocalDateTime.now());
             System.out.println(checkDTO);

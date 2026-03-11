@@ -256,25 +256,9 @@ INSERT INTO customer (fullname, birthday, phone, address) VALUES
 -- ===================================================================
 INSERT INTO roles (name, status) VALUES
 ('Admin', 1),
-('Quản lý kho', 1),
-('Nhân viên nhập hàng', 1),
 ('Nhân viên bán hàng', 1),
-('Kế toán', 1),
-('Thủ kho', 1),
-('Giám đốc', 1),
-('Nhân viên kiểm kê', 1),
-('Trưởng phòng kinh doanh', 1),
-('Nhân viên CSKH', 1),
-('Trưởng phòng kho', 1),
-('Nhân viên marketing', 1),
-('Thủ quỹ', 1),
-('Trưởng phòng kế toán', 1),
-('Nhân viên IT', 1),
-('Bảo vệ', 1),
-('Lái xe', 1),
-('Tạp vụ', 1),
-('Thực tập sinh', 1),
-('Cộng tác viên', 1);
+('Nhân viên kho', 1),
+('Nhân viên kiểm kê', 1);
 
 -- ===================================================================
 -- 4b. THÊM DỮ LIỆU CHO BẢNG PERMISSION (bitmask: 4=r, 2=w, 1=x)
@@ -348,28 +332,30 @@ INSERT INTO permission (role_id, resource, perm_value, status) VALUES
 
 -- ===================================================================
 -- 5. THÊM DỮ LIỆU CHO BẢNG USERS
+-- role_id 1 = Admin | role_id 2 = Nhân viên bán hàng
+-- role_id 3 = Nhân viên kho | role_id 4 = Nhân viên kiểm kê
 -- ===================================================================
 INSERT INTO users (role_id, username, password, avatar, fullname, phone, email, address, status) VALUES
-(1, 'admin', '123456', 'avatar1.jpg', 'Nguyễn Văn Admin', '0901111111', 'admin@khosach.vn', '123 Admin Street, Q.1, TP.HCM', 1),
-(2, 'qlkho01', '123456', 'avatar2.jpg', 'Trần Thị Kho', '0902222222', 'qlkho01@khosach.vn', '456 Warehouse Rd, Q.3, TP.HCM', 1),
-(3, 'nvnhap01', '123456', 'avatar3.jpg', 'Lê Văn Nhập', '0903333333', 'nvnhap01@khosach.vn', '789 Import St, Q.5, TP.HCM', 1),
-(4, 'nvban01', '123456', 'avatar4.jpg', 'Phạm Thị Bán', '0904444444', 'nvban01@khosach.vn', '321 Sales Ave, Q.10, TP.HCM', 1),
-(5, 'ketoan01', '123456', 'avatar5.jpg', 'Hoàng Văn Toán', '0905555555', 'ketoan01@khosach.vn', '654 Account Blvd, Q.Tân Bình, TP.HCM', 1),
-(6, 'thukho01', '123456', 'avatar6.jpg', 'Vũ Thị Thủ', '0906666666', 'thukho01@khosach.vn', '147 Stock Rd, Q.Bình Thạnh, TP.HCM', 1),
-(7, 'giamdoc01', '123456', 'avatar7.jpg', 'Đặng Văn Giám', '0907777777', 'giamdoc@khosach.vn', '258 Director St, Q.1, TP.HCM', 1),
-(8, 'nvkiemke01', '123456', 'avatar8.jpg', 'Bùi Thị Kiểm', '0908888888', 'nvkiemke01@khosach.vn', '369 Audit Lane, Q.3, TP.HCM', 1),
-(9, 'tpkinhdoanh', '123456', 'avatar9.jpg', 'Ngô Văn Kinh', '0909999999', 'tpkd@khosach.vn', '741 Business Rd, Q.5, TP.HCM', 1),
-(10, 'nvcskh01', '123456', 'avatar10.jpg', 'Dương Thị Chăm', '0910101010', 'cskh01@khosach.vn', '852 Service St, Q.10, TP.HCM', 1),
-(11, 'tpkho01', '123456', 'avatar11.jpg', 'Trịnh Văn Trưởng', '0911111111', 'tpkho01@khosach.vn', '963 Warehouse Mgr Rd, Q.Gò Vấp, TP.HCM', 1),
-(12, 'nvmarketing', '123456', 'avatar12.jpg', 'Lý Thị Marketing', '0912121212', 'marketing01@khosach.vn', '159 Marketing Ave, Q.Phú Nhuận, TP.HCM', 1),
-(13, 'thuquy01', '123456', 'avatar13.jpg', 'Phan Văn Quỹ', '0913131313', 'thuquy01@khosach.vn', '357 Cashier St, Q.1, TP.HCM', 1),
-(14, 'tpketoan', '123456', 'avatar14.jpg', 'Mai Thị Kế', '0914141414', 'tpketoan@khosach.vn', '486 Accounting Rd, Q.3, TP.HCM', 1),
-(15, 'nvit01', '123456', 'avatar15.jpg', 'Võ Văn IT', '0915151515', 'nvit01@khosach.vn', '597 Tech Lane, Q.Tân Bình, TP.HCM', 1),
-(3, 'nvnhap02', '123456', 'avatar16.jpg', 'Đỗ Thị Nhập 2', '0916161616', 'nvnhap02@khosach.vn', '168 Import St 2, Q.5, TP.HCM', 1),
-(4, 'nvban02', '123456', 'avatar17.jpg', 'Cao Văn Bán 2', '0917171717', 'nvban02@khosach.vn', '279 Sales Ave 2, Q.10, TP.HCM', 1),
-(4, 'nvban03', '123456', 'avatar18.jpg', 'Hồ Thị Bán 3', '0918181818', 'nvban03@khosach.vn', '381 Sales Ave 3, Q.10, TP.HCM', 1),
-(6, 'thukho02', '123456', 'avatar19.jpg', 'Tô Văn Thủ 2', '0919191919', 'thukho02@khosach.vn', '492 Stock Rd 2, Q.Bình Thạnh, TP.HCM', 1),
-(10, 'nvcskh02', '123456', 'avatar20.jpg', 'Lưu Thị Chăm 2', '0920202020', 'cskh02@khosach.vn', '513 Service St 2, Q.10, TP.HCM', 1);
+(1, 'admin',      '123456', 'avatar1.jpg',  'Nguyễn Văn Admin',  '0901111111', 'admin@khosach.vn',      '123 Admin Street, Q.1, TP.HCM',        1),
+(2, 'nvbh01',     '123456', 'avatar2.jpg',  'Trần Thị Bán',      '0902222222', 'nvbh01@khosach.vn',     '456 Sales Rd, Q.3, TP.HCM',            1),
+(2, 'nvbh02',     '123456', 'avatar3.jpg',  'Lê Văn Hàng',       '0903333333', 'nvbh02@khosach.vn',     '789 Sales Rd, Q.5, TP.HCM',            1),
+(2, 'nvbh03',     '123456', 'avatar4.jpg',  'Phạm Thị Xuất',     '0904444444', 'nvbh03@khosach.vn',     '321 Sales Ave, Q.10, TP.HCM',          1),
+(2, 'nvbh04',     '123456', 'avatar5.jpg',  'Hoàng Văn Giao',    '0905555555', 'nvbh04@khosach.vn',     '654 Sales Blvd, Q.Tân Bình, TP.HCM',  1),
+(2, 'nvbh05',     '123456', 'avatar6.jpg',  'Vũ Thị Đơn',        '0906666666', 'nvbh05@khosach.vn',     '147 Sales Rd, Q.Bình Thạnh, TP.HCM',  1),
+(3, 'nvkho01',    '123456', 'avatar7.jpg',  'Đặng Văn Nhập',     '0907777777', 'nvkho01@khosach.vn',    '258 Kho St, Q.1, TP.HCM',              1),
+(3, 'nvkho02',    '123456', 'avatar8.jpg',  'Bùi Thị Lô',        '0908888888', 'nvkho02@khosach.vn',    '369 Kho Lane, Q.3, TP.HCM',            1),
+(3, 'nvkho03',    '123456', 'avatar9.jpg',  'Ngô Văn Tồn',       '0909999999', 'nvkho03@khosach.vn',    '741 Kho Rd, Q.5, TP.HCM',              1),
+(3, 'nvkho04',    '123456', 'avatar10.jpg', 'Dương Thị Hàng',    '0910101010', 'nvkho04@khosach.vn',    '852 Kho St, Q.10, TP.HCM',             1),
+(3, 'nvkho05',    '123456', 'avatar11.jpg', 'Trịnh Văn Sắp',     '0911111111', 'nvkho05@khosach.vn',    '963 Kho Rd, Q.Gò Vấp, TP.HCM',        1),
+(3, 'nvkho06',    '123456', 'avatar12.jpg', 'Lý Thị Chuyển',     '0912121212', 'nvkho06@khosach.vn',    '159 Kho Ave, Q.Phú Nhuận, TP.HCM',    1),
+(3, 'nvkho07',    '123456', 'avatar13.jpg', 'Phan Văn Đóng',     '0913131313', 'nvkho07@khosach.vn',    '357 Kho St, Q.1, TP.HCM',              1),
+(4, 'nvkk01',     '123456', 'avatar14.jpg', 'Mai Thị Kiểm',      '0914141414', 'nvkk01@khosach.vn',     '486 Audit Rd, Q.3, TP.HCM',            1),
+(4, 'nvkk02',     '123456', 'avatar15.jpg', 'Võ Văn Kê',         '0915151515', 'nvkk02@khosach.vn',     '597 Audit Lane, Q.Tân Bình, TP.HCM',  1),
+(4, 'nvkk03',     '123456', 'avatar16.jpg', 'Đỗ Thị Đếm',        '0916161616', 'nvkk03@khosach.vn',     '168 Audit St, Q.5, TP.HCM',            1),
+(4, 'nvkk04',     '123456', 'avatar17.jpg', 'Cao Văn Tra',       '0917171717', 'nvkk04@khosach.vn',     '279 Audit Ave, Q.10, TP.HCM',          1),
+(4, 'nvkk05',     '123456', 'avatar18.jpg', 'Hồ Thị Soát',       '0918181818', 'nvkk05@khosach.vn',     '381 Audit Ave 2, Q.10, TP.HCM',        1),
+(4, 'nvkk06',     '123456', 'avatar19.jpg', 'Tô Văn Ghi',        '0919191919', 'nvkk06@khosach.vn',     '492 Audit Rd, Q.Bình Thạnh, TP.HCM',  1),
+(4, 'nvkk07',     '123456', 'avatar20.jpg', 'Lưu Thị Chép',      '0920202020', 'nvkk07@khosach.vn',     '513 Audit St, Q.10, TP.HCM',           1);
 
 -- ===================================================================
 -- 6. THÊM DỮ LIỆU CHO BẢNG PRODUCT

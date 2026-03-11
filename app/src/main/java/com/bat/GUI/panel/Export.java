@@ -16,6 +16,7 @@ import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,6 +45,7 @@ import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
 import com.bat.GUI.dialog.AddExportDialog;
 import com.bat.GUI.dialog.ReceiptDetailDialog;
+import com.bat.utils.helper.ExcelExporter;
 import com.toedter.calendar.JDateChooser;
 
 public class Export extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {
@@ -60,12 +62,14 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
     JComboBox<String> customerCbx, userCbx;
     JDateChooser fromDateChooser, toDateChooser;
     Main main;
+    UserDTO currentUser;
     
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
 
-    public Export(Main main) {
+    public Export(Main main, UserDTO user) {
         this.main = main;
+        this.currentUser = user;
         initComponent();
         exportList = exportBLL.getExportList();
         loadDataTable(exportList);
@@ -204,7 +208,7 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
         panel.setBackground(new Color(228, 238, 255));
         panel.setBorder(new EmptyBorder(0, 10, 0, 0));
         
-        String[] columns = {"Mã phiếu", "Khách hàng", "Ngày xuất", "Nhân viên xuất", "Tổng tiền", "Trạng thái"};
+        String[] columns = {"Mã phiếu", "Khách hàng", "Ngày xuất", "Nhân viên xuất", "Tổng tiền"};
         tableModel = new DefaultTableModel(null, columns) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -232,14 +236,14 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
         table.getColumnModel().getColumn(2).setPreferredWidth(100);
         table.getColumnModel().getColumn(3).setPreferredWidth(100);
         table.getColumnModel().getColumn(4).setPreferredWidth(100);
-        table.getColumnModel().getColumn(5).setPreferredWidth(100);
+        // table.getColumnModel().getColumn(5).setPreferredWidth(100);
         
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
         table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-        table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
+        // table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
         
         DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
         rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -264,8 +268,7 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
                 customerBLL.getCustomerNameById(exp.getCustomer_id()),
                 formattedDate,
                 userBLL.getUserNameById(exp.getUser_id()),
-                formattedPrice,
-                exp.getStatus() == 1 ? "Đã xuất" : "Đã hủy"
+                formattedPrice
             };
             tableModel.addRow(rowData);
         }
@@ -285,7 +288,7 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
         String command = e.getActionCommand();
         switch (command) {
             case "create":
-                AddExportDialog dialog = new AddExportDialog(main);
+                AddExportDialog dialog = new AddExportDialog(main, currentUser.getUserId());
                 dialog.setVisible(true);
                 exportList = exportBLL.getExportList();
                 loadDataTable(exportList);
@@ -312,8 +315,8 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
                 }
                 break;
             case "export":
-                JOptionPane.showMessageDialog(this, "Tính năng xuất Excel đang được phát triển");
-                break;
+                exportToExcel();
+            break;
             case "reset":
                 resetFilterInputs();
                 break;
@@ -331,8 +334,55 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
         fromDateChooser.setDate(null);
     }
 
+    public boolean validateFilterInputs(){
+        // System.out.println();
+        Date fromDate = fromDateChooser.getDate();
+        Date toDate = toDateChooser.getDate();
+        Date currentDate = new Date();
+
+        if (fromDate != null && fromDate.after(currentDate)) {
+            JOptionPane.showMessageDialog(this, "Ngày bắt đầu không được lớn hơn ngày hiện tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            fromDateChooser.setDate(null);
+            return false;
+        }
+        if (toDate != null && toDate.after(currentDate)) {
+            JOptionPane.showMessageDialog(this, "Ngày kết thúc không được lớn hơn ngày hiện tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            toDateChooser.setDate(null);
+            return false;
+        }
+        if (fromDate != null && toDate != null && fromDate.after(toDate))
+        {
+            JOptionPane.showMessageDialog(this, "Ngày bắt đầu không được lớn hơn ngày kết thúc.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            fromDateChooser.setDate(null);
+            toDateChooser.setDate(null);
+            return false;
+        }
+        if (fromDate == null && toDate != null)
+        {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày bắt đầu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
+    public void filter() {
+        if (validateFilterInputs()) {
+            String searchTxt = searchPanel.txtSearchForm.getText().trim();            
+            int prdId = customerCbx.getSelectedIndex() == 0 ? 0 : customerBLL.getCustomerIdByIdx(customerCbx.getSelectedIndex() - 1);
+            int userId = userCbx.getSelectedIndex() == 0 ? 0 : userBLL.getUserIdByIdx(userCbx.getSelectedIndex() - 1);
+            int searchOpt = searchPanel.cbxChoose.getSelectedIndex();
+            Date fromDate = fromDateChooser.getDate() == null ? null : fromDateChooser.getDate();
+            Date toDate = toDateChooser.getDate() == null ? null : toDateChooser.getDate();
+            ArrayList<ExportReceiptDTO> filteredImports = exportBLL.searchExports(searchTxt, prdId, userId, searchOpt, fromDate, toDate);
+            loadDataTable(filteredImports);
+        }
+    }
+
     @Override
     public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() == customerCbx || e.getSource() == userCbx) {
+            filter();
+        }
         // Xử lý khi thay đổi filter
     }
 
@@ -344,11 +394,27 @@ public class Export extends JPanel implements ActionListener, ItemListener, KeyL
 
     @Override
     public void keyReleased(KeyEvent e) {
-        // Xử lý tìm kiếm
+        filter();
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        // Xử lý khi thay đổi ngày
+        if (evt.getSource() == fromDateChooser || evt.getSource() == toDateChooser) {
+            filter();
+        }
+    }
+
+    private void exportToExcel() {
+        if (exportBLL == null || exportList.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Không có dữ liệu để xuất!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        try {
+            ExcelExporter.exportJTableToExcel(table);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi xuất file: " + ex.getMessage(), 
+                                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

@@ -21,6 +21,7 @@ public class MenuFunction extends JToolBar {
         buttons.put("detail", new ButtonToolbar("Chi Tiết", "info.svg", "view"));
         buttons.put("export", new ButtonToolbar("Xuất Excel", "export_excel.svg", "view"));
         buttons.put("history", new ButtonToolbar("Lịch sử", "history.svg", "history"));
+        
     }
 
     private void initComponents(String[] listBtn) {

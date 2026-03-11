@@ -15,7 +15,7 @@ public class ExportReceiptDAL {
     /**
      * Lấy tất cả phiếu xuất
      */
-    public ArrayList<ExportReceiptDTO> getAll() {
+    public ArrayList<ExportReceiptDTO> getExports() {
         ArrayList<ExportReceiptDTO> list = new ArrayList<>();
         String query = "SELECT export_id, export_date, status, user_id, total_price, customer_id FROM export_receipt WHERE status = 1";
 
@@ -38,7 +38,7 @@ public class ExportReceiptDAL {
                 list.add(exportReceipt);
             }
         } catch (SQLException e) {
-            System.err.println("Database error in getAll: " + e.getMessage());
+            System.err.println("Database error in getExports: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Error initializing database connection in getAll: " + e.getMessage());
         }

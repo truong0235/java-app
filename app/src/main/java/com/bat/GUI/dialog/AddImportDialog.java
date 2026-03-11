@@ -68,7 +68,7 @@ public class AddImportDialog extends JDialog implements ActionListener { // vde:
     private  static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
     private int USERID = 1;
 
-    public AddImportDialog(JFrame parent) {
+    public AddImportDialog(JFrame parent, int userId) {
         super(parent, "Thêm phiếu nhập", true);
         // this.currentUserId = userId;
         productList = productBLL.getProductsList();
