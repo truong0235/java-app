@@ -71,7 +71,7 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
     private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
 
 
-    public ReceiptDetailDialog(JFrame main, String title, ImportDTO importDTO) { // chp cột STT bên phải nhỏ lại (để có chỗ cho mã lô)
+    public ReceiptDetailDialog(JFrame main, String title, ImportDTO importDTO) { 
         super(main, title, true);
         this.importDTO = importDTO;
         this.prInImportList = productBLL.getPrdInImport(importDTO.getReceiptId());
@@ -79,7 +79,7 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
         initImport();
         this.setVisible(true); 
     }
-    public ReceiptDetailDialog(JFrame main, String title, ExportReceiptDTO exportDTO) { // chp cột STT bên phải nhỏ lại (để có chỗ cho mã lô)
+    public ReceiptDetailDialog(JFrame main, String title, ExportReceiptDTO exportDTO) {
         super(main, title, true);
         this.exportDTO = exportDTO;
         this.prInExportList = productBLL.getPrdInExport(exportDTO.getExport_id());
@@ -185,7 +185,6 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
                 if (type.equals("import")) {
                     LoadLotsData(lotBLL.getLotsByProductIdInImport(importDTO.getReceiptId(), prInImportList.get(idx).getProductId()));
                 } else {
-                    // LoadLotsData(lotBLL.getLotsByProductIdInExport(exportDTO.getExport_id(), prInExportList.get(idx).getProductId()));
                     LoadExportLotsData(exportBLL.getExportLotsByExportId(exportDTO.getExport_id(), prInExportList.get(idx).getProductId()));
                 }
             } 
@@ -290,7 +289,6 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
         txtUser.setText(userBLL.getUserNameById(exportDTO.getUser_id()));
         txtProvider.setText(customerBLL.getCustomerNameById(exportDTO.getCustomer_id()));
         
-        // Format date
         String formattedDate = exportDTO.getExport_date() != null ? exportDTO.getExport_date().format(DATE_FORMATTER) : "";
         txtCreatedDate.setText(formattedDate);
         
@@ -340,52 +338,62 @@ public class ReceiptDetailDialog extends JDialog implements ActionListener {
     
     private void exportToPDF() {
         try {
-            // Create file chooser
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Lưu phiếu nhập PDF");
             
-            // Set default file name
-            String defaultFileName = "PhieuNhap_" + importDTO.getReceiptId() + "_" + 
-                                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss")) + ".pdf";
+            boolean isImport = (importDTO != null);
+            
+            fileChooser.setDialogTitle(isImport ? "Lưu phiếu nhập PDF" : "Lưu phiếu xuất PDF");
+            
+            String defaultFileName;
+            if (isImport) {
+                defaultFileName = "PhieuNhap_" + importDTO.getReceiptId() + "_" + 
+                                LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss")) + ".pdf";
+            } else {
+                defaultFileName = "PhieuXuat_" + exportDTO.getExport_id() + "_" + 
+                                LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss")) + ".pdf";
+            }
             fileChooser.setSelectedFile(new File(defaultFileName));
             
-            // Set file filter
             FileNameExtensionFilter filter = new FileNameExtensionFilter("PDF Files", "pdf");
             fileChooser.setFileFilter(filter);
             
-            // Show save dialog
             int userSelection = fileChooser.showSaveDialog(this);
             
             if (userSelection == JFileChooser.APPROVE_OPTION) {
                 File fileToSave = fileChooser.getSelectedFile();
                 String filePath = fileToSave.getAbsolutePath();
                 
-                // Add .pdf extension if not present
                 if (!filePath.toLowerCase().endsWith(".pdf")) {
                     filePath += ".pdf";
                 }
                 
-                // Get provider details
-                ProviderDTO provider = prdBLL.getProviderById(importDTO.getProviderId());
-                String userName = userBLL.getUserNameById(importDTO.getUserId());
+                PDFExporter pdfExporter = new PDFExporter();
                 
-                // Get all lots for this import
-                ArrayList<LotDTO> lots = lotBLL.getLotsByImportId(importDTO.getReceiptId());
-                
-                // Create product name map
-                Map<Integer, String> productNames = new HashMap<>();
-                for (LotDTO lot : lots) {
-                    if (!productNames.containsKey(lot.getProductId())) {
-                        String productName = productBLL.getProductById(lot.getProductId()).getProductName();
-                        productNames.put(lot.getProductId(), productName);
+                if (isImport) {
+                    ProviderDTO provider = prdBLL.getProviderById(importDTO.getProviderId());
+                    String userName = userBLL.getUserNameById(importDTO.getUserId());
+                    
+                    ArrayList<LotDTO> lots = lotBLL.getLotsByImportId(importDTO.getReceiptId());
+                    
+                    Map<Integer, String> productNames = new HashMap<>();
+                    for (LotDTO lot : lots) {
+                        if (!productNames.containsKey(lot.getProductId())) {
+                            String productName = productBLL.getProductById(lot.getProductId()).getProductName();
+                            productNames.put(lot.getProductId(), productName);
+                        }
                     }
+                    
+                    pdfExporter.exportImportReceipt(filePath, importDTO, lots, productNames, userName, provider);
+                } else {
+                    String userName = userBLL.getUserNameById(exportDTO.getUser_id());
+                    
+                    ArrayList<ProductDTO> prInExportList = productBLL.getPrdInExport(exportDTO.getExport_id());
+                    
+                    var customer = customerBLL.getCustomerById(exportDTO.getCustomer_id());
+                    
+                    pdfExporter.exportExportReceipt(filePath, exportDTO, prInExportList, userName, customer);
                 }
                 
-                // Create PDF
-                PDFExporter pdfExporter = new PDFExporter();
-                pdfExporter.exportImportReceipt(filePath, importDTO, lots, productNames, userName, provider);
-                
-                // Show success message
                 JOptionPane.showMessageDialog(this, 
                     "Xuất PDF thành công!\nFile đã được lưu tại: " + filePath, 
                     "Thành công", 

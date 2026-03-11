@@ -80,7 +80,6 @@ public class CheckDetailDAL {
     }
 
     public boolean delete(int checkId){
-        // cân nhắc xóa mềm 
         String query = "DELETE FROM inventory_check_detail WHERE check_id = ?";
         try (
             DBConnectHelper db = new DBConnectHelper();

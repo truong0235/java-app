@@ -58,7 +58,7 @@ public class Chart extends javax.swing.JPanel {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+   
     private void initComponents() {
 
         blankPlotChart = new com.bat.GUI.component.chart.barchart.blankchart.BlankPlotChart();
@@ -89,10 +89,8 @@ public class Chart extends javax.swing.JPanel {
                 .addComponent(panelLegend, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-    }// </editor-fold>//GEN-END:initComponents
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    }
     private com.bat.GUI.component.chart.barchart.blankchart.BlankPlotChart blankPlotChart;
     private javax.swing.JPanel panelLegend;
-    // End of variables declaration//GEN-END:variables
+    
 }

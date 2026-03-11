@@ -15,13 +15,11 @@ public class ProductBLL {
         products = productDAL.getProducts();
     }
 
-    // Hàm mới chuẩn theo Customer
     public ArrayList<ProductDTO> getProductList() {
         products = productDAL.getProducts();
         return products;
     }
 
-    // Hàm cũ giữ lại để không bị lỗi AddCheckDialog
     public ArrayList<ProductDTO> getProductsList() {
         return getProductList();
     }
@@ -34,7 +32,6 @@ public class ProductBLL {
         return null;
     }
 
-    // --- GIỮ LẠI CHO CÁC MODULE KHÁC ---
     public ProductDTO getProductByLotId(int lotId){
         return productDAL.getProductByLotId(lotId);
     }
@@ -54,7 +51,6 @@ public class ProductBLL {
         return productDAL.getPrInExport(exportId);
     }
 
-    // --- LOGIC CHO GIAO DIỆN QUẢN LÝ ---
     public String add(ProductDTO p) {
         if (p.getProductName().trim().isEmpty()) return "Tên sản phẩm không được để trống!";
         if (p.getPublisher().trim().isEmpty()) return "Thương hiệu không được để trống!";

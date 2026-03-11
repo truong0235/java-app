@@ -62,15 +62,12 @@ public class LotDetailDialog extends JDialog implements ActionListener {
         this.setSize(900, 600);
         this.setLocationRelativeTo(null);
         
-        // Header
         JPanel headerPanel = createHeaderPanel();
         
-        // Main content
         JScrollPane scrollPane = new JScrollPane(createMainPanel());
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         
-        // Button panel
         JPanel buttonPanel = createButtonPanel();
         
         this.add(headerPanel, BorderLayout.NORTH);
@@ -104,25 +101,21 @@ public class LotDetailDialog extends JDialog implements ActionListener {
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
         container.setBackground(Color.WHITE);
         
-        // Lot Information Section
         JPanel lotInfoPanel = createSectionPanel("Thông tin lô hàng", createLotInfoContent());
         lotInfoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
         container.add(lotInfoPanel);
         container.add(Box.createVerticalStrut(15));
         
-        // Product & Import Information Section
         JPanel productImportPanel = createSectionPanel("Thông tin sản phẩm & Phiếu nhập", createProductImportContent());
         productImportPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 180));
         container.add(productImportPanel);
         container.add(Box.createVerticalStrut(15));
         
-        // Quantity & Price Information Section
         JPanel qtyPricePanel = createSectionPanel("Số lượng & Giá trị", createQtyPriceContent());
         qtyPricePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
         container.add(qtyPricePanel);
         container.add(Box.createVerticalStrut(15));
         
-        // Other Information Section
         JPanel otherInfoPanel = createSectionPanel("Thông tin khác", createOtherInfoContent());
         otherInfoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
         container.add(otherInfoPanel);
@@ -281,51 +274,43 @@ public class LotDetailDialog extends JDialog implements ActionListener {
     }
 
     private void loadData() {
-        // Lot basic info
         txtLotId.setText(String.valueOf(lot.getLotId()));
         txtLotCode.setText(lot.getLotCode());
         
-        // Product info
         ProductDTO product = productBLL.getProductById(lot.getProductId());
         if (product != null) {
             txtProductName.setText(product.getProductName());
         }
         
-        // Import info
         ImportDTO importDto = importBLL.getImportById(lot.getImportId());
         txtImportId.setText(String.valueOf(lot.getImportId()));
         
         if (importDto != null) {
-            // Provider info
             ProviderDTO provider = providerBLL.getProviderById(importDto.getProviderId());
             if (provider != null) {
                 txtProvider.setText(provider.getProviderName());
             }
             
-            // User info
             String userName = userBLL.getUserNameById(importDto.getUserId());
             if (userName != null) {
                 txtUser.setText(userName);
             }
         }
         
-        // Quantity & Price
         txtInitialQty.setText(String.valueOf(lot.getInitialQuantity()));
         txtCurrentQty.setText(String.valueOf(lot.getQuantity()));
         txtImportPrice.setText(CURRENCY_FORMATTER.format(lot.getImportPrice()));
         
-        // Other info
         txtPrintYear.setText(String.valueOf(lot.getPrintYear()));
         txtStatus.setText(lot.getStatus());
         txtImportDate.setText(lot.getImportDate().format(DATE_FORMATTER));
         
-        // Set color for current quantity
         if (lot.getQuantity() == 0) {
-            txtCurrentQty.setDisabledTextColor(new Color(220, 38, 38)); // Red
+            txtCurrentQty.setDisabledTextColor(new Color(220, 38, 38));
         } else if (lot.getQuantity() < lot.getInitialQuantity() * 0.3) {
-            txtCurrentQty.setDisabledTextColor(new Color(245, 158, 11)); // Orange
+            txtCurrentQty.setDisabledTextColor(new Color(245, 158, 11));
         } else {
-            txtCurrentQty.setDisabledTextColor(new Color(22, 163, 74)); // Green
+            txtCurrentQty.setDisabledTextColor(new Color(22, 163, 74));
         }
     }
 

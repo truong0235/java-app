@@ -8,7 +8,6 @@ import java.awt.FlowLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -17,7 +16,6 @@ import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 public class ItemTaskbar extends JPanel implements MouseListener {
-    // Font styles constants
     private static final String FONT_SMALL = "font: 100% $medium.font";
     private static final String FONT_MEDIUM = "font: 145% $medium.font";
     private static final String FONT_LARGE = "font: 200% $medium.font";
@@ -31,7 +29,7 @@ public class ItemTaskbar extends JPanel implements MouseListener {
     JLabel lblIcon, pnlContent, pnlSoLuong, pnlContent1;
     JPanel right;
     JLabel img;
-    public boolean isSelected; // đánh dấu mục đang chọn
+    public boolean isSelected; 
 
     public ItemTaskbar(String linkIcon, String content) {
         this.setLayout(new FlowLayout(1, 10, 7));
@@ -56,10 +54,8 @@ public class ItemTaskbar extends JPanel implements MouseListener {
     }
 
     public ItemTaskbar(String linkIcon, String content1, String content2) {
-        // Chỉnh lại FlowLayout (khoảng cách trên dưới) cho hợp lý
         this.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20)); 
         
-        // NẾU LÀ THẺ TO (Dashboard): Tăng chiều cao lên 150 để chứa đủ cái icon 110px
         this.setPreferredSize(new Dimension(250, 150)); 
         this.setBackground(DefaultColor);
         this.putClientProperty( FlatClientProperties.STYLE, "arc: 15" );
@@ -70,7 +66,6 @@ public class ItemTaskbar extends JPanel implements MouseListener {
         
         FlatSVGIcon svg2 = loadSvgIcon("/icon/" + linkIcon);
         if (svg2 != null) {
-            // 👉 ĐÃ SỬA: Ép kích thước ảnh SVG về 80x80 pixel để nằm vừa vặn trong cái JLabel 110x110
             lblIcon.setIcon(svg2.derive(80, 80)); 
         }
 
@@ -82,37 +77,8 @@ public class ItemTaskbar extends JPanel implements MouseListener {
         pnlContent.setForeground(FontColor);
         this.add(pnlContent);
 
-        // Lưu ý: Biến content2 hiện tại bạn đang truyền vào hàm nhưng lại chưa code để hiển thị nó ra (VD: add thêm 1 JLabel chứa content2)
     }
 
-    public ItemTaskbar(String linkImg, String tenSP, int soLuong) {
-
-        this.setLayout(new BorderLayout(0, 0));
-        this.setPreferredSize(new Dimension(380, 60));
-        this.setBackground(Color.white);
-
-        img = new JLabel("");
-        img.setIcon(InputImage.resizeImage(new ImageIcon("./src/img_product/" + linkImg), 38));
-        this.add(img, BorderLayout.WEST);
-
-        right = new JPanel();
-        right.setLayout(new FlowLayout(0, 0, 0));
-        right.setBorder(new EmptyBorder(10, 10, 0, 0));
-        right.setOpaque(false);
-        this.add(right, BorderLayout.CENTER);
-
-        pnlContent = new JLabel(tenSP);
-        pnlContent.putClientProperty("FlatLaf.style", FONT_SEMIBOLD);
-        pnlContent.setForeground(Color.black);
-        right.add(pnlContent);
-
-        pnlSoLuong = new JLabel("Số lượng: " + soLuong);
-        pnlSoLuong.setPreferredSize(new Dimension(350, 20));
-        pnlSoLuong.putClientProperty("FlatLaf.style", FONT_SMALL);
-        pnlSoLuong.setForeground(Color.gray);
-        right.add(pnlSoLuong);
-
-    }
 
     public ItemTaskbar(String linkIcon, String content, String content2, int n) {
         this.setLayout(new BorderLayout(0, 0));
@@ -163,7 +129,6 @@ public class ItemTaskbar extends JPanel implements MouseListener {
 
     @Override
     public void mouseClicked(java.awt.event.MouseEvent e) {
-        // TODO: Implement mouse click behavior if needed
     }
 
     @Override
@@ -183,12 +148,10 @@ public class ItemTaskbar extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(java.awt.event.MouseEvent e) {
-        // TODO: Implement mouse press behavior if needed
     }
 
     @Override
     public void mouseReleased(java.awt.event.MouseEvent e) {
-        // TODO: Implement mouse release behavior if needed
     }
     
 }

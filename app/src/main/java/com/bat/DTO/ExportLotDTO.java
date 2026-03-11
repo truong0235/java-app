@@ -9,7 +9,6 @@ public class ExportLotDTO {
     private int quantity;
     private BigDecimal exportPrice;
     
-    // Thêm các trường bổ sung để hiển thị
     private String productName;
     private String lotCode;
 

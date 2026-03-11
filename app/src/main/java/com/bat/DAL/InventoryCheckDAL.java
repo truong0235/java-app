@@ -59,7 +59,7 @@ public class InventoryCheckDAL {
         return -1;
     }
 
-    public boolean delete(int checkId) { // update SL sp, lô -> xóa ct kiểm kê, lsu thay đổi, 
+    public boolean delete(int checkId) {
         CheckDetailDAL checkDetailDAL = new CheckDetailDAL();
         LotTransactionDAL lotTransactionDAL = new LotTransactionDAL();
 

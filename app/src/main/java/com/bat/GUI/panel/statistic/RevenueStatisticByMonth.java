@@ -36,7 +36,6 @@ public class RevenueStatisticByMonth extends JPanel implements ActionListener {
     private final StatisticBLL statisticBLL;
     private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
     
-    // UI Components
     private JTextField txtYear;
     private JButton btnStatistic;
     private JButton btnRefresh;
@@ -60,14 +59,11 @@ public class RevenueStatisticByMonth extends JPanel implements ActionListener {
         setBackground(new Color(228, 238, 255));
         setBorder(new EmptyBorder(15, 15, 15, 15));
         
-        // Top panel - Filter controls
         add(createFilterPanel(), BorderLayout.NORTH);
         
-        // Center panel - Chart
         chartPanel = createChartPanel();
         add(chartPanel, BorderLayout.CENTER);
         
-        // Bottom panel - Table
         add(createTablePanel(), BorderLayout.SOUTH);
     }
     
@@ -145,7 +141,6 @@ public class RevenueStatisticByMonth extends JPanel implements ActionListener {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
         
-        // Set column widths
         table.getColumnModel().getColumn(0).setPreferredWidth(100);
         table.getColumnModel().getColumn(1).setPreferredWidth(200);
         table.getColumnModel().getColumn(2).setPreferredWidth(200);
@@ -165,15 +160,11 @@ public class RevenueStatisticByMonth extends JPanel implements ActionListener {
     
     private void loadData(int year) {
         try {
-            // Get data from BLL
             currentData = statisticBLL.getDoanhThuTheoTungThang(year);
             
-            // Clear table
             tableModel.setRowCount(0);
             
-            // Update chart and table
             for (ThongKeTheoThangDTO dto : currentData) {
-                // Add to chart
                 String label = "Tháng " + dto.getThang();
                 double[] values = {
                     dto.getChiphi().doubleValue(),
@@ -182,7 +173,6 @@ public class RevenueStatisticByMonth extends JPanel implements ActionListener {
                 };
                 chart.addData(new ModelChart(label, values));
                 
-                // Add to table
                 Object[] row = {
                     "Tháng " + dto.getThang(),
                     CURRENCY_FORMATTER.format(dto.getChiphi()),
@@ -192,7 +182,6 @@ public class RevenueStatisticByMonth extends JPanel implements ActionListener {
                 tableModel.addRow(row);
             }
             
-            // Refresh chart
             chart.repaint();
             chart.revalidate();
             
@@ -218,7 +207,6 @@ public class RevenueStatisticByMonth extends JPanel implements ActionListener {
     
     private void handleStatistic() {
         try {
-            // Check empty field
             if (txtYear.getText().trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this,
                     "Vui lòng nhập năm cần thống kê!",
@@ -229,7 +217,6 @@ public class RevenueStatisticByMonth extends JPanel implements ActionListener {
             
             int year = Integer.parseInt(txtYear.getText().trim());
             
-            // Validation: Year range
             if (year < 1900 || year > 2100) {
                 JOptionPane.showMessageDialog(this,
                     "Năm phải nằm trong khoảng từ 1900 đến 2100!",
@@ -238,7 +225,6 @@ public class RevenueStatisticByMonth extends JPanel implements ActionListener {
                 return;
             }
             
-            // Validation: Not future year
             int currentYear = Year.now().getValue();
             if (year > currentYear) {
                 JOptionPane.showMessageDialog(this,
@@ -248,7 +234,6 @@ public class RevenueStatisticByMonth extends JPanel implements ActionListener {
                 return;
             }
             
-            // Create new chart
             chartPanel.removeAll();
             chart = new Chart();
             chart.addLegend("Chi phí", new Color(255, 193, 7));
@@ -256,10 +241,8 @@ public class RevenueStatisticByMonth extends JPanel implements ActionListener {
             chart.addLegend("Lợi nhuận", new Color(168, 85, 247));
             chartPanel.add(chart, BorderLayout.CENTER);
             
-            // Load new data
             loadData(year);
             
-            // Refresh UI
             chartPanel.revalidate();
             chartPanel.repaint();
             
@@ -274,7 +257,6 @@ public class RevenueStatisticByMonth extends JPanel implements ActionListener {
     private void handleRefresh() {
         txtYear.setText(String.valueOf(Year.now().getValue()));
         
-        // Create new chart
         chartPanel.removeAll();
         chart = new Chart();
         chart.addLegend("Chi phí", new Color(255, 193, 7));
@@ -284,7 +266,6 @@ public class RevenueStatisticByMonth extends JPanel implements ActionListener {
         
         loadDefaultData();
         
-        // Refresh UI
         chartPanel.revalidate();
         chartPanel.repaint();
     }

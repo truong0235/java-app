@@ -58,11 +58,13 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
     JComboBox<String> userCbx;
     JDateChooser fromDateChooser, toDateChooser;
     Main main;
+    UserDTO currentUser;
     
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    public InventoryCheck(Main main) {
+    public InventoryCheck(Main main, UserDTO user) {
         this.main = main;
+        this.currentUser = user;
         initComponent();
         checkList = checkBLL.getCheckList();
         loadDataTable(checkList);
@@ -73,7 +75,6 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
         this.setBackground(new Color(228, 238, 255));
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
         
-        // Config cho trang quản lý phiếu kiểm kê
         String[] checkButtons = {"detail", "create", "delete", "export"};
         
         String[] checkSearchOptions = {"Tất cả", "Mã phiếu kiểm kê", "Nhân viên kiểm kê"};
@@ -82,11 +83,9 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
         menuBar.setBackground(new Color(228, 238, 255));
         menuBar.setBorder(new EmptyBorder(0, 0, 10, 0));
         
-        // Header panel với title và buttons
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
         
-        // Title panel bên trái
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
         titlePanel.setOpaque(false);
@@ -108,7 +107,6 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
 
         headerPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
         
-        // Tạo MenuFunction instance để truy cập buttons HashMap
         menuFunction = new MenuFunction(checkButtons);
         for (String btnKey : checkButtons) {
             JButton btn = menuFunction.buttons.get(btnKey);
@@ -119,7 +117,6 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
         headerPanel.add(menuFunction, BorderLayout.EAST);
         menuBar.add(headerPanel, BorderLayout.NORTH);
         
-        // Search panel ở dưới nếu có config
         if (checkSearchOptions != null) {
             searchPanel = new IntegratedSearch(checkSearchOptions);
             searchPanel.txtSearchForm.putClientProperty("JTextField.placeholderText", "Nhập nội dung tìm kiếm"); 
@@ -131,7 +128,6 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
 
         this.add(menuBar, BorderLayout.NORTH);
         
-        // Tạo table content cho phiếu nhập
         JPanel tablePanel = createCheckTablePanel();
         JPanel filterPanel = creatFilterPanel();
         this.add(filterPanel, BorderLayout.WEST);
@@ -194,7 +190,6 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
         panel.setBackground(new Color(228, 238, 255));
         panel.setBorder(new EmptyBorder(0, 10, 0, 0));
         
-        // Tạo table với dữ liệu mẫu phiếu nhập
         String[] columns = {"Mã phiếu", "Nhân viên kiểm kê", "Ngày kiểm kê" };
         tableModel = new DefaultTableModel(null, columns) {
             @Override
@@ -204,7 +199,6 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
         };
         
         table = new JTable(tableModel);
-        // Styling table
         table.setRowHeight(45);
         table.setShowVerticalLines(false);
         table.setShowHorizontalLines(true);
@@ -213,14 +207,12 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         table.setIntercellSpacing(new java.awt.Dimension(0, 1));
         
-        // Header styling
         JTableHeader header = table.getTableHeader();
         header.setBackground(new Color(248, 249, 250));
         header.setForeground(new Color(73, 80, 87));
         header.setFont(new Font("Segoe UI", Font.BOLD, 13));
         header.setBorder(new EmptyBorder(12, 0, 12, 0));
-        
-        // Center align for some columns
+     
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
@@ -261,13 +253,13 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
         String command = e.getActionCommand();
         switch (command) {
             case "create":
-                AddCheckDialog dialog = new AddCheckDialog(main);
+                AddCheckDialog dialog = new AddCheckDialog(main, currentUser.getUserId());
                 dialog.setVisible(true);
                 checkList = checkBLL.getCheckList();
                 loadDataTable(checkList);
                 break;
             case "delete":
-                // System.out.println("Delete button clicked");
+
                 int selectedRow = getRowSelected();
                 int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu kiểm kê đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
                 if (confirm == 0) {
@@ -285,10 +277,10 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
             case "detail":
                 int idx = getRowSelected();
                 CheckDetailDialog detailDialog = new CheckDetailDialog(main, checkList.get(idx));
-                // detailDialog.setVisible(true);
+
                 break;
             case "export":
-                // System.out.println("Export button clicked");
+
                 exportToExcel();
                 break;
             case "reset":
@@ -309,7 +301,7 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
     }
 
     public boolean validateFilterInputs(){
-        // System.out.println();
+
         Date fromDate = fromDateChooser.getDate();
         Date toDate = toDateChooser.getDate();
         Date currentDate = new Date();
@@ -360,19 +352,17 @@ public class InventoryCheck extends JPanel implements ActionListener, ItemListen
 
     @Override
     public void keyTyped(KeyEvent ke) {
-        // throw new UnsupportedOperationException("Not supported yet.");
-        // System.out.println("Key typed");
+
     }
 
     @Override
     public void keyPressed(KeyEvent ke) {
-        // throw new UnsupportedOperationException("Not supported yet.");
-        // System.out.println("Key pressed");
+
     }
 
     @Override
     public void keyReleased(KeyEvent ke) {
-        // throw new UnsupportedOperationException("Not supported yet.");
+
         filter();
     }
 

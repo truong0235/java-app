@@ -241,50 +241,36 @@ INSERT INTO customer (fullname, birthday, phone, address) VALUES
 -- ===================================================================
 INSERT INTO roles (name, status) VALUES
 ('Admin', 1),
-('Quản lý kho', 1),
-('Nhân viên nhập hàng', 1),
 ('Nhân viên bán hàng', 1),
-('Kế toán', 1),
-('Thủ kho', 1),
-('Giám đốc', 1),
-('Nhân viên kiểm kê', 1),
-('Trưởng phòng kinh doanh', 1),
-('Nhân viên CSKH', 1),
-('Trưởng phòng kho', 1),
-('Nhân viên marketing', 1),
-('Thủ quỹ', 1),
-('Trưởng phòng kế toán', 1),
-('Nhân viên IT', 1),
-('Bảo vệ', 1),
-('Lái xe', 1),
-('Tạp vụ', 1),
-('Thực tập sinh', 1),
-('Cộng tác viên', 1);
+('Nhân viên kho', 1),
+('Nhân viên kiểm kê', 1);
 
 -- ===================================================================
 -- 5. THÊM DỮ LIỆU CHO BẢNG USERS
+-- role_id 1 = Admin | role_id 2 = Nhân viên bán hàng
+-- role_id 3 = Nhân viên kho | role_id 4 = Nhân viên kiểm kê
 -- ===================================================================
 INSERT INTO users (role_id, username, password, avatar, fullname, phone, email, address, status) VALUES
-(1, 'admin', '123456', 'avatar1.jpg', 'Nguyễn Văn Admin', '0901111111', 'admin@khosach.vn', '123 Admin Street, Q.1, TP.HCM', 1),
-(2, 'qlkho01', '123456', 'avatar2.jpg', 'Trần Thị Kho', '0902222222', 'qlkho01@khosach.vn', '456 Warehouse Rd, Q.3, TP.HCM', 1),
-(3, 'nvnhap01', '123456', 'avatar3.jpg', 'Lê Văn Nhập', '0903333333', 'nvnhap01@khosach.vn', '789 Import St, Q.5, TP.HCM', 1),
-(4, 'nvban01', '123456', 'avatar4.jpg', 'Phạm Thị Bán', '0904444444', 'nvban01@khosach.vn', '321 Sales Ave, Q.10, TP.HCM', 1),
-(5, 'ketoan01', '123456', 'avatar5.jpg', 'Hoàng Văn Toán', '0905555555', 'ketoan01@khosach.vn', '654 Account Blvd, Q.Tân Bình, TP.HCM', 1),
-(6, 'thukho01', '123456', 'avatar6.jpg', 'Vũ Thị Thủ', '0906666666', 'thukho01@khosach.vn', '147 Stock Rd, Q.Bình Thạnh, TP.HCM', 1),
-(7, 'giamdoc01', '123456', 'avatar7.jpg', 'Đặng Văn Giám', '0907777777', 'giamdoc@khosach.vn', '258 Director St, Q.1, TP.HCM', 1),
-(8, 'nvkiemke01', '123456', 'avatar8.jpg', 'Bùi Thị Kiểm', '0908888888', 'nvkiemke01@khosach.vn', '369 Audit Lane, Q.3, TP.HCM', 1),
-(9, 'tpkinhdoanh', '123456', 'avatar9.jpg', 'Ngô Văn Kinh', '0909999999', 'tpkd@khosach.vn', '741 Business Rd, Q.5, TP.HCM', 1),
-(10, 'nvcskh01', '123456', 'avatar10.jpg', 'Dương Thị Chăm', '0910101010', 'cskh01@khosach.vn', '852 Service St, Q.10, TP.HCM', 1),
-(11, 'tpkho01', '123456', 'avatar11.jpg', 'Trịnh Văn Trưởng', '0911111111', 'tpkho01@khosach.vn', '963 Warehouse Mgr Rd, Q.Gò Vấp, TP.HCM', 1),
-(12, 'nvmarketing', '123456', 'avatar12.jpg', 'Lý Thị Marketing', '0912121212', 'marketing01@khosach.vn', '159 Marketing Ave, Q.Phú Nhuận, TP.HCM', 1),
-(13, 'thuquy01', '123456', 'avatar13.jpg', 'Phan Văn Quỹ', '0913131313', 'thuquy01@khosach.vn', '357 Cashier St, Q.1, TP.HCM', 1),
-(14, 'tpketoan', '123456', 'avatar14.jpg', 'Mai Thị Kế', '0914141414', 'tpketoan@khosach.vn', '486 Accounting Rd, Q.3, TP.HCM', 1),
-(15, 'nvit01', '123456', 'avatar15.jpg', 'Võ Văn IT', '0915151515', 'nvit01@khosach.vn', '597 Tech Lane, Q.Tân Bình, TP.HCM', 1),
-(3, 'nvnhap02', '123456', 'avatar16.jpg', 'Đỗ Thị Nhập 2', '0916161616', 'nvnhap02@khosach.vn', '168 Import St 2, Q.5, TP.HCM', 1),
-(4, 'nvban02', '123456', 'avatar17.jpg', 'Cao Văn Bán 2', '0917171717', 'nvban02@khosach.vn', '279 Sales Ave 2, Q.10, TP.HCM', 1),
-(4, 'nvban03', '123456', 'avatar18.jpg', 'Hồ Thị Bán 3', '0918181818', 'nvban03@khosach.vn', '381 Sales Ave 3, Q.10, TP.HCM', 1),
-(6, 'thukho02', '123456', 'avatar19.jpg', 'Tô Văn Thủ 2', '0919191919', 'thukho02@khosach.vn', '492 Stock Rd 2, Q.Bình Thạnh, TP.HCM', 1),
-(10, 'nvcskh02', '123456', 'avatar20.jpg', 'Lưu Thị Chăm 2', '0920202020', 'cskh02@khosach.vn', '513 Service St 2, Q.10, TP.HCM', 1);
+(1, 'admin',      '123456', 'avatar1.jpg',  'Nguyễn Văn Admin',  '0901111111', 'admin@khosach.vn',      '123 Admin Street, Q.1, TP.HCM',        1),
+(2, 'nvbh01',     '123456', 'avatar2.jpg',  'Trần Thị Bán',      '0902222222', 'nvbh01@khosach.vn',     '456 Sales Rd, Q.3, TP.HCM',            1),
+(2, 'nvbh02',     '123456', 'avatar3.jpg',  'Lê Văn Hàng',       '0903333333', 'nvbh02@khosach.vn',     '789 Sales Rd, Q.5, TP.HCM',            1),
+(2, 'nvbh03',     '123456', 'avatar4.jpg',  'Phạm Thị Xuất',     '0904444444', 'nvbh03@khosach.vn',     '321 Sales Ave, Q.10, TP.HCM',          1),
+(2, 'nvbh04',     '123456', 'avatar5.jpg',  'Hoàng Văn Giao',    '0905555555', 'nvbh04@khosach.vn',     '654 Sales Blvd, Q.Tân Bình, TP.HCM',  1),
+(2, 'nvbh05',     '123456', 'avatar6.jpg',  'Vũ Thị Đơn',        '0906666666', 'nvbh05@khosach.vn',     '147 Sales Rd, Q.Bình Thạnh, TP.HCM',  1),
+(3, 'nvkho01',    '123456', 'avatar7.jpg',  'Đặng Văn Nhập',     '0907777777', 'nvkho01@khosach.vn',    '258 Kho St, Q.1, TP.HCM',              1),
+(3, 'nvkho02',    '123456', 'avatar8.jpg',  'Bùi Thị Lô',        '0908888888', 'nvkho02@khosach.vn',    '369 Kho Lane, Q.3, TP.HCM',            1),
+(3, 'nvkho03',    '123456', 'avatar9.jpg',  'Ngô Văn Tồn',       '0909999999', 'nvkho03@khosach.vn',    '741 Kho Rd, Q.5, TP.HCM',              1),
+(3, 'nvkho04',    '123456', 'avatar10.jpg', 'Dương Thị Hàng',    '0910101010', 'nvkho04@khosach.vn',    '852 Kho St, Q.10, TP.HCM',             1),
+(3, 'nvkho05',    '123456', 'avatar11.jpg', 'Trịnh Văn Sắp',     '0911111111', 'nvkho05@khosach.vn',    '963 Kho Rd, Q.Gò Vấp, TP.HCM',        1),
+(3, 'nvkho06',    '123456', 'avatar12.jpg', 'Lý Thị Chuyển',     '0912121212', 'nvkho06@khosach.vn',    '159 Kho Ave, Q.Phú Nhuận, TP.HCM',    1),
+(3, 'nvkho07',    '123456', 'avatar13.jpg', 'Phan Văn Đóng',     '0913131313', 'nvkho07@khosach.vn',    '357 Kho St, Q.1, TP.HCM',              1),
+(4, 'nvkk01',     '123456', 'avatar14.jpg', 'Mai Thị Kiểm',      '0914141414', 'nvkk01@khosach.vn',     '486 Audit Rd, Q.3, TP.HCM',            1),
+(4, 'nvkk02',     '123456', 'avatar15.jpg', 'Võ Văn Kê',         '0915151515', 'nvkk02@khosach.vn',     '597 Audit Lane, Q.Tân Bình, TP.HCM',  1),
+(4, 'nvkk03',     '123456', 'avatar16.jpg', 'Đỗ Thị Đếm',        '0916161616', 'nvkk03@khosach.vn',     '168 Audit St, Q.5, TP.HCM',            1),
+(4, 'nvkk04',     '123456', 'avatar17.jpg', 'Cao Văn Tra',       '0917171717', 'nvkk04@khosach.vn',     '279 Audit Ave, Q.10, TP.HCM',          1),
+(4, 'nvkk05',     '123456', 'avatar18.jpg', 'Hồ Thị Soát',       '0918181818', 'nvkk05@khosach.vn',     '381 Audit Ave 2, Q.10, TP.HCM',        1),
+(4, 'nvkk06',     '123456', 'avatar19.jpg', 'Tô Văn Ghi',        '0919191919', 'nvkk06@khosach.vn',     '492 Audit Rd, Q.Bình Thạnh, TP.HCM',  1),
+(4, 'nvkk07',     '123456', 'avatar20.jpg', 'Lưu Thị Chép',      '0920202020', 'nvkk07@khosach.vn',     '513 Audit St, Q.10, TP.HCM',           1);
 
 -- ===================================================================
 -- 6. THÊM DỮ LIỆU CHO BẢNG PRODUCT
@@ -317,183 +303,183 @@ INSERT INTO product (product_name, pic, publisher, publish_year, author, languag
 
 -- Phiếu nhập 1
 INSERT INTO import_receipt (import_date, status, total_price, provider_id, user_id) 
-VALUES ('2024-01-15 08:30:00', 1, 45000000, 1, 3);
+VALUES ('2026-01-15 08:30:00', 1, 45000000, 1, 7);
 SET @import_id_1 = LAST_INSERT_ID();
 
 INSERT INTO lot (lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id)
 VALUES 
-('LOT2024011501', '2024-01-15 08:30:00', 100, 100, 2023, 70000, 'Còn', @import_id_1, 1),
-('LOT2024011502', '2024-01-15 08:30:00', 120, 120, 2023, 65000, 'Còn', @import_id_1, 2),
-('LOT2024011503', '2024-01-15 08:30:00', 80, 80, 2023, 150000, 'Còn', @import_id_1, 3);
+('LOT2026011501', '2026-01-15 08:30:00', 100, 100, 2023, 70000, 'Còn', @import_id_1, 1),
+('LOT2026011502', '2026-01-15 08:30:00', 120, 120, 2023, 65000, 'Còn', @import_id_1, 2),
+('LOT2026011503', '2026-01-15 08:30:00', 80, 80, 2023, 150000, 'Còn', @import_id_1, 3);
 
 UPDATE product SET quantity = quantity + 100 WHERE product_id = 1;
 UPDATE product SET quantity = quantity + 120 WHERE product_id = 2;
 UPDATE product SET quantity = quantity + 80 WHERE product_id = 3;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
-SELECT 'import', '2024-01-15 08:30:00', initial_quantity, quantity, @import_id_1, lot_id FROM lot WHERE import_id = @import_id_1;
+SELECT 'import', '2026-01-15 08:30:00', initial_quantity, quantity, @import_id_1, lot_id FROM lot WHERE import_id = @import_id_1;
 
 -- Phiếu nhập 2
 INSERT INTO import_receipt (import_date, status, total_price, provider_id, user_id) 
-VALUES ('2024-01-20 09:00:00', 1, 38000000, 2, 3);
+VALUES ('2026-01-20 09:00:00', 1, 38000000, 2, 8);
 SET @import_id_2 = LAST_INSERT_ID();
 
 INSERT INTO lot (lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id)
 VALUES 
-('LOT2024012001', '2024-01-20 09:00:00', 150, 150, 2023, 65000, 'Còn', @import_id_2, 4),
-('LOT2024012002', '2024-01-20 09:00:00', 100, 100, 2023, 140000, 'Còn', @import_id_2, 5),
-('LOT2024012003', '2024-01-20 09:00:00', 60, 60, 2023, 200000, 'Còn', @import_id_2, 6);
+('LOT2026012001', '2026-01-20 09:00:00', 150, 150, 2023, 65000, 'Còn', @import_id_2, 4),
+('LOT2026012002', '2026-01-20 09:00:00', 100, 100, 2023, 140000, 'Còn', @import_id_2, 5),
+('LOT2026012003', '2026-01-20 09:00:00', 60, 60, 2023, 200000, 'Còn', @import_id_2, 6);
 
 UPDATE product SET quantity = quantity + 150 WHERE product_id = 4;
 UPDATE product SET quantity = quantity + 100 WHERE product_id = 5;
 UPDATE product SET quantity = quantity + 60 WHERE product_id = 6;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
-SELECT 'import', '2024-01-20 09:00:00', initial_quantity, quantity, @import_id_2, lot_id FROM lot WHERE import_id = @import_id_2;
+SELECT 'import', '2026-01-20 09:00:00', initial_quantity, quantity, @import_id_2, lot_id FROM lot WHERE import_id = @import_id_2;
 
 -- Phiếu nhập 3
 INSERT INTO import_receipt (import_date, status, total_price, provider_id, user_id) 
-VALUES ('2024-01-25 10:15:00', 1, 42000000, 3, 16);
+VALUES ('2026-01-25 10:15:00', 1, 42000000, 3, 9);
 SET @import_id_3 = LAST_INSERT_ID();
 
 INSERT INTO lot (lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id)
 VALUES 
-('LOT2024012501', '2024-01-25 10:15:00', 90, 90, 2023, 120000, 'Còn', @import_id_3, 7),
-('LOT2024012502', '2024-01-25 10:15:00', 75, 75, 2023, 135000, 'Còn', @import_id_3, 8),
-('LOT2024012503', '2024-01-25 10:15:00', 110, 110, 2023, 150000, 'Còn', @import_id_3, 9);
+('LOT2026012501', '2026-01-25 10:15:00', 90, 90, 2023, 120000, 'Còn', @import_id_3, 7),
+('LOT2026012502', '2026-01-25 10:15:00', 75, 75, 2023, 135000, 'Còn', @import_id_3, 8),
+('LOT2026012503', '2026-01-25 10:15:00', 110, 110, 2023, 150000, 'Còn', @import_id_3, 9);
 
 UPDATE product SET quantity = quantity + 90 WHERE product_id = 7;
 UPDATE product SET quantity = quantity + 75 WHERE product_id = 8;
 UPDATE product SET quantity = quantity + 110 WHERE product_id = 9;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
-SELECT 'import', '2024-01-25 10:15:00', initial_quantity, quantity, @import_id_3, lot_id FROM lot WHERE import_id = @import_id_3;
+SELECT 'import', '2026-01-25 10:15:00', initial_quantity, quantity, @import_id_3, lot_id FROM lot WHERE import_id = @import_id_3;
 
 -- Phiếu nhập 4
 INSERT INTO import_receipt (import_date, status, total_price, provider_id, user_id) 
-VALUES ('2024-02-01 08:45:00', 1, 35000000, 4, 3);
+VALUES ('2026-02-01 08:45:00', 1, 35000000, 4, 10);
 SET @import_id_4 = LAST_INSERT_ID();
 
 INSERT INTO lot (lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id)
 VALUES 
-('LOT2024020101', '2024-02-01 08:45:00', 85, 85, 2023, 115000, 'Còn', @import_id_4, 10),
-('LOT2024020102', '2024-02-01 08:45:00', 130, 130, 2023, 80000, 'Còn', @import_id_4, 11),
-('LOT2024020103', '2024-02-01 08:45:00', 95, 95, 2023, 55000, 'Còn', @import_id_4, 12);
+('LOT2026020101', '2026-02-01 08:45:00', 85, 85, 2023, 115000, 'Còn', @import_id_4, 10),
+('LOT2026020102', '2026-02-01 08:45:00', 130, 130, 2023, 80000, 'Còn', @import_id_4, 11),
+('LOT2026020103', '2026-02-01 08:45:00', 95, 95, 2023, 55000, 'Còn', @import_id_4, 12);
 
 UPDATE product SET quantity = quantity + 85 WHERE product_id = 10;
 UPDATE product SET quantity = quantity + 130 WHERE product_id = 11;
 UPDATE product SET quantity = quantity + 95 WHERE product_id = 12;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
-SELECT 'import', '2024-02-01 08:45:00', initial_quantity, quantity, @import_id_4, lot_id FROM lot WHERE import_id = @import_id_4;
+SELECT 'import', '2026-02-01 08:45:00', initial_quantity, quantity, @import_id_4, lot_id FROM lot WHERE import_id = @import_id_4;
 
 -- Phiếu nhập 5
 INSERT INTO import_receipt (import_date, status, total_price, provider_id, user_id) 
-VALUES ('2024-02-05 09:30:00', 1, 48000000, 1, 16);
+VALUES ('2026-02-05 09:30:00', 1, 48000000, 1, 11);
 SET @import_id_5 = LAST_INSERT_ID();
 
 INSERT INTO lot (lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id)
 VALUES 
-('LOT2024020501', '2024-02-05 09:30:00', 125, 125, 2024, 75000, 'Còn', @import_id_5, 13),
-('LOT2024020502', '2024-02-05 09:30:00', 105, 105, 2024, 70000, 'Còn', @import_id_5, 14),
-('LOT2024020503', '2024-02-05 09:30:00', 140, 140, 2024, 145000, 'Còn', @import_id_5, 15);
+('LOT2026020501', '2026-02-05 09:30:00', 125, 125, 2024, 75000, 'Còn', @import_id_5, 13),
+('LOT2026020502', '2026-02-05 09:30:00', 105, 105, 2024, 70000, 'Còn', @import_id_5, 14),
+('LOT2026020503', '2026-02-05 09:30:00', 140, 140, 2024, 145000, 'Còn', @import_id_5, 15);
 
 UPDATE product SET quantity = quantity + 125 WHERE product_id = 13;
 UPDATE product SET quantity = quantity + 105 WHERE product_id = 14;
 UPDATE product SET quantity = quantity + 140 WHERE product_id = 15;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
-SELECT 'import', '2024-02-05 09:30:00', initial_quantity, quantity, @import_id_5, lot_id FROM lot WHERE import_id = @import_id_5;
+SELECT 'import', '2026-02-05 09:30:00', initial_quantity, quantity, @import_id_5, lot_id FROM lot WHERE import_id = @import_id_5;
 
 -- Phiếu nhập 6
 INSERT INTO import_receipt (import_date, status, total_price, provider_id, user_id) 
-VALUES ('2024-02-10 11:00:00', 1, 25000000, 5, 3);
+VALUES ('2026-02-10 11:00:00', 1, 25000000, 5, 7);
 SET @import_id_6 = LAST_INSERT_ID();
 
 INSERT INTO lot (lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id)
 VALUES 
-('LOT2024021001', '2024-02-10 11:00:00', 115, 115, 2024, 105000, 'Còn', @import_id_6, 16),
-('LOT2024021002', '2024-02-10 11:00:00', 200, 200, 2024, 14000, 'Còn', @import_id_6, 17),
-('LOT2024021003', '2024-02-10 11:00:00', 180, 180, 2024, 18000, 'Còn', @import_id_6, 18);
+('LOT2026021001', '2026-02-10 11:00:00', 115, 115, 2024, 105000, 'Còn', @import_id_6, 16),
+('LOT2026021002', '2026-02-10 11:00:00', 200, 200, 2024, 14000, 'Còn', @import_id_6, 17),
+('LOT2026021003', '2026-02-10 11:00:00', 180, 180, 2024, 18000, 'Còn', @import_id_6, 18);
 
 UPDATE product SET quantity = quantity + 115 WHERE product_id = 16;
 UPDATE product SET quantity = quantity + 200 WHERE product_id = 17;
 UPDATE product SET quantity = quantity + 180 WHERE product_id = 18;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
-SELECT 'import', '2024-02-10 11:00:00', initial_quantity, quantity, @import_id_6, lot_id FROM lot WHERE import_id = @import_id_6;
+SELECT 'import', '2026-02-10 11:00:00', initial_quantity, quantity, @import_id_6, lot_id FROM lot WHERE import_id = @import_id_6;
 
 -- Phiếu nhập 7
 INSERT INTO import_receipt (import_date, status, total_price, provider_id, user_id) 
-VALUES ('2024-02-15 08:20:00', 1, 52000000, 6, 16);
+VALUES ('2026-02-15 08:20:00', 1, 52000000, 6, 8);
 SET @import_id_7 = LAST_INSERT_ID();
 
 INSERT INTO lot (lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id)
 VALUES 
-('LOT2024021501', '2024-02-15 08:20:00', 95, 95, 2024, 165000, 'Còn', @import_id_7, 19),
-('LOT2024021502', '2024-02-15 08:20:00', 75, 75, 2024, 240000, 'Còn', @import_id_7, 20),
-('LOT2024021503', '2024-02-15 08:20:00', 100, 100, 2024, 70000, 'Còn', @import_id_7, 1);
+('LOT2026021501', '2026-02-15 08:20:00', 95, 95, 2024, 165000, 'Còn', @import_id_7, 19),
+('LOT2026021502', '2026-02-15 08:20:00', 75, 75, 2024, 240000, 'Còn', @import_id_7, 20),
+('LOT2026021503', '2026-02-15 08:20:00', 100, 100, 2024, 70000, 'Còn', @import_id_7, 1);
 
 UPDATE product SET quantity = quantity + 95 WHERE product_id = 19;
 UPDATE product SET quantity = quantity + 75 WHERE product_id = 20;
 UPDATE product SET quantity = quantity + 100 WHERE product_id = 1;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
-SELECT 'import', '2024-02-15 08:20:00', initial_quantity, quantity, @import_id_7, lot_id FROM lot WHERE import_id = @import_id_7;
+SELECT 'import', '2026-02-15 08:20:00', initial_quantity, quantity, @import_id_7, lot_id FROM lot WHERE import_id = @import_id_7;
 
 -- Phiếu nhập 8
 INSERT INTO import_receipt (import_date, status, total_price, provider_id, user_id) 
-VALUES ('2024-02-20 10:00:00', 1, 39000000, 7, 3);
+VALUES ('2026-02-20 10:00:00', 1, 39000000, 7, 9);
 SET @import_id_8 = LAST_INSERT_ID();
 
 INSERT INTO lot (lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id)
 VALUES 
-('LOT2024022001', '2024-02-20 10:00:00', 110, 110, 2024, 65000, 'Còn', @import_id_8, 2),
-('LOT2024022002', '2024-02-20 10:00:00', 88, 88, 2024, 150000, 'Còn', @import_id_8, 3),
-('LOT2024022003', '2024-02-20 10:00:00', 125, 125, 2024, 65000, 'Còn', @import_id_8, 4);
+('LOT2026022001', '2026-02-20 10:00:00', 110, 110, 2024, 65000, 'Còn', @import_id_8, 2),
+('LOT2026022002', '2026-02-20 10:00:00', 88, 88, 2024, 150000, 'Còn', @import_id_8, 3),
+('LOT2026022003', '2026-02-20 10:00:00', 125, 125, 2024, 65000, 'Còn', @import_id_8, 4);
 
 UPDATE product SET quantity = quantity + 110 WHERE product_id = 2;
 UPDATE product SET quantity = quantity + 88 WHERE product_id = 3;
 UPDATE product SET quantity = quantity + 125 WHERE product_id = 4;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
-SELECT 'import', '2024-02-20 10:00:00', initial_quantity, quantity, @import_id_8, lot_id FROM lot WHERE import_id = @import_id_8;
+SELECT 'import', '2026-02-20 10:00:00', initial_quantity, quantity, @import_id_8, lot_id FROM lot WHERE import_id = @import_id_8;
 
 -- Phiếu nhập 9
 INSERT INTO import_receipt (import_date, status, total_price, provider_id, user_id) 
-VALUES ('2024-02-25 09:15:00', 1, 44000000, 8, 16);
+VALUES ('2026-02-25 09:15:00', 1, 44000000, 8, 10);
 SET @import_id_9 = LAST_INSERT_ID();
 
 INSERT INTO lot (lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id)
 VALUES 
-('LOT2024022501', '2024-02-25 09:15:00', 92, 92, 2024, 140000, 'Còn', @import_id_9, 5),
-('LOT2024022502', '2024-02-25 09:15:00', 78, 78, 2024, 200000, 'Còn', @import_id_9, 6),
-('LOT2024022503', '2024-02-25 09:15:00', 105, 105, 2024, 120000, 'Còn', @import_id_9, 7);
+('LOT2026022501', '2026-02-25 09:15:00', 92, 92, 2024, 140000, 'Còn', @import_id_9, 5),
+('LOT2026022502', '2026-02-25 09:15:00', 78, 78, 2024, 200000, 'Còn', @import_id_9, 6),
+('LOT2026022503', '2026-02-25 09:15:00', 105, 105, 2024, 120000, 'Còn', @import_id_9, 7);
 
 UPDATE product SET quantity = quantity + 92 WHERE product_id = 5;
 UPDATE product SET quantity = quantity + 78 WHERE product_id = 6;
 UPDATE product SET quantity = quantity + 105 WHERE product_id = 7;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
-SELECT 'import', '2024-02-25 09:15:00', initial_quantity, quantity, @import_id_9, lot_id FROM lot WHERE import_id = @import_id_9;
+SELECT 'import', '2026-02-25 09:15:00', initial_quantity, quantity, @import_id_9, lot_id FROM lot WHERE import_id = @import_id_9;
 
 -- Phiếu nhập 10
 INSERT INTO import_receipt (import_date, status, total_price, provider_id, user_id) 
-VALUES ('2024-03-01 08:00:00', 1, 36000000, 9, 3);
+VALUES ('2026-03-01 08:00:00', 1, 36000000, 9, 11);
 SET @import_id_10 = LAST_INSERT_ID();
 
 INSERT INTO lot (lot_code, import_date, initial_quantity, quantity, print_year, import_price, status, import_id, product_id)
 VALUES 
-('LOT2024030101', '2024-03-01 08:00:00', 82, 82, 2024, 135000, 'Còn', @import_id_10, 8),
-('LOT2024030102', '2024-03-01 08:00:00', 98, 98, 2024, 150000, 'Còn', @import_id_10, 9),
-('LOT2024030103', '2024-03-01 08:00:00', 70, 70, 2024, 115000, 'Còn', @import_id_10, 10);
+('LOT2026030101', '2026-03-01 08:00:00', 82, 82, 2024, 135000, 'Còn', @import_id_10, 8),
+('LOT2026030102', '2026-03-01 08:00:00', 98, 98, 2024, 150000, 'Còn', @import_id_10, 9),
+('LOT2026030103', '2026-03-01 08:00:00', 70, 70, 2024, 115000, 'Còn', @import_id_10, 10);
 
 UPDATE product SET quantity = quantity + 82 WHERE product_id = 8;
 UPDATE product SET quantity = quantity + 98 WHERE product_id = 9;
 UPDATE product SET quantity = quantity + 70 WHERE product_id = 10;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
-SELECT 'import', '2024-03-01 08:00:00', initial_quantity, quantity, @import_id_10, lot_id FROM lot WHERE import_id = @import_id_10;
+SELECT 'import', '2026-03-01 08:00:00', initial_quantity, quantity, @import_id_10, lot_id FROM lot WHERE import_id = @import_id_10;
 
 -- ===================================================================
 -- 8. THÊM DỮ LIỆU CHO PHIẾU XUẤT (đã bỏ order_id)
@@ -501,7 +487,7 @@ SELECT 'import', '2024-03-01 08:00:00', initial_quantity, quantity, @import_id_1
 
 -- Phiếu xuất 1
 INSERT INTO export_receipt (export_date, status, total_price, user_id, customer_id)
-VALUES ('2024-01-17 10:30:00', 1, 667000, 4, 1);
+VALUES ('2026-01-17 10:30:00', 1, 667000, 2, 1);
 SET @export_id_1 = LAST_INSERT_ID();
 
 INSERT INTO export_detail (export_id, product_id) VALUES (@export_id_1, 1), (@export_id_1, 2);
@@ -517,12 +503,12 @@ UPDATE product SET quantity = quantity - 3 WHERE product_id = 2;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
 VALUES 
-('export', '2024-01-17 10:30:00', -5, (SELECT quantity FROM lot WHERE lot_id = 1), @export_id_1, 1),
-('export', '2024-01-17 10:30:00', -3, (SELECT quantity FROM lot WHERE lot_id = 2), @export_id_1, 2);
+('export', '2026-01-17 10:30:00', -5, (SELECT quantity FROM lot WHERE lot_id = 1), @export_id_1, 1),
+('export', '2026-01-17 10:30:00', -3, (SELECT quantity FROM lot WHERE lot_id = 2), @export_id_1, 2);
 
 -- Phiếu xuất 2
 INSERT INTO export_receipt (export_date, status, total_price, user_id, customer_id)
-VALUES ('2024-01-23 11:00:00', 1, 698000, 4, 2);
+VALUES ('2026-01-23 11:00:00', 1, 698000, 3, 2);
 SET @export_id_2 = LAST_INSERT_ID();
 
 INSERT INTO export_detail (export_id, product_id) VALUES (@export_id_2, 3), (@export_id_2, 4);
@@ -538,12 +524,12 @@ UPDATE product SET quantity = quantity - 4 WHERE product_id = 4;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
 VALUES 
-('export', '2024-01-23 11:00:00', -2, (SELECT quantity FROM lot WHERE lot_id = 3), @export_id_2, 3),
-('export', '2024-01-23 11:00:00', -4, (SELECT quantity FROM lot WHERE lot_id = 4), @export_id_2, 4);
+('export', '2026-01-23 11:00:00', -2, (SELECT quantity FROM lot WHERE lot_id = 3), @export_id_2, 3),
+('export', '2026-01-23 11:00:00', -4, (SELECT quantity FROM lot WHERE lot_id = 4), @export_id_2, 4);
 
 -- Phiếu xuất 3
 INSERT INTO export_receipt (export_date, status, total_price, user_id, customer_id)
-VALUES ('2024-01-28 14:15:00', 1, 1015000, 17, 3);
+VALUES ('2026-01-28 14:15:00', 1, 1015000, 4, 3);
 SET @export_id_3 = LAST_INSERT_ID();
 
 INSERT INTO export_detail (export_id, product_id) VALUES (@export_id_3, 5), (@export_id_3, 6);
@@ -559,12 +545,12 @@ UPDATE product SET quantity = quantity - 2 WHERE product_id = 6;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
 VALUES 
-('export', '2024-01-28 14:15:00', -3, (SELECT quantity FROM lot WHERE lot_id = 5), @export_id_3, 5),
-('export', '2024-01-28 14:15:00', -2, (SELECT quantity FROM lot WHERE lot_id = 6), @export_id_3, 6);
+('export', '2026-01-28 14:15:00', -3, (SELECT quantity FROM lot WHERE lot_id = 5), @export_id_3, 5),
+('export', '2026-01-28 14:15:00', -2, (SELECT quantity FROM lot WHERE lot_id = 6), @export_id_3, 6);
 
 -- Phiếu xuất 4
 INSERT INTO export_receipt (export_date, status, total_price, user_id, customer_id)
-VALUES ('2024-02-03 09:30:00', 1, 934000, 4, 4);
+VALUES ('2026-02-03 09:30:00', 1, 934000, 5, 4);
 SET @export_id_4 = LAST_INSERT_ID();
 
 INSERT INTO export_detail (export_id, product_id) VALUES (@export_id_4, 7), (@export_id_4, 8);
@@ -580,12 +566,12 @@ UPDATE product SET quantity = quantity - 2 WHERE product_id = 8;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
 VALUES 
-('export', '2024-02-03 09:30:00', -4, (SELECT quantity FROM lot WHERE lot_id = 7), @export_id_4, 7),
-('export', '2024-02-03 09:30:00', -2, (SELECT quantity FROM lot WHERE lot_id = 8), @export_id_4, 8);
+('export', '2026-02-03 09:30:00', -4, (SELECT quantity FROM lot WHERE lot_id = 7), @export_id_4, 7),
+('export', '2026-02-03 09:30:00', -2, (SELECT quantity FROM lot WHERE lot_id = 8), @export_id_4, 8);
 
 -- Phiếu xuất 5
 INSERT INTO export_receipt (export_date, status, total_price, user_id, customer_id)
-VALUES ('2024-02-08 15:45:00', 1, 845000, 17, 5);
+VALUES ('2026-02-08 15:45:00', 1, 845000, 6, 5);
 SET @export_id_5 = LAST_INSERT_ID();
 
 INSERT INTO export_detail (export_id, product_id) VALUES (@export_id_5, 9), (@export_id_5, 10);
@@ -601,12 +587,12 @@ UPDATE product SET quantity = quantity - 2 WHERE product_id = 10;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
 VALUES 
-('export', '2024-02-08 15:45:00', -3, (SELECT quantity FROM lot WHERE lot_id = 9), @export_id_5, 9),
-('export', '2024-02-08 15:45:00', -2, (SELECT quantity FROM lot WHERE lot_id = 10), @export_id_5, 10);
+('export', '2026-02-08 15:45:00', -3, (SELECT quantity FROM lot WHERE lot_id = 9), @export_id_5, 9),
+('export', '2026-02-08 15:45:00', -2, (SELECT quantity FROM lot WHERE lot_id = 10), @export_id_5, 10);
 
 -- Phiếu xuất 6
 INSERT INTO export_receipt (export_date, status, total_price, user_id, customer_id)
-VALUES ('2024-02-13 10:15:00', 1, 690000, 18, 6);
+VALUES ('2026-02-13 10:15:00', 1, 690000, 2, 6);
 SET @export_id_6 = LAST_INSERT_ID();
 
 INSERT INTO export_detail (export_id, product_id) VALUES (@export_id_6, 11), (@export_id_6, 12);
@@ -622,12 +608,12 @@ UPDATE product SET quantity = quantity - 3 WHERE product_id = 12;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
 VALUES 
-('export', '2024-02-13 10:15:00', -5, (SELECT quantity FROM lot WHERE lot_id = 11), @export_id_6, 11),
-('export', '2024-02-13 10:15:00', -3, (SELECT quantity FROM lot WHERE lot_id = 12), @export_id_6, 12);
+('export', '2026-02-13 10:15:00', -5, (SELECT quantity FROM lot WHERE lot_id = 11), @export_id_6, 11),
+('export', '2026-02-13 10:15:00', -3, (SELECT quantity FROM lot WHERE lot_id = 12), @export_id_6, 12);
 
 -- Phiếu xuất 7
 INSERT INTO export_receipt (export_date, status, total_price, user_id, customer_id)
-VALUES ('2024-02-18 13:30:00', 1, 635000, 4, 7);
+VALUES ('2026-02-18 13:30:00', 1, 635000, 3, 7);
 SET @export_id_7 = LAST_INSERT_ID();
 
 INSERT INTO export_detail (export_id, product_id) VALUES (@export_id_7, 13), (@export_id_7, 14);
@@ -643,12 +629,12 @@ UPDATE product SET quantity = quantity - 3 WHERE product_id = 14;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
 VALUES 
-('export', '2024-02-18 13:30:00', -4, (SELECT quantity FROM lot WHERE lot_id = 13), @export_id_7, 13),
-('export', '2024-02-18 13:30:00', -3, (SELECT quantity FROM lot WHERE lot_id = 14), @export_id_7, 14);
+('export', '2026-02-18 13:30:00', -4, (SELECT quantity FROM lot WHERE lot_id = 13), @export_id_7, 13),
+('export', '2026-02-18 13:30:00', -3, (SELECT quantity FROM lot WHERE lot_id = 14), @export_id_7, 14);
 
 -- Phiếu xuất 8
 INSERT INTO export_receipt (export_date, status, total_price, user_id, customer_id)
-VALUES ('2024-02-23 08:50:00', 1, 733000, 17, 8);
+VALUES ('2026-02-23 08:50:00', 1, 733000, 4, 8);
 SET @export_id_8 = LAST_INSERT_ID();
 
 INSERT INTO export_detail (export_id, product_id) VALUES (@export_id_8, 15), (@export_id_8, 16);
@@ -664,12 +650,12 @@ UPDATE product SET quantity = quantity - 3 WHERE product_id = 16;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
 VALUES 
-('export', '2024-02-23 08:50:00', -2, (SELECT quantity FROM lot WHERE lot_id = 15), @export_id_8, 15),
-('export', '2024-02-23 08:50:00', -3, (SELECT quantity FROM lot WHERE lot_id = 16), @export_id_8, 16);
+('export', '2026-02-23 08:50:00', -2, (SELECT quantity FROM lot WHERE lot_id = 15), @export_id_8, 15),
+('export', '2026-02-23 08:50:00', -3, (SELECT quantity FROM lot WHERE lot_id = 16), @export_id_8, 16);
 
 -- Phiếu xuất 9
 INSERT INTO export_receipt (export_date, status, total_price, user_id, customer_id)
-VALUES ('2024-02-28 16:20:00', 1, 356000, 18, 9);
+VALUES ('2026-02-28 16:20:00', 1, 356000, 5, 9);
 SET @export_id_9 = LAST_INSERT_ID();
 
 INSERT INTO export_detail (export_id, product_id) VALUES (@export_id_9, 17), (@export_id_9, 18);
@@ -685,12 +671,12 @@ UPDATE product SET quantity = quantity - 8 WHERE product_id = 18;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
 VALUES 
-('export', '2024-02-28 16:20:00', -10, (SELECT quantity FROM lot WHERE lot_id = 17), @export_id_9, 17),
-('export', '2024-02-28 16:20:00', -8, (SELECT quantity FROM lot WHERE lot_id = 18), @export_id_9, 18);
+('export', '2026-02-28 16:20:00', -10, (SELECT quantity FROM lot WHERE lot_id = 17), @export_id_9, 17),
+('export', '2026-02-28 16:20:00', -8, (SELECT quantity FROM lot WHERE lot_id = 18), @export_id_9, 18);
 
 -- Phiếu xuất 10
 INSERT INTO export_receipt (export_date, status, total_price, user_id, customer_id)
-VALUES ('2024-03-04 11:40:00', 1, 1175000, 4, 10);
+VALUES ('2026-03-04 11:40:00', 1, 1175000, 6, 10);
 SET @export_id_10 = LAST_INSERT_ID();
 
 INSERT INTO export_detail (export_id, product_id) VALUES (@export_id_10, 19), (@export_id_10, 20);
@@ -706,8 +692,8 @@ UPDATE product SET quantity = quantity - 2 WHERE product_id = 20;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
 VALUES 
-('export', '2024-03-04 11:40:00', -3, (SELECT quantity FROM lot WHERE lot_id = 19), @export_id_10, 19),
-('export', '2024-03-04 11:40:00', -2, (SELECT quantity FROM lot WHERE lot_id = 20), @export_id_10, 20);
+('export', '2026-03-04 11:40:00', -3, (SELECT quantity FROM lot WHERE lot_id = 19), @export_id_10, 19),
+('export', '2026-03-04 11:40:00', -2, (SELECT quantity FROM lot WHERE lot_id = 20), @export_id_10, 20);
 
 -- ===================================================================
 -- 9. THÊM DỮ LIỆU CHO KIỂM KÊ (VỚI CẬP NHẬT SỐ LƯỢNG)
@@ -715,7 +701,7 @@ VALUES
 
 -- Kiểm kê lần 1
 INSERT INTO inventory_check (check_date, status, user_id)
-VALUES ('2024-02-29 17:00:00', 1, 8);
+VALUES ('2026-02-28 17:00:00', 1, 14);
 SET @check_id_1 = LAST_INSERT_ID();
 
 INSERT INTO inventory_check_detail (check_id, lot_id, actual_quantity, system_quantity, difference) VALUES
@@ -731,12 +717,12 @@ UPDATE product SET quantity = quantity - 1 WHERE product_id = 1;
 UPDATE product SET quantity = quantity - 1 WHERE product_id = 4;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id) VALUES
-('adjust', '2024-02-29 17:00:00', -1, 94, @check_id_1, 1),
-('adjust', '2024-02-29 17:00:00', -1, 145, @check_id_1, 4);
+('adjust', '2026-02-28 17:00:00', -1, 94, @check_id_1, 1),
+('adjust', '2026-02-28 17:00:00', -1, 145, @check_id_1, 4);
 
 -- Kiểm kê lần 2
 INSERT INTO inventory_check (check_date, status, user_id)
-VALUES ('2024-03-15 16:30:00', 1, 8);
+VALUES ('2026-03-03 16:30:00', 1, 15);
 SET @check_id_2 = LAST_INSERT_ID();
 
 INSERT INTO inventory_check_detail (check_id, lot_id, actual_quantity, system_quantity, difference) VALUES
@@ -752,12 +738,12 @@ UPDATE product SET quantity = quantity - 1 WHERE product_id = 7;
 UPDATE product SET quantity = quantity + 1 WHERE product_id = 9;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id) VALUES
-('adjust', '2024-03-15 16:30:00', -1, 85, @check_id_2, 7),
-('adjust', '2024-03-15 16:30:00', 1, 108, @check_id_2, 9);
+('adjust', '2026-03-15 16:30:00', -1, 85, @check_id_2, 7),
+('adjust', '2026-03-15 16:30:00', 1, 108, @check_id_2, 9);
 
 -- Kiểm kê lần 3
 INSERT INTO inventory_check (check_date, status, user_id)
-VALUES ('2024-04-10 15:45:00', 1, 8);
+VALUES ('2026-03-05 15:45:00', 1, 16);
 SET @check_id_3 = LAST_INSERT_ID();
 
 INSERT INTO inventory_check_detail (check_id, lot_id, actual_quantity, system_quantity, difference) VALUES
@@ -771,7 +757,7 @@ UPDATE lot SET quantity = 91 WHERE lot_id = 12;
 UPDATE product SET quantity = quantity - 1 WHERE product_id = 12;
 
 INSERT INTO lot_transaction (type, date, quantity_change, quantity, ref_id, lot_id)
-VALUES ('adjust', '2024-04-10 15:45:00', -1, 91, @check_id_3, 12);
+VALUES ('adjust', '2026-04-10 15:45:00', -1, 91, @check_id_3, 12);
 
 -- ===================================================================
 -- KẾT THÚC THÊM DỮ LIỆU

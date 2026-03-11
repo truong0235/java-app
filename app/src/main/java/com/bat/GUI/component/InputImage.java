@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.bat.GUI.component;
 
 import java.awt.Color;
@@ -24,10 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
-/**
- *
- * @author 84907
- */
 public class InputImage extends JPanel implements ActionListener {
 
     private JButton btnChooseImg;

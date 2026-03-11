@@ -12,7 +12,6 @@ public class LegendItem extends JPanel{
         lbName.setText(data.getName());
     }
 
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         lbColor = new com.bat.GUI.component.chart.barchart.LabelColor();
@@ -45,10 +44,8 @@ public class LegendItem extends JPanel{
                     .addComponent(lbColor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
-    }// </editor-fold>//GEN-END:initComponents
-
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    }
+    
     private com.bat.GUI.component.chart.barchart.LabelColor lbColor;
     private javax.swing.JLabel lbName;
 }

@@ -18,7 +18,6 @@ public class CustomerDAL {
              PreparedStatement ps = conn.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                // Convert java.sql.Date to java.util.Date
                 java.sql.Date sqlDate = rs.getDate("birthday");
                 java.util.Date birthday = (sqlDate != null) ? new java.util.Date(sqlDate.getTime()) : null;
                 
@@ -55,7 +54,6 @@ public class CustomerDAL {
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, c.getCustomerId());
             ps.setString(2, c.getFullName());
-            // Convert java.util.Date to java.sql.Date
             if (c.getBirthday() != null) {
                 ps.setDate(3, new java.sql.Date(c.getBirthday().getTime()));
             } else {
@@ -76,7 +74,6 @@ public class CustomerDAL {
              Connection conn = db.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, c.getFullName());
-            // Convert java.util.Date to java.sql.Date
             if (c.getBirthday() != null) {
                 ps.setDate(2, new java.sql.Date(c.getBirthday().getTime()));
             } else {

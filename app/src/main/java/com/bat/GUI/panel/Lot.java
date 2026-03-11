@@ -47,16 +47,13 @@ import com.bat.utils.helper.ExcelExporter;
 import com.toedter.calendar.JDateChooser;
 
 public class Lot extends JPanel implements ActionListener, ItemListener, KeyListener, PropertyChangeListener {
-    // UserBLL userBLL = new UserBLL();
+
     ProviderBLL providerBLL = new ProviderBLL();
     LotBLL lotBLL = new LotBLL();
     ProductBLL productBLL = new ProductBLL();
-    // ImportBLL importBLL = new ImportBLL();
-
 
     DefaultTableModel tableModel;
     JTable table;
-    // ArrayList<ImportDTO> importList;
     ArrayList<LotDTO> lotList;
     
 
@@ -68,12 +65,10 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
     
     private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
 
-    // private boolean isInitialized = false;
-
     public Lot(Main main) {
         this.main = main;
         initComponent();
-        // importList = importBLL.getImportList();
+
         lotList = lotBLL.getLotList();
         loadDataTable(lotList);
     }
@@ -83,7 +78,6 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         this.setBackground(new Color(228, 238, 255));
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
         
-        // Config cho trang quản lý phiếu nhập
         String[] importButtons = {"detail", "history", "update", "export"};
         
         String[] importSearchOptions = {"Tất cả", "Mã lô", "Mã lô TT", "Tên sản phẩm"};
@@ -92,11 +86,9 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         menuBar.setBackground(new Color(228, 238, 255));
         menuBar.setBorder(new EmptyBorder(0, 0, 10, 0));
         
-        // Header panel với title và buttons
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
         
-        // Title panel bên trái
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
         titlePanel.setOpaque(false);
@@ -117,8 +109,7 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         headerPanel.add(titlePanel, BorderLayout.WEST);
 
         headerPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
-        
-        // Tạo MenuFunction instance để truy cập buttons HashMap
+
         menuFunction = new MenuFunction(importButtons);
         for (String btnKey : importButtons) {
             JButton btn = menuFunction.buttons.get(btnKey);
@@ -128,8 +119,7 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         
         headerPanel.add(menuFunction, BorderLayout.EAST);
         menuBar.add(headerPanel, BorderLayout.NORTH);
-        
-        // Search panel ở dưới nếu có config
+
         if (importSearchOptions != null) {
             searchPanel = new IntegratedSearch(importSearchOptions);
             searchPanel.txtSearchForm.putClientProperty("JTextField.placeholderText", "Nhập mã lô hàng, ..."); 
@@ -140,8 +130,7 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         }
 
         this.add(menuBar, BorderLayout.NORTH);
-        
-        // Tạo table content cho lô hàng
+
         JPanel tablePanel = createLotTablePanel();
         JPanel filterPanel = creatFilterPanel();
         this.add(filterPanel, BorderLayout.WEST);
@@ -156,7 +145,7 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         panel.setBorder(new EmptyBorder(0, 10, 250, 10));
 
         List<ProviderDTO> prdList = providerBLL.getProviderList();
-        // List<UserDTO> userList = userBLL.getUserList();
+
         List<ProductDTO> productList = productBLL.getProductsList();
 
         JPanel prdPn = new JPanel();
@@ -177,9 +166,7 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         JLabel userLbl = new JLabel("Tên sản phẩm:");
         productCbx = new JComboBox<>();
         productCbx.addItem("Tất cả");
-        // for (UserDTO user : userList) {
-        //     userCbx.addItem(user.getUsername());
-        // }
+
         for (ProductDTO prd : productList) {
             productCbx.addItem(prd.getProductName());
         }
@@ -223,7 +210,6 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         panel.setBackground(new Color(228, 238, 255));
         panel.setBorder(new EmptyBorder(0, 10, 0, 0));
         
-        // Tạo table với dữ liệu mẫu phiếu nhập
         String[] columns = {"Mã lô", "Mã lô TT", "Tên sản phẩm", "Số lượng BĐ" ,"Số lượng HT", "Giá nhập", "Trạng thái"};
         tableModel = new DefaultTableModel(null, columns) {
             @Override
@@ -233,7 +219,7 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         };
         
         table = new JTable(tableModel);
-        // Styling table
+
         table.setRowHeight(45);
         table.setShowVerticalLines(false);
         table.setShowHorizontalLines(true);
@@ -242,14 +228,14 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         table.setIntercellSpacing(new java.awt.Dimension(0, 1));
         
-        // Header styling
+
         JTableHeader header = table.getTableHeader();
         header.setBackground(new Color(248, 249, 250));
         header.setForeground(new Color(73, 80, 87));
         header.setFont(new Font("Segoe UI", Font.BOLD, 13));
         header.setBorder(new EmptyBorder(12, 0, 12, 0));
         
-        // Column widths
+
         table.getColumnModel().getColumn(0).setPreferredWidth(50);
         table.getColumnModel().getColumn(1).setPreferredWidth(150);
         table.getColumnModel().getColumn(2).setPreferredWidth(200);
@@ -258,21 +244,6 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         table.getColumnModel().getColumn(5).setPreferredWidth(100);
         table.getColumnModel().getColumn(6).setPreferredWidth(100);
         
-        // Cell renderer for status column
-        // table.getColumnModel().getColumn(4).setCellRenderer(new ImportStatusCellRenderer());
-        
-        // Center align for some columns
-        // DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        // centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        // table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-        // table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
-        // table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-        // table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
-        
-        // Right align for money column
-        // DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-        // rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
-        // table.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
         
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(null);
@@ -282,33 +253,8 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
         return panel;
     }
     
-    // Custom renderer for status column
-    // private class ImportStatusCellRenderer extends DefaultTableCellRenderer {
-    //     @Override
-    //     public Component getTableCellRendererComponent(JTable table, Object value,
-    //             boolean isSelected, boolean hasFocus, int row, int column) {
-            
-    //         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            
-    //         if (value != null) {
-    //             String status = value.toString();
-    //             if (status.equals("Đã duyệt")) {
-    //                 setForeground(new Color(22, 163, 74));
-    //             } else if (status.equals("Chờ duyệt")) {
-    //                 setForeground(new Color(245, 158, 11));
-    //             } else if (status.equals("Đã hủy")) {
-    //                 setForeground(new Color(220, 38, 38));
-    //             }
-    //             setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
-    //         }
-            
-    //         setHorizontalAlignment(SwingConstants.CENTER);
-    //         return this;
-    //     }
-    // }
 
     public void loadDataTable(ArrayList<LotDTO> lotData) {
-        // importList = importBLL.getImportList();
         tableModel.setRowCount(0);
         for (LotDTO lot : lotData) {
             ProductDTO prd = productBLL.getProductById(lot.getProductId());
@@ -339,39 +285,7 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
         switch (command) {
-        //     case "create":
-        //         AddImportDialog dialog = new AddImportDialog(main);
-        //         dialog.setVisible(true);
-        //         importList = importBLL.getImportList();
-        //         loadDataTable(importList);
-        //         break;
-        //     case "update":
-        //         System.out.println("Update button clicked");
-        //         break;
-        //     case "delete":
-        //         // System.out.println("Delete button clicked");
-        //         int selectedRow = getRowSelected();
-        //         int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu nhập đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-        //         if (confirm == 0) {
-        //             ImportDTO selectedImport = importList.get(selectedRow);
-        //             if (importBLL.cancelImport(selectedImport.getReceiptId())) {
-        //                 importList = importBLL.getImportList();
-        //                 JOptionPane.showMessageDialog(null, "Xóa phiếu nhập thành công.");
-        //                 loadDataTable(importList);
-        //             }
-        //             else {
-        //                 JOptionPane.showMessageDialog(null, "Sản phẩm trong phiếu này đã được xuất kho, không thể xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-        //             }
-        //         }
-        //         break;
-        //     case "detail":
-        //         int idx = getRowSelected();
-        //         ReceiptDetailDialog detailDialog = new ReceiptDetailDialog(main, "Chi tiết phiếu nhập", importList.get(idx));
-        //         // detailDialog.setVisible(true);
-        //         break;
-        //     case "export":
-        //         System.out.println("Export button clicked");
-        //         break;
+   
             case "detail":
                 int detailRow = getRowSelected();
                 if (detailRow != -1) {
@@ -391,7 +305,6 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
                 if (updateRow != -1) {
                     LotDTO updateLot = lotList.get(updateRow);
                     UpdateLotStatusDialog updateDialog = new UpdateLotStatusDialog(main, updateLot);
-                    // Reload table if status was updated
                     if (updateDialog.isUpdated()) {
                         filter();
                     }
@@ -471,17 +384,17 @@ public class Lot extends JPanel implements ActionListener, ItemListener, KeyList
 
     @Override
     public void keyTyped(KeyEvent ke) {
-        // throw new UnsupportedOperationException("Not supported yet.");
+
     }
 
     @Override
     public void keyPressed(KeyEvent ke) {
-        // throw new UnsupportedOperationException("Not supported yet.");
+
     }
 
     @Override
     public void keyReleased(KeyEvent ke) {
-        // throw new UnsupportedOperationException("Not supported yet.");
+
         filter();
     }
 

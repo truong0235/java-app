@@ -6,11 +6,8 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Shape;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
@@ -21,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 
 public class PieChart extends JComponent {
 
@@ -36,33 +32,6 @@ public class PieChart extends JComponent {
     public PieChart() {
         models = new ArrayList<>();
         setForeground(new Color(60, 60, 60));
-        MouseAdapter mouseEvent = new MouseAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                int index = checkMouseHover(e.getPoint());
-                if (index != hoverIndex) {
-                    hoverIndex = index;
-                    repaint();
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) {
-                    int index = checkMouseHover(e.getPoint());
-                    if (index != -1) {
-                        if (index != selectedIndex) {
-                            selectedIndex = index;
-                        } else {
-                            selectedIndex = -1;
-                        }
-                        repaint();
-                    }
-                }
-            }
-        };
-        addMouseListener(mouseEvent);
-        addMouseMotionListener(mouseEvent);
     }
 
     @Override
@@ -198,37 +167,7 @@ public class PieChart extends JComponent {
         double total = getTotalvalue();
         return format.format(value * 100 / total);
     }
-
-    private int checkMouseHover(Point point) {
-        int index = -1;
-        double width = getWidth();
-        double height = getHeight();
-        float p = borderHover;
-        double size = Math.min(width, height);
-        size -= (size * p) + padding * size;
-        double x = (width - size) / 2;
-        double y = (height - size) / 2;
-        double totalValue = getTotalvalue();
-        double drawAngle = 90;
-        for (int i = 0; i < models.size(); i++) {
-            ModelPieChart data = models.get(i);
-            double angle = data.getValues() * 360 / totalValue;
-            Area area = new Area(new Arc2D.Double(x, y, size, size, drawAngle, -angle, Arc2D.PIE));
-            if (chartType == PeiChartType.DONUT_CHART) {
-                double s1 = size * 0.5f;
-                double x1 = (width - s1) / 2;
-                double y1 = (height - s1) / 2;
-                area.subtract(new Area(new Ellipse2D.Double(x1, y1, s1, s1)));
-            }
-            if (area.contains(point)) {
-                index = i;
-                break;
-            }
-            drawAngle -= angle;
-        }
-        return index;
-    }
-
+    
     private double getTotalvalue() {
         double max = 0;
         for (ModelPieChart data : models) {
@@ -261,8 +200,6 @@ public class PieChart extends JComponent {
     }
     
     public void start() {
-        // Phương thức này để tương thích với code cũ
-        // Animation có thể được thêm vào sau nếu cần
         repaint();
     }
 

@@ -2,12 +2,8 @@ package com.bat.DTO.Statistic;
 
 import java.util.Objects;
 
-/**
- *
- * @author Tran Nhat Sinh
- */
 public class ThongKeDoanhThuDTO {
-    int thoigian; // nam, thang, ngay
+    int thoigian; 
     Long von;
     Long doanhthu;
     Long loinhuan;

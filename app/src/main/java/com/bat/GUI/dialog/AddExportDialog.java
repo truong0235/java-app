@@ -53,28 +53,26 @@ public class AddExportDialog extends JDialog implements ActionListener {
     private ArrayList<ProductDTO> filteredProducts;
     private ArrayList<ExportLotDTO> selectedExportLots = new ArrayList<>();
 
-    // Left panel - Product search
     private JTextField txtSearch;
     private JTable tblProducts;
     private DefaultTableModel productTableModel;
 
-    // Right panel - Lot details
     private JTextField txtProductName, txtProductId, txtPublisher, txtPrice;
     private JComboBox<String> cbxCustomer, cbxLot;
     private JButton btnAdd, btnEdit, btnDelete;
     private JSpinner spnQuantity;
     
-    // Bottom panel - Selected lots
     private JTable tblSelectedLots;
     private DefaultTableModel selectedLotsTableModel;
     private JLabel lblTotalPrice, labelQuantity;
     private JButton btnExport, btnCancel;
 
     private static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
-    private int USERID = 1;
+    private int currentUserId;
 
-    public AddExportDialog(JFrame parent) {
+    public AddExportDialog(JFrame parent, int userId) {
         super(parent, "Thêm phiếu xuất hàng", true);
+        this.currentUserId = userId;
         productList = productBLL.getProductsList();
         filteredProducts = new ArrayList<>(productList);
         
@@ -87,12 +85,10 @@ public class AddExportDialog extends JDialog implements ActionListener {
         setLayout(new BorderLayout(10, 10));
         ((JPanel) getContentPane()).setBorder(new EmptyBorder(0, 0, 0, 0));
 
-        // Create main split panel
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBackground(new Color(228, 238, 255));
         mainPanel.setBorder(new EmptyBorder(5,5,5,5));
         
-        // Left-Right split
         JPanel topPanel = new JPanel(new GridLayout(1, 2, 10, 0));
         topPanel.setBackground(Color.WHITE);
         topPanel.add(createProductSearchPanel());
@@ -109,7 +105,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
         panel.setBorder(new EmptyBorder(5,5,5,5));
         panel.setBackground(Color.WHITE);
 
-        // Search box
         JPanel searchPanel = new JPanel(new BorderLayout(5, 5));
         searchPanel.setBackground(Color.WHITE);
         txtSearch = new JTextField();
@@ -123,7 +118,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
         });
         searchPanel.add(txtSearch, BorderLayout.CENTER);
 
-        // Product table
         String[] columns = {"Mã SP", "Tên sản phẩm", "SL"};
         productTableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -159,7 +153,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
         panel.setBorder(new EmptyBorder(5,5,5,5));
         panel.setBackground(Color.WHITE);
 
-        // Customer
         JPanel customerPn = new JPanel(new GridLayout(2, 1, 5, 5));
         customerPn.setBackground(Color.WHITE);
         customerPn.add(new JLabel("Khách hàng"));
@@ -170,7 +163,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
         }
         customerPn.add(cbxCustomer);
 
-        // Product name
         JPanel prdNamePn = new JPanel(new GridLayout(2, 1, 5, 5));
         prdNamePn.setBackground(Color.WHITE);
         prdNamePn.add(new JLabel("Tên sản phẩm"));
@@ -178,7 +170,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
         txtProductName.setEditable(false);
         prdNamePn.add(txtProductName);
 
-        // Product ID & Lot Code
         JPanel idLotPn = new JPanel(new GridLayout(1, 2, 5, 5));
         idLotPn.setBackground(Color.WHITE);
         
@@ -199,7 +190,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
         idLotPn.add(idPn);
         idLotPn.add(lotPn);
 
-        // Publisher
         JPanel publisherPn = new JPanel(new GridLayout(2, 1, 5, 5));
         publisherPn.setBackground(Color.WHITE);
         publisherPn.add(new JLabel("Nhà xuất bản"));
@@ -207,7 +197,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
         txtPublisher.setEditable(false);
         publisherPn.add(txtPublisher);
 
-        // Price & Quantity
         JPanel priceQtyPn = new JPanel(new GridLayout(1, 2, 5, 5));
         priceQtyPn.setBackground(Color.WHITE);
         
@@ -271,7 +260,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
         panel.setBackground(Color.WHITE);
         panel.setPreferredSize(new Dimension(0, 250));
 
-        // Table
         String[] columns = {"STT", "Mã SP", "Tên sản phẩm", "Mã lô", "Đơn giá", "Số lượng"};
         selectedLotsTableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -290,7 +278,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
             }
         });
         
-        // Bottom panel with total and buttons
         JPanel bottomPn = new JPanel(new BorderLayout());
         bottomPn.setBackground(Color.WHITE);
         
@@ -368,7 +355,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
             txtPublisher.setText(product.getPublisher());
             txtPrice.setText(product.getPrice().toString());
             
-            // Load lô hàng của sản phẩm
             cbxLot.removeAllItems();
             listLotsBaseOnProduct = lotBLL.getLotsByProductId(product.getProductId());
             for (LotDTO lot : listLotsBaseOnProduct) {
@@ -405,7 +391,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
             return false;
         }
         
-        // Kiểm tra trùng lô trong danh sách đã chọn
         for (ExportLotDTO exportLot : selectedExportLots) {
             if (!oldLotText.isEmpty() && exportLot.getLotCode().equals(oldLotText)) 
                 continue;
@@ -428,7 +413,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
             return false;
         }
 
-        // Kiểm tra số lượng tồn kho
         if (spnQuantity.getValue() != null && (int) spnQuantity.getValue() > 0) {
             for (LotDTO lot : listLotsBaseOnProduct) {
                 if (cbxLot.getSelectedIndex() != -1 && lot.getLotCode().equals(cbxLot.getSelectedItem())) {
@@ -447,10 +431,8 @@ public class AddExportDialog extends JDialog implements ActionListener {
         try {
             String qtyText = spnQuantity.getValue().toString();
             String priceText = txtPrice.getText().trim();
-            // String lotText = (String) cbxLot.getSelectedItem();
             String lotText = cbxLot.getSelectedIndex() != -1 ? (String) cbxLot.getSelectedItem() : "";
 
-            // Validate inputs
             if (!validateInput(lotText, "", qtyText, priceText)) {
                 return;
             }
@@ -461,7 +443,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
             String productName = txtProductName.getText();
             LotDTO lot = lotBLL.getLotByCode(lotText);
             
-            // Create export lot
             ExportLotDTO exportLot = new ExportLotDTO();
             exportLot.setProductId(productId);
             exportLot.setProductName(productName);
@@ -472,7 +453,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
             
             selectedExportLots.add(exportLot);
             
-            // Add to table
             selectedLotsTableModel.addRow(new Object[]{
                 selectedLotsTableModel.getRowCount() + 1,
                 productId,
@@ -523,7 +503,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
         try {
             BigDecimal totalPrice = calTotalPrice();     
             
-            // Lấy customerId
             ArrayList<CustomerDTO> customers = customerBLL.getCustomerList();
             int customerId = -1;
             if (cbxCustomer.getSelectedIndex() >= 0 && cbxCustomer.getSelectedIndex() < customers.size()) {
@@ -535,11 +514,10 @@ public class AddExportDialog extends JDialog implements ActionListener {
                 return;
             }
             
-            // Create export receipt
             ExportReceiptDTO exportDTO = new ExportReceiptDTO();
             exportDTO.setExport_date(LocalDateTime.now());
             exportDTO.setStatus(1);
-            exportDTO.setUser_id(USERID);
+            exportDTO.setUser_id(currentUserId);
             exportDTO.setTotal_price(totalPrice.intValue());
             exportDTO.setCustomer_id(customerId);
             
@@ -622,7 +600,6 @@ public class AddExportDialog extends JDialog implements ActionListener {
                 selectedExportLots.remove(selectedRow);
                 selectedLotsTableModel.removeRow(selectedRow);
 
-                // Cập nhật lại số thứ tự
                 for (int i = 0; i < selectedLotsTableModel.getRowCount(); i++) {
                     selectedLotsTableModel.setValueAt(i + 1, i, 0);
                 }

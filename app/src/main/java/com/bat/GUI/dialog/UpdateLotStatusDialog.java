@@ -49,14 +49,11 @@ public class UpdateLotStatusDialog extends JDialog implements ActionListener {
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         
-        // Header
         JPanel headerPanel = createHeaderPanel();
         
-        // Main content
         JPanel mainPanel = createMainPanel();
         mainPanel.setBorder(new EmptyBorder(20, 30, 20, 30));
         
-        // Button panel
         JPanel buttonPanel = createButtonPanel();
         
         this.add(headerPanel, BorderLayout.NORTH);
@@ -86,7 +83,6 @@ public class UpdateLotStatusDialog extends JDialog implements ActionListener {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         
-        // Row 0: Mã lô hàng
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0.0;
@@ -103,7 +99,6 @@ public class UpdateLotStatusDialog extends JDialog implements ActionListener {
         txtLotId.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         panel.add(txtLotId, gbc);
         
-        // Row 1: Mã code lô hàng
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0.0;
@@ -120,7 +115,6 @@ public class UpdateLotStatusDialog extends JDialog implements ActionListener {
         txtLotCode.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         panel.add(txtLotCode, gbc);
         
-        // Row 2: Trạng thái
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weightx = 0.0;
@@ -174,7 +168,6 @@ public class UpdateLotStatusDialog extends JDialog implements ActionListener {
             txtLotId.setText(String.valueOf(lot.getLotId()));
             txtLotCode.setText(lot.getLotCode());
             
-            // Set current status
             String currentStatus = lot.getStatus();
             if (currentStatus != null) {
                 cboStatus.setSelectedItem(currentStatus);
@@ -194,7 +187,6 @@ public class UpdateLotStatusDialog extends JDialog implements ActionListener {
     private void handleSave() {
         String selectedStatus = (String) cboStatus.getSelectedItem();
         
-        // Confirm before saving
         int confirm = JOptionPane.showConfirmDialog(
             this,
             "Bạn có chắc muốn cập nhật trạng thái lô hàng này?",
@@ -213,7 +205,7 @@ public class UpdateLotStatusDialog extends JDialog implements ActionListener {
                     "Thành công",
                     JOptionPane.INFORMATION_MESSAGE
                 );
-                lot.setStatus(selectedStatus); // Update the DTO
+                lot.setStatus(selectedStatus); 
                 isUpdated = true;
                 this.dispose();
             } else {

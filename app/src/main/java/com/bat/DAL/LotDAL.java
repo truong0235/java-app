@@ -138,7 +138,7 @@ public class LotDAL {
         return null;
     }
 
-    public int add(LotDTO lot) { // thêm lot, update SL sp và ghi nhận lịch sử nhập kho
+    public int add(LotDTO lot) { 
         String query = "INSERT INTO Lot (lot_code, product_id, import_id, initial_quantity, quantity, import_price, print_year, status, import_date) " +
                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (

@@ -46,7 +46,6 @@ public class CategoryBLL {
     }
 
     public String update(CategoryDTO c) {
-        // if (c.getCategoryName().trim().isEmpty()) return "Tên danh mục không được để trống!";
 
         if (categoryDAL.update(c)) {
             return "Cập nhật thành công!";

@@ -16,7 +16,6 @@ public class ImportBLL {
     private final LotDAL lotDAL = new LotDAL();
     private final ProviderBLL prdBLL = new ProviderBLL();
     private final UserBLL userBLL = new UserBLL();
-    // private final LotTransactionDAL transDAL = new LotTransactionDAL();
 
     ArrayList<ImportDTO> importList;
     public ImportBLL() {
@@ -59,7 +58,7 @@ public class ImportBLL {
         return result;
     }
 
-    public boolean cancelImport(int importId) { // xoá import, các lot liên quan, lịch sử nhập kho và kiểm tra trước khi xoá
+    public boolean cancelImport(int importId) { 
         boolean isChecked = importDAL.checkUsedLot(importId);
         if (isChecked) {
             importDAL.delete(importId);
@@ -75,7 +74,6 @@ public class ImportBLL {
     
         for (ImportDTO imp : importList) {
             boolean matches = true;
-            // Filter by search text
             if (!searchTxt.isEmpty()) {
                 String impIdStr = String.valueOf(imp.getReceiptId());
                 String providerName = prdBLL.getProviderNameById(imp.getProviderId()).toLowerCase();
@@ -83,32 +81,29 @@ public class ImportBLL {
                 String searchLower = searchTxt.toLowerCase();
 
                 switch (searchOpt) {
-                    case 0: // All
+                    case 0: 
                         matches &= impIdStr.contains(searchTxt) || providerName.contains(searchLower) || userName.contains(searchLower);
                         break;
-                    case 1: // Import ID
+                    case 1: 
                         matches &= impIdStr.contains(searchTxt);
                         break;
-                    case 2: // Provider Name
+                    case 2: 
                         matches &= providerName.contains(searchLower);
                         break;
-                    case 3: // User Name
+                    case 3: 
                         matches &= userName.contains(searchLower);
                         break;
                 }
             }
 
-            // Filter by provider ID
             if (providerId != 0) {
                 matches &= (imp.getProviderId() == providerId);
             }
 
-            // Filter by user ID
             if (userId != 0) {
                 matches &= (imp.getUserId() == userId);
             }
 
-            // Filter by date range
             if (fromDate != null) {
                 LocalDateTime fromDateTime = LocalDateTime.ofInstant(fromDate.toInstant(), zone).with(LocalTime.MIN);
                 matches &= !imp.getCreatedDate().isBefore(fromDateTime);

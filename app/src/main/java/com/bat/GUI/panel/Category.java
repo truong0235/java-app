@@ -76,7 +76,6 @@ public class Category extends JPanel implements ActionListener {
         menuBar.setBackground(new Color(228, 238, 255));
         menuBar.setBorder(new EmptyBorder(0, 0, 10, 0));
 
-        // Header Title
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
 
@@ -99,7 +98,6 @@ public class Category extends JPanel implements ActionListener {
         titlePanel.add(subtitleLabel);
         headerPanel.add(titlePanel, BorderLayout.WEST);
 
-        // Menu Function Buttons
         String[] navButtons = {"create", "update", "delete", "detail", "export"};
         menuFunction = new MenuFunction(navButtons);
 
@@ -119,7 +117,6 @@ public class Category extends JPanel implements ActionListener {
         headerPanel.add(menuFunction, BorderLayout.EAST);
         menuBar.add(headerPanel, BorderLayout.NORTH);
 
-        // Search Panel
         String[] searchOptions = {"Tất cả", "Tên danh mục", "Mã loại"};
         searchPanel = new IntegratedSearch(searchOptions);
         searchPanel.txtSearchForm.putClientProperty("JTextField.placeholderText", "Nhập từ khóa tìm kiếm...");
@@ -469,12 +466,12 @@ public class Category extends JPanel implements ActionListener {
 
             addInput(pnlCenter, "Tên danh mục:", txtName);
             addInput(pnlCenter, "Mô tả chi tiết:", txtDesc);
-            addInput(pnlCenter, "Trạng thái:", cbStatus); // Bổ sung trạng thái
+            addInput(pnlCenter, "Trạng thái:", cbStatus); 
 
             if (data != null) {
                 txtName.setText(data.getCategoryName());
                 txtDesc.setText(data.getDescription());
-                cbStatus.setSelectedIndex(data.getStatus() == 1 ? 0 : 1); // 0 là Hoạt động, 1 là Ngừng
+                cbStatus.setSelectedIndex(data.getStatus() == 1 ? 0 : 1);
             }
 
             add(pnlCenter, BorderLayout.CENTER);
@@ -490,11 +487,10 @@ public class Category extends JPanel implements ActionListener {
             add(pnlBottom, BorderLayout.SOUTH);
 
             btnSave.addActionListener(e -> {
-                // Validate dữ liệu nhập vào
                 String validationError = validateInput();
                 if (validationError != null) {
                     JOptionPane.showMessageDialog(this, validationError, "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
-                    return; // Không đóng dialog khi có lỗi validation
+                    return; 
                 }
 
                 String name = txtName.getText().trim();
@@ -506,10 +502,9 @@ public class Category extends JPanel implements ActionListener {
                     String result = categoryBLL.add(newCategory);
                     if (result.contains("thành công")) {
                         JOptionPane.showMessageDialog(this, result, "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                        dispose(); // CHỈ đóng dialog khi THÀNH CÔNG
+                        dispose(); 
                     } else {
                         JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        // KHÔNG đóng dialog khi lỗi, để user sửa lại
                     }
                 } else {
                     data.setCategoryName(name);
@@ -518,16 +513,14 @@ public class Category extends JPanel implements ActionListener {
                     String result = categoryBLL.update(data);
                     if (result.contains("thành công")) {
                         JOptionPane.showMessageDialog(this, result, "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                        dispose(); // CHỈ đóng dialog khi THÀNH CÔNG
+                        dispose(); 
                     } else {
                         JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        // KHÔNG đóng dialog khi lỗi, để user sửa lại
                     }
                 }
             });
         }
 
-        // Đổi JTextField thành JComponent để nhận cả JTextField và JComboBox
         private void addInput(JPanel p, String label, JComponent field) {
             JPanel item = new JPanel(new BorderLayout(0, 5));
             item.setBackground(Color.WHITE);
@@ -539,14 +532,13 @@ public class Category extends JPanel implements ActionListener {
             p.add(item);
         }
 
-        // Phương thức validate dữ liệu nhập vào
         private String validateInput() {
-            // Kiểm tra tên danh mục
+
             if (txtName.getText().trim().isEmpty()) {
                 txtName.requestFocus();
                 return "Tên danh mục không được để trống!";
             }
-            // Tất cả validation đều pass
+
             return null;
         }
     }

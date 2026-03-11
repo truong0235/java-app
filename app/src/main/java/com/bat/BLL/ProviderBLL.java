@@ -42,7 +42,7 @@ public class ProviderBLL {
         if (index >= 0 && index < providers.size()) {
             return providers.get(index).getProviderId();
         }
-        return -1; // or throw an exception
+        return -1; 
     }
 
     public int getIdxByProviderId(int providerId) {
@@ -55,12 +55,10 @@ public class ProviderBLL {
     }
 
     public String add(ProviderDTO p) {
-        // Validate tên nhà cung cấp
         if (p.getProviderName() == null || p.getProviderName().trim().isEmpty()) {
             return "Tên nhà cung cấp không được để trống!";
         }
         
-        // Validate số điện thoại
         if (p.getPhone() == null || p.getPhone().trim().isEmpty()) {
             return "Số điện thoại không được để trống!";
         }
@@ -70,18 +68,12 @@ public class ProviderBLL {
         if (isPhoneExists(p.getPhone(), -1)) {
             return "Số điện thoại này đã được sử dụng bởi nhà cung cấp khác!";
         }
-        // Validate email
         if (p.getEmail() == null || p.getEmail().trim().isEmpty()) {
             return "Email không được để trống!";
         }
         if (!p.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
             return "Email không hợp lệ!";
         }
-        
-        // Validate địa chỉ
-        // if (p.getAddress() == null || p.getAddress().trim().isEmpty()) {
-        //     return "Địa chỉ không được để trống!";
-        // }
 
         int newId = providerDAL.getAutoIncrement();
         p.setProviderId(newId);
@@ -93,12 +85,10 @@ public class ProviderBLL {
     }
 
     public String update(ProviderDTO p) {
-        // Validate tên nhà cung cấp
         if (p.getProviderName() == null || p.getProviderName().trim().isEmpty()) {
             return "Tên nhà cung cấp không được để trống!";
         }
         
-        // Validate số điện thoại
         if (p.getPhone() == null || p.getPhone().trim().isEmpty()) {
             return "Số điện thoại không được để trống!";
         }
@@ -109,17 +99,11 @@ public class ProviderBLL {
             return "Số điện thoại này đã được sử dụng bởi nhà cung cấp khác!";
         }
         
-        // Validate email
         if (p.getEmail() == null || p.getEmail().trim().isEmpty()) {
             return "Email không được để trống!";
         }
         if (!p.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
             return "Email không hợp lệ!";
-        }
-        
-        // Validate địa chỉ
-        if (p.getAddress() == null || p.getAddress().trim().isEmpty()) {
-            return "Địa chỉ không được để trống!";
         }
 
         if (providerDAL.update(p)) {

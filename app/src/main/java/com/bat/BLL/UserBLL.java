@@ -15,7 +15,7 @@ public class UserBLL {
     }
 
     public ArrayList<UserDTO> getUserList() {
-        users = userDAL.getUsers(); // Luôn lấy dữ liệu mới nhất
+        users = userDAL.getUsers();
         return users;
     }
 
@@ -25,7 +25,6 @@ public class UserBLL {
     }
     
     public String addUser(UserDTO u) {
-        // Kiểm tra trùng username
         for(UserDTO user : getUserList()) {
             if(user.getUsername().equalsIgnoreCase(u.getUsername())) {
                 return "Tên đăng nhập đã tồn tại!";
@@ -45,16 +44,11 @@ public class UserBLL {
         return "Xóa thất bại!";
     }
     
-    // ==========================================
-    // 🔐 XỬ LÝ LOGIC ĐỔI MẬT KHẨU (XÁC MINH 3 LỚP)
-    // ==========================================
     public String resetPassword(String username, String phone, String email, String newPassword) {
-        // Kiểm tra xem có ô nào bị bỏ trống không
         if (username.trim().isEmpty() || phone.trim().isEmpty() || email.trim().isEmpty() || newPassword.trim().isEmpty()) {
             return "Vui lòng điền đầy đủ thông tin!";
         }
         
-        // Gọi xuống DAL để thực hiện update trong Database
         int result = userDAL.resetPassword(username, phone, email, newPassword);
         
         if (result > 0) {
@@ -76,7 +70,7 @@ public class UserBLL {
         if (index >= 0 && index < users.size()) {
             return users.get(index).getUserId();
         }
-        return -1; // or throw an exception
+        return -1;
     }
 
     public boolean isUsernameExists(String username) {

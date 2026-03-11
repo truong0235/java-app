@@ -43,9 +43,7 @@ public class InventoryCheckBLL {
             for (CheckDetailDTO detail : dList) {
                 detail.setCheckId(result); 
                 checkDetailDAL.add(detail);
-            }
-            // check.setCheckId(result);
-            // checkList.add(check);
+            }            
         }
         return result != -1;
     }

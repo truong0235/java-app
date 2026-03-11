@@ -82,7 +82,7 @@ public class ImportDAL {
         return false;
     }
     
-    public boolean delete(int importId){ //  kiểm tra trước khi xoá -> update SL sp -> xoá  lịch sử nhập kho, các lot liên quan, import 
+    public boolean delete(int importId){ 
         LotTransactionDAL transDAL = new LotTransactionDAL();
         LotDAL lotDAL = new LotDAL();
 

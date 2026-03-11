@@ -33,10 +33,7 @@ public final class Statistic extends JPanel {
         tabbedPane = new JTabbedPane();
         tabbedPane.setOpaque(false);
         tabbedPane.addTab("Tổng quan", dashboard);
-        // tabbedPane.addTab("Tồn kho", nhapxuat);
         tabbedPane.addTab("Doanh thu", revenueStatistic);
-        // tabbedPane.addTab("Nhà cung cấp", nhacungcap);
-        // tabbedPane.addTab("Khách hàng", khachhang);
 
         this.add(tabbedPane);
     }

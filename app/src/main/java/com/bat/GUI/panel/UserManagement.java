@@ -61,7 +61,6 @@ public class UserManagement extends JPanel implements ActionListener {
     private JComboBox<String> cbbStatusFilter;
     private UserDTO currentUser;
 
-    // Danh sách 15 Role chuẩn theo Database
     private final String[] ROLES_ARRAY = {
         "Quản trị viên", "Giám đốc", "Trưởng phòng kho", "Quản lý kho", 
         "Thủ kho", "Nhân viên nhập hàng", "Nhân viên kiểm kê", 
@@ -81,9 +80,6 @@ public class UserManagement extends JPanel implements ActionListener {
         this.setBackground(new Color(228, 238, 255)); 
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // ==========================================
-        // 1. HEADER & MENU BAR
-        // ==========================================
         JPanel menuBar = new JPanel(new BorderLayout());
         menuBar.setBackground(new Color(228, 238, 255));
         menuBar.setBorder(new EmptyBorder(0, 0, 10, 0));
@@ -130,9 +126,6 @@ public class UserManagement extends JPanel implements ActionListener {
         headerPanel.add(menuFunction, BorderLayout.EAST);
         menuBar.add(headerPanel, BorderLayout.NORTH);
 
-        // ==========================================
-        // 2. THANH TÌM KIẾM
-        // ==========================================
         String[] searchOptions = {"Tất cả", "Họ và tên", "Tên đăng nhập", "Số điện thoại"};
         searchPanel = new IntegratedSearch(searchOptions);
         searchPanel.txtSearchForm.putClientProperty("JTextField.placeholderText", "Nhập từ khóa tìm kiếm...");
@@ -148,9 +141,6 @@ public class UserManagement extends JPanel implements ActionListener {
         menuBar.add(searchPanel, BorderLayout.SOUTH);
         this.add(menuBar, BorderLayout.NORTH);
 
-        // ==========================================
-        // 3. BẢNG VÀ BỘ LỌC
-        // ==========================================
         JPanel tablePanel = createTablePanel();
         this.add(tablePanel, BorderLayout.CENTER);
 
@@ -285,9 +275,6 @@ public class UserManagement extends JPanel implements ActionListener {
         performSearch();
     }
 
-    // ==========================================
-    // FORM POPUP ĐÃ TÍCH HỢP HIỂN THỊ ẢNH AVATAR VÀ VALIDATION
-    // ==========================================
     private void showUserDialog(UserDTO user, boolean isViewOnly) {
         boolean isEdit = (user != null);
         String title = isViewOnly ? "Chi tiết tài khoản" : (isEdit ? "Cập nhật tài khoản" : "Thêm tài khoản mới");
@@ -297,7 +284,6 @@ public class UserManagement extends JPanel implements ActionListener {
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
-        // Header
         JPanel pnlHeader = new JPanel();
         pnlHeader.setBackground(new Color(13, 110, 253));
         JLabel lblTitle = new JLabel(title);
@@ -306,11 +292,9 @@ public class UserManagement extends JPanel implements ActionListener {
         pnlHeader.add(lblTitle);
         dialog.add(pnlHeader, BorderLayout.NORTH);
 
-        // Khung Body chứa Ảnh (Top) và Form (Center)
         JPanel pnlBody = new JPanel(new BorderLayout());
         pnlBody.setBackground(Color.WHITE);
 
-        // --- 1. KHU VỰC HIỂN THỊ ẢNH AVATAR ---
         JPanel pnlAvatar = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 15));
         pnlAvatar.setBackground(Color.WHITE);
         
@@ -321,11 +305,9 @@ public class UserManagement extends JPanel implements ActionListener {
         
         String avatarFile = (isEdit && user.getAvatar() != null && !user.getAvatar().isEmpty()) ? user.getAvatar() : "";
         
-        // Hiển thị ảnh của người dùng hoặc ảnh mặc định
         boolean avatarLoaded = false;
         if (!avatarFile.isEmpty()) {
             try {
-                // Thử load ảnh từ folder image (file system)
                 File imageFile = new File("app/src/main/resources/image/" + avatarFile);
                 if (imageFile.exists() && imageFile.isFile()) {
                     java.awt.Image img = new javax.swing.ImageIcon(imageFile.getAbsolutePath())
@@ -333,7 +315,6 @@ public class UserManagement extends JPanel implements ActionListener {
                     lblAvatarPic.setIcon(new javax.swing.ImageIcon(img));
                     avatarLoaded = true;
                 } else {
-                    // Thử load từ resources nếu không tìm thấy trong file system
                     java.net.URL imgUrl = getClass().getResource("/image/" + avatarFile);
                     if (imgUrl != null) {
                         java.awt.Image img = new javax.swing.ImageIcon(imgUrl)
@@ -343,24 +324,20 @@ public class UserManagement extends JPanel implements ActionListener {
                     }
                 }
             } catch (Exception ex) {
-                // Nếu lỗi, dùng ảnh mặc định
             }
         }
         
-        // Nếu không load được ảnh hoặc không có ảnh, dùng ảnh mặc định
         if (!avatarLoaded) {
             try {
                 FlatSVGIcon defaultIcon = new FlatSVGIcon("icon/account.svg");
                 lblAvatarPic.setIcon(defaultIcon.derive(100, 100));
             } catch (Exception ex) {
-                // Để trống nếu không load được cả ảnh mặc định
             }
         }
 
         pnlAvatar.add(lblAvatarPic);
         pnlBody.add(pnlAvatar, BorderLayout.NORTH);
 
-        // --- 2. KHU VỰC NHẬP THÔNG TIN ---
         JPanel pnlCenter = new JPanel(new GridLayout(10, 2, 10, 10)); 
         pnlCenter.setBorder(new EmptyBorder(0, 40, 10, 40));
         pnlCenter.setBackground(Color.WHITE);
@@ -375,13 +352,13 @@ public class UserManagement extends JPanel implements ActionListener {
         JTextField txtPhone = new JTextField(isEdit ? user.getPhone() : "");
         JTextField txtAddress = new JTextField(isEdit ? user.getAddress() : "");
         JTextField txtAvatar = new JTextField(isEdit ? user.getAvatar() : "");
-        txtAvatar.setEditable(false); // Không cho nhập tay, chỉ chọn từ nút
+        txtAvatar.setEditable(false);
         
         JComboBox<String> cbRole = new JComboBox<>(ROLES_ARRAY);
         JComboBox<String> cbStatus = new JComboBox<>(new String[]{"Bị khoá", "Hoạt động"});
 
         if (isEdit) {
-            txtUser.setEnabled(false); // Không cho sửa tên đăng nhập
+            txtUser.setEnabled(false); 
             if (user.getRoleId() > 0 && user.getRoleId() <= ROLES_ARRAY.length) {
                 cbRole.setSelectedIndex(user.getRoleId() - 1);
             }
@@ -397,7 +374,6 @@ public class UserManagement extends JPanel implements ActionListener {
             cbRole.setEnabled(false); cbStatus.setEnabled(false);
         }
 
-        // Tạo panel chứa txtAvatar và nút chọn ảnh ở bên cạnh
         JPanel pnlAvatarUpload = new JPanel(new BorderLayout(5, 0));
         pnlAvatarUpload.setBackground(Color.WHITE);
         pnlAvatarUpload.add(txtAvatar, BorderLayout.CENTER);
@@ -411,7 +387,6 @@ public class UserManagement extends JPanel implements ActionListener {
         
         if (!isViewOnly) {
             btnChooseImage.addActionListener(evt -> {
-                // Kiểm tra username đã nhập chưa
                 String username = txtUser.getText().trim();
                 if (username.isEmpty()) {
                     JOptionPane.showMessageDialog(dialog, 
@@ -433,18 +408,15 @@ public class UserManagement extends JPanel implements ActionListener {
                     File selectedFile = fileChooser.getSelectedFile();
                     String originalFileName = selectedFile.getName();
                     
-                    // Lấy extension của file gốc
                     String extension = "";
                     int lastDot = originalFileName.lastIndexOf('.');
                     if (lastDot > 0) {
                         extension = originalFileName.substring(lastDot);
                     }
                     
-                    // Tạo tên file mới theo username
                     String newFileName = username + extension;
                     
                     try {
-                        // Đường dẫn đến thư mục resources/image trong project
                         String resourcePath = "src/main/resources/image/";
                         File destDir = new File(resourcePath);
                         if (!destDir.exists()) {
@@ -453,19 +425,15 @@ public class UserManagement extends JPanel implements ActionListener {
                         
                         File destFile = new File(destDir, newFileName);
                         
-                        // Copy file vào thư mục resources/image với tên mới
                         java.nio.file.Files.copy(
                             selectedFile.toPath(), 
                             destFile.toPath(), 
                             java.nio.file.StandardCopyOption.REPLACE_EXISTING
                         );
                         
-                        // Cập nhật txtAvatar với tên file mới
                         txtAvatar.setText(newFileName);
                         
-                        // Cập nhật preview ảnh
                         try {
-                            // Load ảnh từ file vừa lưu để hiển thị preview
                             java.awt.Image img = new javax.swing.ImageIcon(destFile.getAbsolutePath())
                                 .getImage().getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
                             lblAvatarPic.setIcon(new javax.swing.ImageIcon(img));
@@ -503,7 +471,6 @@ public class UserManagement extends JPanel implements ActionListener {
         pnlBody.add(pnlCenter, BorderLayout.CENTER);
         dialog.add(pnlBody, BorderLayout.CENTER);
 
-        // --- 3. KHU VỰC BUTTON LƯU / ĐÓNG ---
         JPanel pnlBottom = new JPanel();
         pnlBottom.setBackground(Color.WHITE);
         pnlBottom.setBorder(new EmptyBorder(0, 0, 15, 0));
@@ -516,7 +483,6 @@ public class UserManagement extends JPanel implements ActionListener {
             btnSave.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
             btnSave.addActionListener(e -> {
-                // Lấy dữ liệu và loại bỏ khoảng trắng dư thừa
                 String name = txtName.getText().trim();
                 String uname = txtUser.getText().trim();
                 String pass = new String(txtPass.getPassword()).trim();
@@ -555,7 +521,6 @@ public class UserManagement extends JPanel implements ActionListener {
                     return;
                 }
                 
-                // Kiểm tra định dạng Email
                 String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
                 if (!email.matches(emailRegex)) {
                     JOptionPane.showMessageDialog(dialog, "Email không hợp lệ!\nVui lòng nhập đúng định dạng (VD: abc@gmail.com)", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
@@ -569,7 +534,6 @@ public class UserManagement extends JPanel implements ActionListener {
                     return;
                 }
              
-                // Kiểm tra định dạng Số điện thoại (10 số, bắt đầu bằng số 0)
                 String phoneRegex = "^(0[3|5|7|8|9]\\d{8}|02\\d{8})$";
                 if (!phone.matches(phoneRegex)) {
                     JOptionPane.showMessageDialog(dialog, "Số điện thoại không hợp lệ!\nVui lòng nhập đúng 10 chữ số và bắt đầu bằng số 0.", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
@@ -602,25 +566,6 @@ public class UserManagement extends JPanel implements ActionListener {
                 if (msg.contains("thành công")) {
                     performSearch();
                     dialog.dispose();
-
-                    // 🚨 BỔ SUNG LOGIC: KIỂM TRA NẾU TỰ KHÓA CHÍNH MÌNH THÌ ĐĂNG XUẤT
-                    if (isEdit && currentUser != null && u.getUserId() == currentUser.getUserId() && u.getStatus() == 0) {
-                        JOptionPane.showMessageDialog(UserManagement.this, 
-                            "Bạn đã tự khóa tài khoản đang sử dụng. Hệ thống sẽ tự động đăng xuất!", 
-                            "Cảnh báo bảo mật", 
-                            JOptionPane.WARNING_MESSAGE);
-                        
-                        // Lấy Frame Main hiện tại và đóng nó lại
-                        JFrame mainFrame = (JFrame) SwingUtilities.getWindowAncestor(UserManagement.this);
-                        if (mainFrame != null) {
-                            mainFrame.dispose();
-                        }
-                        
-                        // Gọi lại màn hình Đăng nhập
-                        java.awt.EventQueue.invokeLater(() -> {
-                            new com.bat.GUI.LoginJFrame().setVisible(true);
-                        });
-                    }
                 }
             });
             pnlBottom.add(btnSave);
@@ -667,21 +612,17 @@ public class UserManagement extends JPanel implements ActionListener {
             int id = (int) table.getValueAt(row, 0);
             if (JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa tài khoản này?", "Cảnh báo", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 
-                // 1. Thực hiện xóa dưới Database
                 userBLL.deleteUser(id);
-                performSearch(); // Tải lại bảng
+                performSearch();
 
-                // 2. KIỂM TRA NẾU TỰ XÓA CHÍNH MÌNH THÌ ĐĂNG XUẤT
                 if (currentUser != null && currentUser.getUserId() == id) {
                     JOptionPane.showMessageDialog(this, "Bạn đã xóa tài khoản đang sử dụng. Hệ thống sẽ tự động đăng xuất!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
                     
-                    // Lấy Frame cha (Main) và đóng nó lại
                     JFrame mainFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
                     if (mainFrame != null) {
                         mainFrame.dispose();
                     }
                     
-                    // Mở lại màn hình Đăng nhập
                     java.awt.EventQueue.invokeLater(() -> {
                         new com.bat.GUI.LoginJFrame().setVisible(true);
                     });

@@ -68,18 +68,14 @@ public class HistoryLotDialog extends JDialog implements ActionListener {
         
         headerPanel.add(titleLabel, BorderLayout.CENTER);
         
-        // Main panel
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         mainPanel.setBackground(Color.WHITE);
         
-        // Info panel
         JPanel infoPanel = createInfoPanel();
         
-        // Table panel
         JPanel tablePanel = createTablePanel();
         
-        // Button panel
         JPanel buttonPanel = createButtonPanel();
         
         mainPanel.add(infoPanel, BorderLayout.NORTH);
@@ -95,35 +91,30 @@ public class HistoryLotDialog extends JDialog implements ActionListener {
         panel.setBackground(Color.WHITE);
         panel.setBorder(new EmptyBorder(0, 0, 15, 0));
         
-        // Lot ID
         JPanel lotIdPanel = createFieldPanel("Mã lô:");
         txtLotId = new JTextField();
         txtLotId.setEnabled(false);
         txtLotId.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lotIdPanel.add(txtLotId);
         
-        // Lot Code
         JPanel lotCodePanel = createFieldPanel("Mã lô TT:");
         txtLotCode = new JTextField();
         txtLotCode.setEnabled(false);
         txtLotCode.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lotCodePanel.add(txtLotCode);
         
-        // Product Name
         JPanel productPanel = createFieldPanel("Tên sản phẩm:");
         txtProductName = new JTextField();
         txtProductName.setEnabled(false);
         txtProductName.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         productPanel.add(txtProductName);
         
-        // Initial Quantity
         JPanel initialQtyPanel = createFieldPanel("Số lượng ban đầu:");
         txtInitialQty = new JTextField();
         txtInitialQty.setEnabled(false);
         txtInitialQty.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         initialQtyPanel.add(txtInitialQty);
         
-        // Current Quantity
         JPanel currentQtyPanel = createFieldPanel("Số lượng hiện tại:");
         txtCurrentQty = new JTextField();
         txtCurrentQty.setEnabled(false);
@@ -156,13 +147,11 @@ public class HistoryLotDialog extends JDialog implements ActionListener {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.WHITE);
         
-        // Title for table
         JLabel tableTitle = new JLabel("Lịch sử giao dịch");
         tableTitle.setFont(new Font("Segoe UI", Font.BOLD, 16));
         tableTitle.setForeground(new Color(33, 37, 41));
         tableTitle.setBorder(new EmptyBorder(0, 0, 10, 0));
         
-        // Create table
         String[] columns = {"STT", "Loại giao dịch", "Thay đổi", "Số lượng sau", "Ngày giờ", "Mã tham chiếu"};
         tableModel = new DefaultTableModel(null, columns) {
             @Override
@@ -180,22 +169,19 @@ public class HistoryLotDialog extends JDialog implements ActionListener {
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         table.setIntercellSpacing(new java.awt.Dimension(0, 1));
         
-        // Header styling
         JTableHeader header = table.getTableHeader();
         header.setBackground(new Color(248, 249, 250));
         header.setForeground(new Color(73, 80, 87));
         header.setFont(new Font("Segoe UI", Font.BOLD, 13));
         header.setPreferredSize(new Dimension(0, 40));
         
-        // Column widths
-        table.getColumnModel().getColumn(0).setPreferredWidth(50);  // STT
-        table.getColumnModel().getColumn(1).setPreferredWidth(120); // Loại
-        table.getColumnModel().getColumn(2).setPreferredWidth(100); // Thay đổi
-        table.getColumnModel().getColumn(3).setPreferredWidth(120); // Số lượng sau
-        table.getColumnModel().getColumn(4).setPreferredWidth(150); // Ngày giờ
-        table.getColumnModel().getColumn(5).setPreferredWidth(100); // Mã TC
+        table.getColumnModel().getColumn(0).setPreferredWidth(50);  
+        table.getColumnModel().getColumn(1).setPreferredWidth(120); 
+        table.getColumnModel().getColumn(2).setPreferredWidth(100); 
+        table.getColumnModel().getColumn(3).setPreferredWidth(120); 
+        table.getColumnModel().getColumn(4).setPreferredWidth(150); 
+        table.getColumnModel().getColumn(5).setPreferredWidth(100); 
         
-        // Center align for some columns
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
@@ -203,7 +189,6 @@ public class HistoryLotDialog extends JDialog implements ActionListener {
         table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
         table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
         
-        // Custom renderer for quantity change column
         DefaultTableCellRenderer changeRenderer = new DefaultTableCellRenderer() {
             @Override
             public java.awt.Component getTableCellRendererComponent(JTable table, Object value,
@@ -215,9 +200,9 @@ public class HistoryLotDialog extends JDialog implements ActionListener {
                 if (value != null && value instanceof String) {
                     String val = value.toString();
                     if (val.startsWith("+")) {
-                        setForeground(new Color(22, 163, 74)); // Green
+                        setForeground(new Color(22, 163, 74)); 
                     } else if (val.startsWith("-")) {
-                        setForeground(new Color(220, 38, 38)); // Red
+                        setForeground(new Color(220, 38, 38)); 
                     } else {
                         setForeground(table.getForeground());
                     }
@@ -261,7 +246,6 @@ public class HistoryLotDialog extends JDialog implements ActionListener {
     }
 
     private void loadData() {
-        // Load lot info
         txtLotId.setText(String.valueOf(lot.getLotId()));
         txtLotCode.setText(lot.getLotCode());
         
@@ -273,7 +257,6 @@ public class HistoryLotDialog extends JDialog implements ActionListener {
         txtInitialQty.setText(String.valueOf(lot.getInitialQuantity()));
         txtCurrentQty.setText(String.valueOf(lot.getQuantity()));
         
-        // Load transaction history
         loadTransactionHistory();
     }
 
@@ -307,8 +290,6 @@ public class HistoryLotDialog extends JDialog implements ActionListener {
                 return "Nhập kho";
             case "export":
                 return "Xuất kho";
-            // case "check":
-            //     return "Kiểm kho";
             case "adjust":
                 return "Điều chỉnh";
             default:
