@@ -82,7 +82,6 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         this.setBackground(new Color(228, 238, 255));
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
         
-        // Config cho trang quản lý phiếu nhập
         String[] importButtons = {"detail", "create", "update", "delete", "export"};
         
         String[] importSearchOptions = {"Tất cả", "Mã phiếu nhập", "Nhà cung cấp", "Nhân viên nhập"};
@@ -91,11 +90,11 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         menuBar.setBackground(new Color(228, 238, 255));
         menuBar.setBorder(new EmptyBorder(0, 0, 10, 0));
         
-        // Header panel với title và buttons
+
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
         
-        // Title panel bên trái
+
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
         titlePanel.setOpaque(false);
@@ -117,7 +116,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
 
         headerPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
         
-        // Tạo MenuFunction instance để truy cập buttons HashMap
+
         menuFunction = new MenuFunction(importButtons);
         for (String btnKey : importButtons) {
             JButton btn = menuFunction.buttons.get(btnKey);
@@ -128,7 +127,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         headerPanel.add(menuFunction, BorderLayout.EAST);
         menuBar.add(headerPanel, BorderLayout.NORTH);
         
-        // Search panel ở dưới nếu có config
+
         if (importSearchOptions != null) {
             searchPanel = new IntegratedSearch(importSearchOptions);
             searchPanel.txtSearchForm.putClientProperty("JTextField.placeholderText", "Nhập mã phiếu, nhà cung cấp..."); 
@@ -139,8 +138,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         }
 
         this.add(menuBar, BorderLayout.NORTH);
-        
-        // Tạo table content cho phiếu nhập
+
         JPanel tablePanel = createImportTablePanel();
         JPanel filterPanel = creatFilterPanel();
         this.add(filterPanel, BorderLayout.WEST);
@@ -218,7 +216,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         panel.setBackground(new Color(228, 238, 255));
         panel.setBorder(new EmptyBorder(0, 10, 0, 0));
         
-        // Tạo table với dữ liệu mẫu phiếu nhập
+
         String[] columns = {"Mã phiếu", "Nhà cung cấp", "Ngày nhập", "Nhân viên nhập" ,"Tổng tiền"};
         tableModel = new DefaultTableModel(null, columns) {
             @Override
@@ -228,7 +226,7 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         };
         
         table = new JTable(tableModel);
-        // Styling table
+
         table.setRowHeight(45);
         table.setShowVerticalLines(false);
         table.setShowHorizontalLines(true);
@@ -237,33 +235,24 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         table.setIntercellSpacing(new java.awt.Dimension(0, 1));
         
-        // Header styling
         JTableHeader header = table.getTableHeader();
         header.setBackground(new Color(248, 249, 250));
         header.setForeground(new Color(73, 80, 87));
         header.setFont(new Font("Segoe UI", Font.BOLD, 13));
         header.setBorder(new EmptyBorder(12, 0, 12, 0));
         
-        // Column widths
         table.getColumnModel().getColumn(0).setPreferredWidth(80);
         table.getColumnModel().getColumn(1).setPreferredWidth(200);
         table.getColumnModel().getColumn(2).setPreferredWidth(100);
         table.getColumnModel().getColumn(3).setPreferredWidth(100);
         table.getColumnModel().getColumn(4).setPreferredWidth(100);
-        // table.getColumnModel().getColumn(5).setPreferredWidth(100);
-        
-        // Cell renderer for status column
-        // table.getColumnModel().getColumn(4).setCellRenderer(new ImportStatusCellRenderer());
-        
-        // Center align for some columns
+
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
         table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-        // table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
-        
-        // Right align for money column
+  
         DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
         rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
         table.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
@@ -275,34 +264,8 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
         
         return panel;
     }
-    
-    // Custom renderer for status column
-    // private class ImportStatusCellRenderer extends DefaultTableCellRenderer {
-    //     @Override
-    //     public Component getTableCellRendererComponent(JTable table, Object value,
-    //             boolean isSelected, boolean hasFocus, int row, int column) {
-            
-    //         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            
-    //         if (value != null) {
-    //             String status = value.toString();
-    //             if (status.equals("Đã duyệt")) {
-    //                 setForeground(new Color(22, 163, 74));
-    //             } else if (status.equals("Chờ duyệt")) {
-    //                 setForeground(new Color(245, 158, 11));
-    //             } else if (status.equals("Đã hủy")) {
-    //                 setForeground(new Color(220, 38, 38));
-    //             }
-    //             setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
-    //         }
-            
-    //         setHorizontalAlignment(SwingConstants.CENTER);
-    //         return this;
-    //     }
-    // }
 
     public void loadDataTable(ArrayList<ImportDTO> importData) {
-        // importList = importBLL.getImportList();
         tableModel.setRowCount(0);
         for (ImportDTO imp : importData) {
             String formattedDate = imp.getCreatedDate() != null ? imp.getCreatedDate().format(DATE_FORMATTER) : "";
@@ -349,7 +312,6 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
                 }
                 break;
             case "delete":
-                // System.out.println("Delete button clicked");
                 int selectedRow = getRowSelected();
                 if (selectedRow == -1) return;
                 int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa phiếu nhập đã chọn?", "Xác nhận xóa", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
@@ -445,19 +407,16 @@ public class Import extends JPanel implements ActionListener, ItemListener, KeyL
 
     @Override
     public void keyTyped(KeyEvent ke) {
-        // throw new UnsupportedOperationException("Not supported yet.");
-        // System.out.println("Key typed");
+        
     }
 
     @Override
     public void keyPressed(KeyEvent ke) {
-        // throw new UnsupportedOperationException("Not supported yet.");
-        // System.out.println("Key pressed");
+
     }
 
     @Override
     public void keyReleased(KeyEvent ke) {
-        // throw new UnsupportedOperationException("Not supported yet.");
         filter();
     }
 
