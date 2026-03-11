@@ -15,7 +15,6 @@ public class CategoryDTO {
         this.status = status;
     }
 
-    // --- Getters & Setters ---
     public int getCategoryId() { return categoryId; }
     public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
 
@@ -27,4 +26,5 @@ public class CategoryDTO {
 
     public int getStatus() { return status; }
     public void setStatus(int status) { this.status = status; }
+
 }

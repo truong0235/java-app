@@ -388,7 +388,6 @@ public class Customer extends JPanel implements ActionListener {
                             String dobStr = row.getCell(2).getStringCellValue();
                             dob = sdf.parse(dobStr);
                         } catch (Exception e) {
-                            // Nếu parse lỗi, để null
                         }
                     }
                     if (row.getCell(3) != null) {
@@ -655,4 +654,5 @@ public class Customer extends JPanel implements ActionListener {
         }
     }
 }
+
 
