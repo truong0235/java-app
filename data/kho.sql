@@ -258,7 +258,11 @@ INSERT INTO roles (name, status) VALUES
 ('Admin', 1),
 ('Nhân viên bán hàng', 1),
 ('Nhân viên kho', 1),
-('Nhân viên kiểm kê', 1);
+('Nhân viên kiểm kê', 1),
+('Kế toán', 1),
+('Thủ kho', 1),
+('Giám đốc', 1),
+('Nhân viên CSKH', 1);
 
 -- ===================================================================
 -- 4b. THÊM DỮ LIỆU CHO BẢNG PERMISSION (bitmask: 4=r, 2=w, 1=x)
@@ -279,26 +283,26 @@ INSERT INTO permission (role_id, resource, perm_value, status) VALUES
 (1, 'statistic',       7, 1),
 
 -- role 2: Quản lý kho → đọc+ghi hầu hết, không quản lý user/permission
-(2, 'category',        6, 1),  -- rw-
-(2, 'product',         7, 1),  -- rwx
-(2, 'provider',        6, 1),  -- rw-
-(2, 'import',          7, 1),  -- rwx
-(2, 'export',          6, 1),  -- rw-
-(2, 'lot',             7, 1),  -- rwx
-(2, 'inventory_check', 7, 1),  -- rwx
-(2, 'statistic',       4, 1),  -- r--
+(3, 'category',        6, 1),  -- rw-
+(3, 'product',         7, 1),  -- rwx
+(3, 'provider',        6, 1),  -- rw-
+(3, 'import',          7, 1),  -- rwx
+(3, 'export',          6, 1),  -- rw-
+(3, 'lot',             7, 1),  -- rwx
+(3, 'inventory_check', 7, 1),  -- rwx
+(3, 'statistic',       4, 1),  -- r--
 
 -- role 3: Nhân viên nhập hàng → chỉ nhập hàng
-(3, 'product',         4, 1),  -- r--
+
 (3, 'provider',        4, 1),  -- r--
 (3, 'import',          6, 1),  -- rw-
 (3, 'lot',             4, 1),  -- r--
 
 -- role 4: Nhân viên bán hàng → chỉ bán hàng
-(4, 'product',         4, 1),  -- r--
-(4, 'customer',        6, 1),  -- rw-
-(4, 'export',          6, 1),  -- rw-
-(4, 'lot',             4, 1),  -- r--
+(2, 'product',         4, 1),  -- r--
+(2, 'customer',        6, 1),  -- rw-
+(2, 'export',          6, 1),  -- rw-
+(2, 'lot',             4, 1),  -- r--
 
 -- role 5: Kế toán → đọc báo cáo, không sửa hàng hóa
 (5, 'import',          4, 1),  -- r--
@@ -322,13 +326,13 @@ INSERT INTO permission (role_id, resource, perm_value, status) VALUES
 (7, 'statistic',       5, 1),  -- r-x
 
 -- role 8: Nhân viên kiểm kê → chỉ kiểm kê
-(8, 'product',         4, 1),  -- r--
-(8, 'lot',             4, 1),  -- r--
-(8, 'inventory_check', 6, 1),  -- rw-
+(4, 'product',         4, 1),  -- r--
+(4, 'lot',             4, 1),  -- r--
+(4, 'inventory_check', 6, 1),  -- rw-
 
 -- role 10: Nhân viên CSKH → chỉ xem/sửa khách hàng
-(10, 'customer',       6, 1),  -- rw-
-(10, 'export',         4, 1);  -- r--
+(8, 'customer',       6, 1),  -- rw-
+(8, 'export',         4, 1);  -- r--
 
 -- ===================================================================
 -- 5. THÊM DỮ LIỆU CHO BẢNG USERS

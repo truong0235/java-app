@@ -32,6 +32,10 @@ import javax.swing.table.TableColumnModel;
 
 import com.bat.GUI.component.IntegratedSearch;
 import com.bat.GUI.component.MenuFunction;
+import com.bat.BLL.PermBLL;
+import com.bat.DAL.RoleDAL;
+import com.bat.DTO.RoleDTO;
+
 
 public class Perm extends JPanel implements ActionListener {
 
@@ -132,10 +136,11 @@ public class Perm extends JPanel implements ActionListener {
     private IntegratedSearch searchPanel;
     private DefaultTableModel tableModel;
     private JTable table;
+    private PermBLL permBLL = new PermBLL();
 
     public Perm() {
         initComponent();
-        loadRoles(ROLES);
+        loadRoles();
     }
 
     private void initComponent() {
@@ -160,18 +165,11 @@ public class Perm extends JPanel implements ActionListener {
         titleLabel.setForeground(new Color(33, 37, 41));
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel subtitleLabel = new JLabel("Chọn vai trò → Chi tiết để xem quyền theo chức năng");
-        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        subtitleLabel.setForeground(new Color(108, 117, 125));
-        subtitleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        subtitleLabel.setBorder(new EmptyBorder(3, 0, 0, 0));
-
         titlePanel.add(titleLabel);
-        titlePanel.add(subtitleLabel);
         headerPanel.add(titlePanel, BorderLayout.WEST);
 
-        // Buttons
-        String[] navButtons = {"create", "update", "delete", "detail"};
+        String[] navButtons = {"create", "update", "disable", "detail"};
+        
         menuFunction = new MenuFunction(navButtons);
         for (String btnKey : navButtons) {
             JButton btn = menuFunction.buttons.get(btnKey);
@@ -240,7 +238,19 @@ public class Perm extends JPanel implements ActionListener {
         return panel;
     }
 
-    private void loadRoles(Object[][] data) {
+    private void loadRoles() {
+        ArrayList<RoleDTO> roles = (ArrayList<RoleDTO>) new RoleDAL().getAllRoles();
+        tableModel.setRowCount(0);
+        for (RoleDTO role : roles) {
+            tableModel.addRow(new Object[]{
+                role.getRole_id(),
+                role.getName(),
+                (role.getStatus() == 1) ? "Hoạt động" : "Không hoạt động"
+            });
+        }
+    }
+
+    private void loadTableData(Object[][] data) {
         tableModel.setRowCount(0);
         for (Object[] row : data) {
             tableModel.addRow(new Object[]{
@@ -272,13 +282,6 @@ public class Perm extends JPanel implements ActionListener {
         }
     }
 
-    /** Convert bitmask to rwx string */
-    private static String toRwx(int v) {
-        return ((v & 4) != 0 ? "r" : "-")
-             + ((v & 2) != 0 ? "w" : "-")
-             + ((v & 1) != 0 ? "x" : "-");
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
@@ -286,10 +289,14 @@ public class Perm extends JPanel implements ActionListener {
                 JOptionPane.showMessageDialog(this, "Chức năng Thêm vai trò (chưa triển khai)");
 
             case "update" -> {
+                int row = table.getSelectedRow();
                 if (table.getSelectedRow() == -1)
                     JOptionPane.showMessageDialog(this, "Vui lòng chọn vai trò cần sửa!");
-                else
-                    JOptionPane.showMessageDialog(this, "Chức năng Sửa vai trò (chưa triển khai)");
+                else {
+                    int    roleId   = (int)    tableModel.getValueAt(row, 0);
+                    String roleName = (String) tableModel.getValueAt(row, 1);
+                    showPermUpdate(roleId, roleName);
+                }
             }
 
             case "delete" -> {
@@ -313,11 +320,108 @@ public class Perm extends JPanel implements ActionListener {
             case "reset" -> {
                 searchPanel.txtSearchForm.setText("");
                 searchPanel.cbxChoose.setSelectedIndex(0);
-                loadRoles(ROLES);
+                loadTableData(ROLES);
             }
         }
     }
 
+
+
+    private void showPermUpdate(int roleId, String roleName) {
+        JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
+        JDialog dialog = new JDialog(parent, "Chinh sua quyền – " + roleName, true);
+        dialog.setSize(600, 420);
+        dialog.setLocationRelativeTo(parent);
+        dialog.setLayout(new BorderLayout());
+
+        // Header
+        JPanel header = new JPanel();
+        header.setBackground(new Color(13, 110, 253));
+        header.setPreferredSize(new Dimension(0, 50));
+        JLabel lblTitle = new JLabel("Quyền hạn của: " + roleName);
+        lblTitle.setForeground(Color.WHITE);
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 17));
+        header.add(lblTitle);
+        dialog.add(header, BorderLayout.NORTH);
+
+        // Table: Mã quyền | Tên chức năng | Quyền (rwx) | Giá trị
+        String[] cols = {"Mã quyền", "Tên chức năng", "Quyền", "Giá trị"};
+        DefaultTableModel model = new DefaultTableModel(null, cols) {
+            @Override public boolean isCellEditable(int r, int c) { return c == 3; }
+        };
+
+        List<Object[]> perms = PERMS.getOrDefault(roleId, new ArrayList<>());
+        for (Object[] p : perms) {
+            int val = (int) p[2];
+            model.addRow(new Object[]{p[0], p[1], "xd", val});
+        }
+        if (perms.isEmpty()) {
+            model.addRow(new Object[]{"—", "(Không có quyền nào)", "---", 0});
+        }
+
+        JTable detailTable = new JTable(model);
+        detailTable.setRowHeight(36);
+        detailTable.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        detailTable.setShowVerticalLines(false);
+        detailTable.setShowHorizontalLines(true);
+        detailTable.setGridColor(new Color(229, 231, 235));
+        detailTable.setSelectionBackground(new Color(239, 246, 255));
+        detailTable.setIntercellSpacing(new Dimension(0, 1));
+
+        JTableHeader dHeader = detailTable.getTableHeader();
+        dHeader.setBackground(new Color(248, 249, 250));
+        dHeader.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        dHeader.setPreferredSize(new Dimension(0, 36));
+
+        DefaultTableCellRenderer center = new DefaultTableCellRenderer();
+        center.setHorizontalAlignment(SwingConstants.CENTER);
+        TableColumnModel dcm = detailTable.getColumnModel();
+        dcm.getColumn(0).setPreferredWidth(70);  dcm.getColumn(0).setCellRenderer(center);
+        dcm.getColumn(1).setPreferredWidth(280);
+        dcm.getColumn(2).setPreferredWidth(90);  dcm.getColumn(2).setCellRenderer(center);
+        dcm.getColumn(3).setPreferredWidth(70);  dcm.getColumn(3).setCellRenderer(center);
+
+        JScrollPane scroll = new JScrollPane(detailTable);
+        scroll.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+        scroll.getViewport().setBackground(Color.WHITE);
+        dialog.add(scroll, BorderLayout.CENTER);
+
+        // Footer
+        JPanel footer = new JPanel();
+        footer.setBackground(Color.WHITE);
+        footer.setBorder(new EmptyBorder(10, 0, 10, 0));
+        JButton btnClose = new JButton("Hủy");
+        btnClose.setBackground(new Color(220, 53, 69));
+        btnClose.setForeground(Color.WHITE);
+        btnClose.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnClose.setPreferredSize(new Dimension(100, 36));
+        btnClose.setFocusPainted(false);
+        btnClose.addActionListener(ev -> dialog.dispose());
+
+        JButton btnSave = new JButton("Lưu");
+        btnSave.setBackground(new Color(25, 135, 84));
+        btnSave.setForeground(Color.WHITE);
+        btnSave.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnSave.setPreferredSize(new Dimension(100, 36));
+        btnSave.setFocusPainted(false);
+        btnSave.addActionListener(ev -> {
+            for (int i = 0; i < model.getRowCount(); i++) {
+                int permId = (int) model.getValueAt(i, 0);
+                int newVal = (int) model.getValueAt(i, 3);
+                PermBLL.updatePerm(permId, newVal);
+            }
+
+        });
+
+        footer.add(btnSave);
+        footer.add(btnClose);
+        dialog.add(footer, BorderLayout.SOUTH);
+
+        dialog.setVisible(true);
+    }
+
+
+    
     /** Opens a detail dialog showing all permissions for the selected role */
     private void showPermDetail(int roleId, String roleName) {
         JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -337,7 +441,7 @@ public class Perm extends JPanel implements ActionListener {
         dialog.add(header, BorderLayout.NORTH);
 
         // Table: Mã quyền | Tên chức năng | Quyền (rwx) | Giá trị
-        String[] cols = {"Mã quyền", "Tên chức năng", "Quyền (rwx)", "Giá trị"};
+        String[] cols = {"Mã quyền", "Tên chức năng", "Quyền", "Giá trị"};
         DefaultTableModel model = new DefaultTableModel(null, cols) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
@@ -345,7 +449,7 @@ public class Perm extends JPanel implements ActionListener {
         List<Object[]> perms = PERMS.getOrDefault(roleId, new ArrayList<>());
         for (Object[] p : perms) {
             int val = (int) p[2];
-            model.addRow(new Object[]{p[0], p[1], toRwx(val), val});
+            model.addRow(new Object[]{p[0], p[1], "xd", val});
         }
         if (perms.isEmpty()) {
             model.addRow(new Object[]{"—", "(Không có quyền nào)", "---", 0});
@@ -394,4 +498,96 @@ public class Perm extends JPanel implements ActionListener {
 
         dialog.setVisible(true);
     }
+
+    public void disablePermission(int permId) {
+        JOptionPane.showMessageDialog(this, "Tính năng vô hiệu hóa quyền " + permId + " chưa triển khai.");
+    }
+
+    class ButtonRenderer extends DefaultTableCellRenderer {
+        private JButton button;
+
+        public ButtonRenderer() {
+            button = new JButton("Vô hiệu hóa");
+            button.setOpaque(true);
+            button.setBackground(new Color(220, 53, 69));
+            button.setForeground(Color.WHITE);
+            button.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            button.setFocusPainted(false);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            if (isSelected) {
+                button.setBackground(table.getSelectionBackground());
+            } else {
+                button.setBackground(new Color(220, 53, 69));
+            }
+            return button;
+        }
+    }
+
+    // class ButtonEditor extends DefaultCellEditor {
+    //     private JButton button;
+    //     private String label;
+    //     private boolean isPushed;
+    //     private JTable table;
+    //     private int row, column;
+    //     private Perm parentPanel;
+
+    //     public ButtonEditor(JCheckBox checkBox, Perm parentPanel) {
+    //         super(checkBox);
+    //         this.parentPanel = parentPanel;
+    //         button = new JButton();
+    //         button.setOpaque(true);
+    //         button.addActionListener(new ActionListener() {
+    //             @Override
+    //             public void actionPerformed(ActionEvent e) {
+    //                 fireEditingStopped();
+    //             }
+    //         });
+    //         button.setBackground(new Color(220, 53, 69));
+    //         button.setForeground(Color.WHITE);
+    //         button.setFont(new Font("Segoe UI", Font.BOLD, 12));
+    //         button.setFocusPainted(false);
+    //     }
+
+    //     @Override
+    //     public Component getTableCellEditorComponent(JTable table, Object value,
+    //             boolean isSelected, int row, int column) {
+    //         this.table = table;
+    //         this.row = row;
+    //         this.column = column;
+    //         if (isSelected) {
+    //             button.setBackground(table.getSelectionBackground());
+    //         } else {
+    //             button.setBackground(new Color(220, 53, 69));
+    //         }
+    //         label = (value == null) ? "Vô hiệu hóa" : value.toString();
+    //         button.setText(label);
+    //         isPushed = true;
+    //         return button;
+    //     }
+
+    //     @Override
+    //     public Object getCellEditorValue() {
+    //         if (isPushed) {
+    //             int permId = (int) table.getModel().getValueAt(row, 0);
+    //             parentPanel.disablePermission(permId);
+    //         }
+    //         isPushed = false;
+    //         return label;
+    //     }
+
+    //     @Override
+    //     public boolean stopCellEditing() {
+    //         isPushed = false;
+    //         return super.stopCellEditing();
+    //     }
+
+    //     @Override
+    //     protected void fireEditingStopped() {
+    //         super.fireEditingStopped();
+    //     }
+    // }
 }
