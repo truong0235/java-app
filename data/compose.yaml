@@ -1,0 +1,21 @@
+﻿
+services:
+  khosach_mysqldb:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: KhoSach
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - khosach_mysqldb:/var/lib/mysql
+      - ./kho.sql:/docker-entrypoint-initdb.d/01-demo_project.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  khosach_mysqldb:

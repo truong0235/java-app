@@ -3,8 +3,10 @@
 
 # Ignore Gradle build output directory
 build
-
+.classpath
+*.project
 
 # fuck vscode
 bin
 .fake
+*.settings/
